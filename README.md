@@ -1,107 +1,85 @@
 # SARD — Sistema Agéntico de Respuesta y Resiliencia ante Desastres
 
-Hackathon SARD, UNAL Manizales.
+Hackathon SARD, UNAL Manizales, 2026. Escenario: sismo de 7,4 y apagón general en la región andina
+(bases en `docs/referencias/HackathonExpoASI2026.pdf`).
 
-Los reportes de emergencia viajan de celular en celular por una malla Bluetooth (fork del port
-Android de bitchat) hasta un celular **pasarela** con internet, que los sube a una **central de
-riesgo**. Allí, agentes clasifican, deduplican y priorizan, y un **coordinador humano** los ve en
-un tablero y aprueba las acciones.
+Un reporte de emergencia hecho **sin internet** viaja de celular en celular por una malla Bluetooth
+hasta un celular **pasarela** que lo sube a una **central de riesgo**. Allí, agentes lo validan,
+priorizan y agrupan con otros del mismo suceso, y un **coordinador humano** lo ve en un tablero con
+su evidencia e incertidumbre y aprueba la acción. Si la central principal se cae, la pasarela pasa a
+la central B, que ya tiene todo sincronizado.
 
-> Principio: **reglas en el borde, Jev en el centro, humanos al final.**
-> Jev (TypeSafe AI) solo corre en la central. Si Jev falla, el triaje sigue con reglas.
+> **Reglas en el borde, Jev en el centro, humanos al final.** El celular prioriza con reglas; Jev
+> (TypeSafe AI) solo corre en la central y nunca baja una prioridad; ninguna acción se ejecuta sin
+> aprobación humana.
 
-Plataforma: **solo Android** por ahora.
+## La demo en tres comandos
 
-Bases de la hackathon: `docs/referencias/HackathonExpoASI2026.pdf` (retos, arquitectura de
-referencia y los 7 entregables oficiales, resumidos en `docs/entregables.md`). Donde las bases
-hablen de otra plataforma o de un plan por días, manda lo que dice este repo.
+Requisitos: Python 3.12+ con [uv](https://docs.astral.sh/uv/) y Node 20+. Puertos libres: 8001,
+8002, 8090 y 5173.
 
-## Organización
+```bash
+git clone https://github.com/aphelions-dev/sard-expoasi.git && cd sard-expoasi
+(cd tablero && npm install && npm run dev)                          # terminal 1: tablero → http://localhost:5173
+cd simulador && uv sync && PYTHONUTF8=1 uv run python -m simulador recorrido   # terminal 2: el recorrido
+```
+
+El recorrido levanta las centrales A y B, abre el visor de la malla (`http://localhost:8090`) y avanza
+por los 8 pasos de la condición de integración (Enter o «Siguiente paso»): reporte, almacenamiento,
+transmisión, agentes, priorización, aprobación en el tablero, **caída de la central A en plena carga**
+y recuperación. Sin `JEV_API_KEY` el triaje corre solo con reglas; con ella, copiar `.env.example` a
+`.env` y agregar `--env-file ../.env`. Guion y plan B de cada paso: `docs/pitch/guion-demo.md`.
+
+## Entregables
+
+| # | Entregable | Dónde | Estado |
+|---|------------|-------|--------|
+| 1 | Prototipo funcional | `central/`, `tablero/`, `simulador/`, `app/` | Central, agentes, tablero y malla simulada funcionando de punta a punta. La app Android (fork de bitchat) está en curso. |
+| 2 | Código fuente | Este repo; cómo instalar y correr cada parte en `central/README.md`, `tablero/README.md` y `simulador/README.md` | Listo |
+| 3 | Documento de arquitectura | `docs/arquitectura.md`, decisiones en `docs/decisiones/` | Listo |
+| 4 | Fichas de agentes | `docs/fichas-agentes/` | Listo; la de comunicación (app) tiene campos por definir |
+| 5 | Protocolo de comunicación | `contracts/protocolo-sard1.md`, `contracts/api-central.md`, ejemplos en `contracts/ejemplos/` | Listo; por definir con la app: largo máximo del texto, vencimiento y tiempos de reintento |
+| 6 | Resultados de pruebas | `pruebas/resultados/README.md` | E1–E5 y E7 con métricas, estrés, errores observados y limitaciones. E6 (triaje con Jev) pendiente de la clave |
+| 7 | Pitch y demostración | `docs/pitch/` | Presentación v1 (el PDF se agrega al aprobarla) y recorrido de 8 pasos ensayado con una condición adversa. Video de respaldo pendiente |
+
+## Resultados clave
+
+- **0 reportes perdidos** al apagar la central A completa en plena carga (60 de 60); la pasarela pasó
+  a la B.
+- **Un P1 llega 4 veces más rápido** con la cola llena gracias a la prioridad (6,3 s contra 25,4 s), sin
+  descartar P3/P4.
+- **99,8 % de entrega** aunque se pierda la mitad de los mensajes en cada salto.
+- **Un reporte por id** en la central aunque llegue por 3 pasarelas.
+- **Sin Jev, el triaje sigue**: prioriza 100 reportes en 4,2 s y nunca baja la prioridad del celular.
+
+Detalle, hallazgos y cómo repetir cada prueba: `pruebas/resultados/README.md`.
+
+## Qué hay en el repo
 
 | Carpeta | Qué es | Dueño |
 |---------|--------|-------|
-| `contracts/` | Protocolo SARD1 y API de la central. Único punto de unión. | Los tres |
+| `contracts/` | Protocolo SARD1, API de la central y palabras críticas. Único punto de unión. | Los tres |
 | `app/` | App Android (fork de bitchat): formulario, malla, pasarela | Persona 1 |
-| `central/` | API, registro de eventos, agentes, central B | Persona 2 |
-| `tablero/` | Tablero del coordinador | Persona 3 |
-| `simulador/` | Simulador de la malla en Python | Persona 3 |
-| `datos/sinteticos/` | Reportes sintéticos etiquetados | Persona 3 |
+| `central/` | API, registro de eventos solo-agregar, agentes, central B | Persona 2 |
+| `tablero/` | Tablero del coordinador (React) con mapa por barrio | Persona 3 |
+| `simulador/` | Simulador de la malla, pruebas E1–E7 y recorrido de la demo | Persona 3 |
+| `datos/sinteticos/` | 100 reportes sintéticos etiquetados a mano | Persona 3 |
 | `pruebas/` | Escenarios y resultados | Persona 3 |
-| `docs/` | Arquitectura, plan, ADRs, fichas de agentes, pitch | Los tres |
+| `docs/` | Arquitectura, decisiones, fichas de agentes, uso responsable de IA, pitch | Los tres |
 
-Integrantes: Persona 1 = **@samcastroca**, Persona 2 = **@lufigir**, Persona 3 = **@CrArenas**
-(ver `.github/CODEOWNERS`).
+Uso responsable de la IA: `docs/uso-responsable-ia.md`. Riesgos y planes B: `docs/riesgos.md`.
 
-## Cómo empezar
+## Limitaciones conocidas
 
-1. Leer este README, `CLAUDE.md` y `contracts/protocolo-sard1.md`.
-2. Clonar, cambiarse a tu rama y abrir Claude Code en tu carpeta (comandos abajo).
-3. Leer el README de tu carpeta y tus issues del hito actual (`docs/plan.md`).
+- La malla se muestra con el simulador mientras la app Android no esté lista; el simulador modela
+  alcance, pérdida y batería, pero no reemplaza la prueba con celulares.
+- Las reglas de triaje tienen falsos positivos y variantes que no detectan (#43); sin Jev, 13 de 30
+  casos críticos sin palabra crítica dependen del coordinador.
+- Si la central A cae justo después de confirmar un reporte, la B lo recibe cuando la A vuelve (#49).
+- Todos los datos son sintéticos.
 
-**Persona 1 — @samcastroca (app y malla)**
+## Equipo
 
-```bash
-git clone --recurse-submodules https://github.com/aphelions-dev/sard-expoasi.git
-cd sard-expoasi
-git switch p1/app-malla
-cd app && claude
-```
-
-**Persona 2 — @lufigir (central y agentes)**
-
-```bash
-git clone --recurse-submodules https://github.com/aphelions-dev/sard-expoasi.git
-cd sard-expoasi
-git switch p2/central-agentes
-cd central && claude
-```
-
-**Persona 3 — @CrArenas (tablero, simulador y pruebas)**
-
-```bash
-git clone --recurse-submodules https://github.com/aphelions-dev/sard-expoasi.git
-cd sard-expoasi
-git switch p3/tablero-pruebas
-cd tablero && claude      # o: cd simulador && claude
-```
-
-Si ya tenías el repo clonado: `git fetch && git switch <tu-rama>`. Cuando se agregue el submódulo
-de bitchat (`app/bitchat-android`), correr una vez `git submodule update --init`.
-
-Antes de abrir cada PR, traer lo último de `dev` a tu rama:
-
-```bash
-git fetch && git merge origin/dev
-```
-
-## Cómo trabajamos
-
-### Ramas
-
-| Rama | Uso |
-|------|-----|
-| `main` | Solo versiones estables para la demo. Protegida. |
-| `dev` | Integración. Protegida. |
-| `p1/app-malla`, `p2/central-agentes`, `p3/tablero-pruebas` | Trabajo de cada persona, desde `dev`. |
-| `contrato/<descripcion>` | Cualquier cambio a `contracts/`. Revisan los tres. |
-
-### Integración
-
-- Al terminar una tarea, PR de tu rama a `dev`. PRs chicos y frecuentes; no acumular.
-- Antes de abrir el PR: `git fetch && git merge origin/dev` en tu rama.
-- Al cumplirse un hito: PR `dev → main` y tag `hito-1` … `hito-5`.
-- Cambios al contrato: nunca dentro de un PR de tu área; rama `contrato/...` aparte.
-
-### Commits
-
-En español, con prefijo: `feat`, `fix`, `docs`, `test`, `chore`, `contrato`.
-
-```
-feat: cola de reenvío por prioridad
-contrato: definir escape de | en el texto
-```
-
-### Issues
-
-Un issue por tarea de `docs/plan.md`, con milestone (`Hito N`), etiqueta de área y asignado a su
-dueño. `bloqueante` marca lo que frena a otra persona.
+Persona 1 **@samcastroca** (app y malla) · Persona 2 **@lufigir** (central y agentes) · Persona 3
+**@CrArenas** (tablero, simulador y pruebas). Cómo trabajamos (ramas, commits, issues):
+`docs/equipo.md`.

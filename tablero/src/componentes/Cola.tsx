@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { MapPin, MapPinOff, Users } from "lucide-react";
+import { Clock, MapPin, MapPinOff, Users } from "lucide-react";
 import type { Incidente } from "../api/tipos";
 import type { Barrio } from "../geo/geo";
 import { FILTROS, conteos, filtrar, type Filtro } from "../cola";
@@ -67,6 +67,15 @@ export function Cola({ incidentes, filtro, onFiltro, seleccion, onSeleccion, aho
                   <span className="fila-hora mono">{haceCuanto(inc.hora_unix, ahora)}</span>
                 </div>
                 <p className="fila-texto">{inc.evidencia[0]?.texto || <em>Sin texto</em>}</p>
+                <p className="fila-motivo" title="Por qué está en este lugar de la cola">
+                  {inc.motivo_orden}
+                </p>
+                {inc.vigencia.sin_noticias_recientes && (
+                  <p className="fila-vigencia">
+                    <Clock size={13} aria-hidden="true" />
+                    Sin noticias hace {inc.vigencia.minutos_sin_noticias} min
+                  </p>
+                )}
                 <div className="fila-abajo">
                   <span className="dato">
                     <Users size={13} aria-hidden="true" />

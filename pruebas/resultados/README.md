@@ -40,6 +40,42 @@ PYTHONUTF8=1 uv run python -m simulador escenarios-central --env-file ../.env   
    (`E7/resumen-central.md`, lista completa); con la prioridad que pone el celular no se pierde
    ninguno, porque la central nunca baja una prioridad.
 
+## Pruebas de estrés
+
+| Prueba | Carga | Resultado |
+|--------|-------|-----------|
+| E3, cola llena | 200 reportes en 60 s, 1 mensaje/s por celular, 10 semillas | Entrega 98,4 % (peor 95 %); mediana P1 6,3 s, P4 77 s; ningún reporte descartado por la cola, los perdidos se fueron con celulares sin batería (7,2 de 30) |
+| E1, pérdida extrema | 50 % de pérdida por salto | Entrega 99,8 %; el p95 de P1 en el peor caso sube a 63 s |
+| E5, caída en carga | 60 reportes en 300 s con la central A apagada en el segundo 120 | 60/60 entregados, 0 perdidos |
+| Recorrido de la demo | Ráfaga de 20 reportes y la central A apagada en plena carga (`python -m simulador recorrido`) | 23/23 entregados y confirmados en dos ensayos; A y B coinciden al volver la A |
+| E7, triaje en lote | 200 reportes de una vez sin Jev | Priorizados en 4,2 s cada lote de 100 |
+
+## Errores observados
+
+Lo que las pruebas encontraron en el sistema, con su issue:
+
+| Error | Dónde | Issue |
+|-------|-------|-------|
+| «gas» se busca como fragmento: «¿lle**gas**te bien?» sale P1 | Reglas de triaje y palabras críticas | #43 |
+| Las reglas no entienden negaciones («no hay carros atrapados» sale P1) ni variantes («sangrar mucho», «atrapda», «aplastada», «ahogando») | Reglas de triaje | #43 |
+| La central da `SACK` antes de que la otra central copie el reporte: 1 o 2 reportes quedan solo en la A si cae en ese segundo | Central, sincronización | #49 |
+| Un celular sin camino a la pasarela reintenta para siempre y se apaga por batería | Cola de la app (tiempos por definir) | #50 |
+| Sin Jev, la correlación junta reportes distintos con el mismo geohash y tipo (un ascensor y un colegio) | Correlación | Anotado en #44 |
+| Los geohash de los ejemplos del contrato caen en Cali | Contrato | #46 |
+| `evidencia[].rutas` llega como número; el contrato lo describe como la lista de pasarelas | API de la central | Anotado en #44 |
+
+Errores de las propias herramientas de prueba, ya corregidos: la paginación de `GET /eventos` en el
+script de E5 (daba 42 reportes "faltantes" que no lo estaban) y la conexión de la malla en la primera
+corrida base (área demasiado grande, la pasarela aislada).
+
+## Pruebas automáticas
+
+| Parte | Comando | Pruebas |
+|-------|---------|---------|
+| Simulador | `cd simulador && uv run pytest` | 22 |
+| Tablero | `cd tablero && npm test` | 17 |
+| Central (P2) | `cd central && uv run pytest` | 52 |
+
 ## Limitaciones
 
 - El simulador es un modelo: alcance fijo, pérdida independiente por mensaje, celulares quietos y un

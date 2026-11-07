@@ -69,6 +69,10 @@ def reportes(entrada: EntradaReportes, conn: Conexion) -> SalidaReportes:
 
 @app.get("/salud")
 def salud(conn: Conexion) -> Salud:
-    conn.execute("SELECT 1")  # la base responde
-    # Provisional hasta el agente de triaje (#11): solo dice si hay clave configurada.
-    return Salud(estado="ok", central=CONFIG.nodo, jev="ok" if CONFIG.jev_api_key else "caido")
+    # Estado de Jev según el último reporte que el triaje le pudo mandar.
+    fila = conn.execute(
+        "SELECT json_extract(datos, '$.jev') FROM eventos WHERE tipo = 'reporte_priorizado'"
+        " AND json_extract(datos, '$.jev') IN ('ok', 'caido') ORDER BY seq DESC LIMIT 1"
+    ).fetchone()
+    jev = fila[0] if fila else ("ok" if CONFIG.jev_api_key else "caido")
+    return Salud(estado="ok", central=CONFIG.nodo, jev=jev)

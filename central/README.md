@@ -12,8 +12,14 @@ Desde `central/`, con el `.env` de la raíz (copia de `.env.example` con `JEV_AP
 uv sync
 uv run --env-file ../.env uvicorn api.main:app --port 8001                 # central A
 SARD_NODO=B uv run --env-file ../.env uvicorn api.main:app --port 8002     # central B
+uv run --env-file ../.env python -m agentes.triaje                         # agente de triaje
 uv run pytest                                                              # pruebas
 ```
+
+Cada agente es un proceso aparte (patrón pizarra): lee del registro de eventos lo que le falta
+procesar y escribe su resultado como evento nuevo. Si uno cae, los demás siguen, y al volver
+retoma lo pendiente. Se pueden correr dos copias de un mismo agente sin duplicar resultados.
+El ejecutor común está en `agentes/ejecutor.py`.
 
 | Variable | Por defecto | Qué es |
 |----------|-------------|--------|
@@ -44,7 +50,8 @@ dos veces el mismo reporte.
 | `reporte_recibido` | Recepción | Llega un SARD1 válido con id nuevo |
 | `reporte_duplicado` | Recepción | Llega otra vez un id ya registrado (guarda la pasarela, para contar rutas) |
 | `reporte_rechazado` | Recepción | El mensaje no cumple el protocolo (guarda los motivos) |
-| `reporte_priorizado` | Triaje | Por implementar (#11) |
+| `reporte_priorizado` | Triaje | Prioridad final, la de reglas y la de Jev, evidencia, fuente (directa, de oídas) y motivos de revisión |
+| `agente_error` | Cualquier agente | Un agente falló con un evento; se reintenta |
 | `incidente_actualizado` | Correlación | Por implementar (#12) |
 
 ## Decisiones provisionales del contrato
@@ -54,8 +61,8 @@ Mientras `contracts/protocolo-sard1.md` las tenga «por definir», la central ha
 - **`|` dentro del texto:** todo lo que sigue al campo 7 es texto, aunque tenga `|`.
 - **Longitud del texto:** no se recorta en la central; el límite lo pone la malla.
 - **Mensaje mal formado:** se rechaza sin `SACK` y queda como `reporte_rechazado`.
-- **`jev` en `/salud`:** por ahora solo indica si hay clave configurada; refleja el estado real
-  cuando exista el agente de triaje.
+- **`jev` en `/salud`:** el estado del último reporte que el triaje le mandó a Jev; si todavía no
+  hay ninguno, si hay clave configurada.
 
 ## Alcance
 

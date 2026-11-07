@@ -29,7 +29,12 @@ CREATE TABLE IF NOT EXISTS eventos (
 CREATE UNIQUE INDEX IF NOT EXISTS un_reporte_recibido
     ON eventos (reporte_id) WHERE tipo = 'reporte_recibido';
 
+-- Un agente responde una sola vez a cada evento, aunque corran varias copias de él.
+CREATE UNIQUE INDEX IF NOT EXISTS un_respuesta
+    ON eventos (tipo, causa) WHERE causa IS NOT NULL;
+
 CREATE INDEX IF NOT EXISTS ix_eventos_tipo ON eventos (tipo, seq);
+CREATE INDEX IF NOT EXISTS ix_eventos_causa ON eventos (causa);
 CREATE INDEX IF NOT EXISTS ix_eventos_reporte ON eventos (reporte_id);
 
 CREATE TRIGGER IF NOT EXISTS eventos_sin_update BEFORE UPDATE ON eventos
@@ -100,6 +105,29 @@ def leer(
         sql += f" AND tipo IN ({','.join('?' * len(tipos))})"
         params += tipos
     return [_a_evento(f) for f in conn.execute(sql + " ORDER BY seq", params)]
+
+
+def pendientes(
+    conn: sqlite3.Connection, *, consume: str, produce: str, limite: int = 50
+) -> list[Evento]:
+    """Eventos `consume` que aún no tienen un evento `produce` que los cite como causa.
+
+    Los P1 salen primero; dentro de cada prioridad, en orden de llegada.
+    """
+    filas = conn.execute(
+        "SELECT e.* FROM eventos e WHERE e.tipo = ? AND NOT EXISTS"
+        " (SELECT 1 FROM eventos r WHERE r.tipo = ? AND r.causa = e.id)"
+        " ORDER BY coalesce(json_extract(e.datos, '$.prioridad'), 'P9'), e.seq LIMIT ?",
+        (consume, produce, limite),
+    )
+    return [_a_evento(f) for f in filas]
+
+
+def ultimo(conn: sqlite3.Connection, tipo: str) -> Evento | None:
+    fila = conn.execute(
+        "SELECT * FROM eventos WHERE tipo = ? ORDER BY seq DESC LIMIT 1", (tipo,)
+    ).fetchone()
+    return _a_evento(fila) if fila else None
 
 
 def _a_evento(fila: sqlite3.Row) -> Evento:

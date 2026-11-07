@@ -14,6 +14,8 @@ PYTHONUTF8=1 uv run python -m simulador correr --semilla 1                 # mal
 PYTHONUTF8=1 uv run python -m simulador correr --perdida 0.3 --pasarelas 2 # cualquier parámetro
 PYTHONUTF8=1 uv run python -m simulador correr --central --velocidad 10    # API real, failover A → B
 PYTHONUTF8=1 uv run python -m simulador correr --desde ../pruebas/resultados/<corrida>/parametros.json
+PYTHONUTF8=1 uv run python -m simulador escenarios                         # E1–E4 de pruebas/escenarios.md
+PYTHONUTF8=1 uv run python -m simulador escenarios-central                 # E4 central, E5, E6/E7 (levanta A y B)
 PYTHONUTF8=1 uv run pytest                                                 # pruebas
 ```
 
@@ -73,7 +75,8 @@ App Android y central (solo las consume).
 
 - **Hito 1:** simulador básico (#3) y generador de reportes sintéticos (#4). Hecho.
 - **Hito 3:** 100 reportes etiquetados a mano (#13). Hecho.
-- **Hito 4:** pruebas de `pruebas/escenarios.md` con métricas (#16).
+- **Hito 4:** pruebas de `pruebas/escenarios.md` con métricas (#16). Hecho salvo E6 con Jev;
+  resultados en `pruebas/resultados/README.md`.
 
 ## Terminado
 

@@ -35,6 +35,12 @@ def main() -> None:
     g.add_argument("--n", type=int, default=10)
     g.add_argument("--semilla", type=int, default=1)
 
+    e = sub.add_parser("escenarios", help="E1–E4 de pruebas/escenarios.md con el simulador")
+    e.add_argument("claves", nargs="*", default=["E1", "E2", "E3", "E4"])
+
+    ec = sub.add_parser("escenarios-central", help="E4, E5 y E6/E7 contra centrales reales que levanta y apaga")
+    ec.add_argument("--env-file", help="archivo .env con JEV_API_KEY para correr E6 con Jev")
+
     c = sub.add_parser("correr", help="corre la malla y guarda resultados en pruebas/resultados/")
     for f in fields(Parametros):
         ayuda = "desde,hasta en segundos" if f.name == "caida" else None
@@ -43,6 +49,16 @@ def main() -> None:
     c.add_argument("--central", action="store_true", help="entregar a la API real (CENTRAL_A_URL, CENTRAL_B_URL)")
     c.add_argument("--nombre", help="carpeta de resultados (por defecto, sale de los parámetros)")
     a = ap.parse_args()
+
+    if a.cmd == "escenarios":
+        from .escenarios import correr as correr_escenarios
+        correr_escenarios(a.claves)
+        return
+
+    if a.cmd == "escenarios-central":
+        from .escenarios_central import correr as correr_central
+        correr_central(a.env_file)
+        return
 
     if a.cmd == "generar":
         gen = Generador(random.Random(a.semilla))

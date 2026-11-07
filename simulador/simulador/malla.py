@@ -41,6 +41,7 @@ class Parametros:
     caida: tuple[int, int] | None = None  # (desde, hasta) s: la central no responde
     velocidad: float = 0.0         # 0 = lo más rápido posible; 1 = tiempo real
     prefijo: str = "n"             # prefijo de los dispositivos en los ids
+    por_prioridad: bool = True     # False = en orden de llegada, solo para comparar en E3
 
 
 @dataclass
@@ -81,8 +82,9 @@ class Seguimiento:
 
 
 class Simulacion:
-    def __init__(self, p: Parametros, central=None, filas: list[dict] | None = None):
+    def __init__(self, p: Parametros, central=None, filas: list[dict] | None = None, al_paso=None):
         self.p = p
+        self.al_paso = al_paso  # función(t) al empezar cada paso: p. ej. apagar la central A en E5
         self.rng = random.Random(p.semilla)
         self.central = central or CentralSimulada()
         self.gen = Generador(self.rng, filas, p.sin_gps)
@@ -134,6 +136,8 @@ class Simulacion:
         """Por prioridad y luego por hora; nunca se descarta un P3/P4, solo espera su turno."""
         listos = [c for c in n.cola.values()
                   if c.reporte.id not in n.confirmados and not c.vencido and c.proximo <= self.t]
+        if not self.p.por_prioridad:
+            return sorted(listos, key=lambda c: c.reporte.hora_unix)
         return sorted(listos, key=lambda c: (c.reporte.prioridad, c.reporte.hora_unix))
 
     def _paso_nodo(self, n: Nodo) -> None:
@@ -216,6 +220,8 @@ class Simulacion:
         for self.t in range(self.p.duracion_s + 1):
             if self.p.caida:
                 self.central.caida = self.p.caida[0] <= self.t < self.p.caida[1]
+            if self.al_paso:
+                self.al_paso(self.t)
             self._crear_reportes()
             orden = [n for n in self.nodos if n.vivo]
             self.rng.shuffle(orden)

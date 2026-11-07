@@ -53,3 +53,10 @@ def test_vencido_se_marca_y_no_se_borra():
     assert vencidos
     for s in vencidos:
         assert s.id in next(n for n in sim.nodos if n.id == s.nodo).cola
+
+
+def test_en_orden_de_llegada_la_prioridad_no_se_nota():
+    kw = dict(semilla=1, reportes=200, ventana_s=60, capacidad=1, bateria_min=50, bateria_max=60)
+    con = correr(**kw)["latencia_por_prioridad"]
+    sin = correr(**kw, por_prioridad=False)["latencia_por_prioridad"]
+    assert con["P1"]["p50_s"] < sin["P1"]["p50_s"]

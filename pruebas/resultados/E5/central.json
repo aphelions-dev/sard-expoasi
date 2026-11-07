@@ -1,0 +1,75 @@
+{
+ "parametros": {
+  "semilla": 5,
+  "nodos": 30,
+  "pasarelas": 1,
+  "lado_m": 150.0,
+  "alcance_m": 50.0,
+  "perdida": 0.1,
+  "reportes": 60,
+  "ventana_s": 300,
+  "duracion_s": 1200,
+  "capacidad": 4,
+  "bateria_min": 5.0,
+  "bateria_max": 20.0,
+  "gasto_reposo": 0.002,
+  "gasto_envio": 0.02,
+  "espera_base_s": 2.0,
+  "espera_tope_s": 60.0,
+  "variacion": 0.2,
+  "vence_s": null,
+  "sin_gps": 0.1,
+  "hora_base": 1794089349,
+  "caida": null,
+  "velocidad": 0.0,
+  "prefijo": "e59349n",
+  "por_prioridad": true
+ },
+ "apagada_A_en_s": 120,
+ "creados": 60,
+ "creados_antes_del_apagon": 25,
+ "entregados": 60,
+ "tasa_entrega": 1.0,
+ "confirmados_reportante": 60,
+ "subidas_por_central": {
+  "A": 25,
+  "B": 31
+ },
+ "subidas_fallidas": 0,
+ "con_sack_pero_ausentes_en_B_con_A_caida": [
+  "e59349n12-2"
+ ],
+ "con_sack_pero_ausentes_en_B_tras_volver_A": [],
+ "perdidos": 0,
+ "latencia_por_prioridad": {
+  "P1": {
+   "creados": 16,
+   "entregados": 16,
+   "p50_s": 2,
+   "p95_s": 5,
+   "max_s": 5
+  },
+  "P2": {
+   "creados": 22,
+   "entregados": 22,
+   "p50_s": 4,
+   "p95_s": 5,
+   "max_s": 6
+  },
+  "P3": {
+   "creados": 8,
+   "entregados": 8,
+   "p50_s": 2,
+   "p95_s": 4,
+   "max_s": 4
+  },
+  "P4": {
+   "creados": 14,
+   "entregados": 14,
+   "p50_s": 2,
+   "p95_s": 5,
+   "max_s": 5
+  }
+ },
+ "cumple": true
+}

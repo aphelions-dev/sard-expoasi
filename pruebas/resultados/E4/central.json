@@ -1,0 +1,12 @@
+{
+ "reportes_distintos": 20,
+ "envios": 70,
+ "sack_recibidos": 70,
+ "reporte_recibido_por_id_en_A": [
+  1
+ ],
+ "reporte_recibido_por_id_en_B": [
+  1
+ ],
+ "cumple": true
+}

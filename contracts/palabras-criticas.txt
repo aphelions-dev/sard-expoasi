@@ -1,0 +1,26 @@
+# Palabras críticas (ADR 0005). Las usan la app (prioridad en el celular) y la central (triaje).
+# Si el texto de un reporte contiene alguna, la prioridad es P1 y ningún modelo la puede bajar.
+#
+# Cómo se comparan: el texto se pasa a minúsculas y sin tildes, y cada línea se busca como
+# fragmento (así "atrapad" cubre atrapado, atrapada y atrapados). Una línea por entrada;
+# las que empiezan por # son comentarios.
+
+atrapad
+no puedo salir
+no podemos salir
+no pueden salir
+sepultad
+bajo escombros
+no respira
+no puede respirar
+inconscien
+no responde
+desmay
+convulsi
+hemorragi
+sangra mucho
+incendi
+fuego
+llamas
+explosi
+gas

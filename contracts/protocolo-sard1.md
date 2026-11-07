@@ -43,6 +43,12 @@ pasarela y la malla hasta el reportante.
 4. Ordenar por `hora_unix` del campo, no por la hora de llegada.
 5. Un reporte vencido queda marcado como "no entregado"; nunca se borra.
 
+## Palabras críticas
+
+La lista vive en `contracts/palabras-criticas.txt`, con la regla de comparación al inicio del
+archivo. La app y la central leen ese mismo archivo: un reporte que contenga una de ellas es P1
+y ningún modelo baja esa prioridad (ADR 0005).
+
 ## Por definir
 
 - Escape del carácter `|` dentro de `texto`.

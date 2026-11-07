@@ -13,7 +13,7 @@ SACK|<id>
 Ejemplo:
 
 ```
-SARD1|a3f9-0042|P1|ATRAP|3|101|d29e4k|1762481000|edificio colapsado calle 23
+SARD1|a3f9-0042|P1|ATRAP|3|101|d2fkcd|1762481000|edificio colapsado calle 23
 ```
 
 ## Campos del reporte

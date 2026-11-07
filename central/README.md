@@ -54,6 +54,7 @@ Para dos computadores, poner en el `.env` de cada uno las URLs reales de las dos
 | `iniciar.py` | Levanta una central completa |
 | `datos/` | Base local y registro de eventos (los `.sqlite` no se suben) |
 | `tests/` | Pruebas; las de protocolo y API usan `contracts/ejemplos/` |
+| `sesgo/` | Prueba de sesgo del triaje: el mismo suceso escrito de varias formas (`sesgo/README.md`) |
 
 ## Registro de eventos
 

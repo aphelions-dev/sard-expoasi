@@ -1,0 +1,15 @@
+# Texto normalizado a LF en el repo (Windows y Linux en el equipo)
+* text=auto eol=lf
+*.bat text eol=crlf
+gradlew text eol=lf
+
+# Binarios: nunca convertir saltos de línea
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jar binary
+*.apk binary
+*.aab binary
+*.keystore binary
+*.sqlite binary
+*.db binary

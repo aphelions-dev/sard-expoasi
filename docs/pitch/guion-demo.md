@@ -44,4 +44,4 @@ mismos incidentes.
 Apertura y cierre: P3. Celulares para la versión con app: por definir con P1 (mínimo 3: reportante,
 relevo y pasarela).
 
-Frase de cierre: por definir.
+Frase de cierre: «Reglas en el borde, Jev en el centro, humanos al final. Ningún reporte perdido, ninguna decisión sin una persona.»

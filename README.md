@@ -12,6 +12,10 @@ un tablero y aprueba las acciones.
 
 Plataforma: **solo Android** por ahora.
 
+Bases de la hackathon: `docs/referencias/HackathonExpoASI2026.pdf` (retos, arquitectura de
+referencia y los 7 entregables oficiales, resumidos en `docs/entregables.md`). Donde las bases
+hablen de otra plataforma o de un plan por días, manda lo que dice este repo.
+
 ## Organización
 
 | Carpeta | Qué es | Dueño |
@@ -31,9 +35,44 @@ Integrantes: Persona 1 = **@samcastroca**, Persona 2 = **@lufigir**, Persona 3 =
 ## Cómo empezar
 
 1. Leer este README, `CLAUDE.md` y `contracts/protocolo-sard1.md`.
-2. Cambiarse a tu rama: `git switch p1/app-malla` (o `p2/central-agentes`, `p3/tablero-pruebas`).
+2. Clonar, cambiarse a tu rama y abrir Claude Code en tu carpeta (comandos abajo).
 3. Leer el README de tu carpeta y tus issues del hito actual (`docs/plan.md`).
-4. Abrir Claude Code dentro de tu carpeta (`cd app && claude`).
+
+**Persona 1 — @samcastroca (app y malla)**
+
+```bash
+git clone --recurse-submodules https://github.com/aphelions-dev/sard-expoasi.git
+cd sard-expoasi
+git switch p1/app-malla
+cd app && claude
+```
+
+**Persona 2 — @lufigir (central y agentes)**
+
+```bash
+git clone --recurse-submodules https://github.com/aphelions-dev/sard-expoasi.git
+cd sard-expoasi
+git switch p2/central-agentes
+cd central && claude
+```
+
+**Persona 3 — @CrArenas (tablero, simulador y pruebas)**
+
+```bash
+git clone --recurse-submodules https://github.com/aphelions-dev/sard-expoasi.git
+cd sard-expoasi
+git switch p3/tablero-pruebas
+cd tablero && claude      # o: cd simulador && claude
+```
+
+Si ya tenías el repo clonado: `git fetch && git switch <tu-rama>`. Cuando se agregue el submódulo
+de bitchat (`app/bitchat-android`), correr una vez `git submodule update --init`.
+
+Antes de abrir cada PR, traer lo último de `dev` a tu rama:
+
+```bash
+git fetch && git merge origin/dev
+```
 
 ## Cómo trabajamos
 

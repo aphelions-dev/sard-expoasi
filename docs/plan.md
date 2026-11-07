@@ -68,6 +68,7 @@ ejecuta sin aprobación.
 | Todos | Recorrido completo de 8 pasos integrado (`docs/pitch/guion-demo.md`) |
 | P2 | Fichas de agentes finales |
 | Todos | Protocolo final revisado (`contracts/`) |
+| Todos | Documento de arquitectura final (`docs/arquitectura.md`) |
 | P3 | Resultados de pruebas documentados |
 | P3 | README final y pitch |
 | Todos | Dos ensayos de la demo |

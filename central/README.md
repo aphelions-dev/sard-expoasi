@@ -56,7 +56,7 @@ Para dos computadores, poner en el `.env` de cada uno las URLs reales de las dos
 | `tests/` | Pruebas; las de protocolo y API usan `contracts/ejemplos/` |
 | `sesgo/` | Prueba de sesgo del triaje: el mismo suceso escrito de varias formas (`sesgo/README.md`) |
 | `calibracion/` | Elige el umbral de Jev con los reportes etiquetados de #13 (`calibracion/README.md`) |
-| `demo/` | Recorrido de la demo en la parte de la central (pasos 4, 5, 7 y 8): hace de pasarela, `python -m demo.recorrido` |
+| `demo/` | Recorrido de la demo en la parte de la central (pasos 4, 5, 7 y 8): hace de pasarela, `python -m demo.recorrido`. Ensayo automático con la A caída en plena carga y Jev caído (E5 y E7): `python -m demo.adversa` |
 
 ## Registro de eventos
 

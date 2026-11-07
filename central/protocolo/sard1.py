@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 PRIORIDADES = ("P1", "P2", "P3", "P4")
 TIPOS = ("ATRAP", "MEDIC", "FUEGO", "VIA", "DESAP", "OTRO")
 N_CAMPOS = 9
+NOMBRES = ("id", "prioridad", "tipo", "personas", "banderas", "geohash", "hora_unix", "texto")
 
 RE_ID = re.compile(r"^[0-9A-Za-z]+-[0-9]+$")
 RE_BANDERAS = re.compile(r"^[01]{3}$")
@@ -49,7 +50,9 @@ def leer(mensaje: str) -> Reporte | Rechazo:
     partes = mensaje.split("|", N_CAMPOS - 1)
     id_ = partes[1] if len(partes) > 1 and RE_ID.match(partes[1]) else None
     if len(partes) < N_CAMPOS:
-        return Rechazo([f"truncado: {len(partes)} de {N_CAMPOS} campos"], id=id_)
+        # Solo los campos que llegaron con su separador: el último pudo cortarse a la mitad.
+        llegados = dict(zip(NOMBRES, partes[1:-1]))
+        return Rechazo([f"truncado: {len(partes)} de {N_CAMPOS} campos"], id=id_, campos=llegados)
 
     _, id_crudo, prioridad, tipo, personas, banderas, geohash, hora, texto = partes
     campos = dict(

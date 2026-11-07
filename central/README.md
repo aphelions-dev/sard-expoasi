@@ -75,6 +75,7 @@ dos veces el mismo reporte.
 | `decision_humana` | API (coordinador) | Aprobación o rechazo de la propuesta vigente |
 | `agente_error` | Cualquier agente | Un agente falló con un evento; se reintenta |
 | `par_caido`, `par_recuperado` | Resiliencia | La otra central dejó de responder o volvió |
+| `recurso_declarado` | API (coordinador) | Cuántas unidades hay de un recurso (`POST /recursos`); reemplaza la declaración anterior |
 
 ## Decisiones provisionales del contrato
 

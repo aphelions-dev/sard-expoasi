@@ -5,12 +5,17 @@ apenas tiene sus eventos, y una corrección es siempre un evento nuevo.
 """
 
 import sqlite3
+import time
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from typing import Any
 
 from registro import eventos
 from registro.eventos import Evento
+
+
+SIN_NOTICIAS_S = 60 * 60  # `vigencia.sin_noticias_recientes` (contracts/api-central.md)
+CONFIANZA = {"corroborado": 0, "sin_confirmar": 1, "posible_rumor": 2}
 
 
 def dispositivo(reporte_id: str) -> str:
@@ -30,6 +35,10 @@ class Incidente:
     estado: str  # sin_propuesta, pendiente, aprobada, rechazada
     accion_propuesta: dict[str, Any] | None
     decision: dict[str, Any] | None = None
+    impacto: dict[str, Any] = field(default_factory=dict)
+    vigencia: dict[str, Any] = field(default_factory=dict)
+    motivo_orden: str = ""
+    recurso: dict[str, Any] | None = None
     _fuentes: list[str] = field(default_factory=list, repr=False)
 
 
@@ -40,6 +49,9 @@ def construir(evs: list[Evento]) -> dict[str, Incidente]:
     vinculos: dict[str, dict] = {}
     propuestas: dict[str, Evento] = {}
     decisiones: dict[str, Evento] = {}
+    propuestas_por_id: dict[str, Evento] = {}
+    declaraciones: dict[tuple[str, str], Evento] = {}
+    aprobaciones: list[Evento] = []
 
     for ev in sorted(evs, key=lambda e: e.creado_en):
         d, rid = ev.datos, ev.reporte_id
@@ -54,8 +66,13 @@ def construir(evs: list[Evento]) -> dict[str, Incidente]:
             vinculos.setdefault(rid, d)  # si A y B correlacionaron, gana el primero
         elif ev.tipo == "accion_propuesta":
             propuestas[d["incidente_id"]] = ev
+            propuestas_por_id[ev.id] = ev
         elif ev.tipo == "decision_humana":
             decisiones[d["incidente_id"]] = ev
+            if d["decision"] == "aprobar":
+                aprobaciones.append(ev)
+        elif ev.tipo == "recurso_declarado":
+            declaraciones[(d["entidad"], d["recurso"])] = ev
 
     miembros: dict[str, list[str]] = defaultdict(list)
     for rid, v in vinculos.items():
@@ -67,7 +84,47 @@ def construir(evs: list[Evento]) -> dict[str, Incidente]:
         rids.sort(key=lambda r: recibidos[r]["hora_unix"])
         out[inc_id] = _incidente(inc_id, rids, recibidos, priorizados, rutas, vinculos,
                                  propuestas.get(inc_id), decisiones.get(inc_id))
+    _asignar_recursos(out, estado_recursos(declaraciones, aprobaciones, propuestas_por_id))
     return out
+
+
+def estado_recursos(declaraciones, aprobaciones, propuestas_por_id) -> dict[tuple, dict]:
+    """Unidades por recurso: lo declarado menos lo aprobado después de la última declaración."""
+    out = {}
+    for clave, dec in declaraciones.items():
+        usados = set()
+        for ap in aprobaciones:
+            prop = propuestas_por_id.get(ap.datos["accion_id"])
+            if (prop and ap.creado_en > dec.creado_en
+                    and (prop.datos["entidad"], prop.datos.get("recurso")) == clave):
+                usados.add(ap.datos["incidente_id"])  # un incidente compromete una unidad
+        n = dec.datos["disponibles"]
+        out[clave] = {"entidad": clave[0], "recurso": clave[1], "declarados": n,
+                      "comprometidos": len(usados), "disponibles": max(0, n - len(usados)),
+                      "coordinador": dec.datos["coordinador"], "declarado_en": dec.creado_en}
+    return out
+
+
+def _asignar_recursos(incs: dict[str, "Incidente"], estado: dict[tuple, dict]) -> None:
+    for inc in incs.values():
+        a = inc.accion_propuesta
+        if not a or not a.get("recurso"):
+            continue
+        clave = (a["entidad"], a["recurso"])
+        compiten = sorted(
+            o.id for o in incs.values()
+            if o.id != inc.id and o.estado == "pendiente" and o.prioridad <= inc.prioridad
+            and o.accion_propuesta
+            and (o.accion_propuesta["entidad"], o.accion_propuesta.get("recurso")) == clave)
+        inc.recurso = {"recurso": a["recurso"], "entidad": a["entidad"],
+                       "disponibles": estado[clave]["disponibles"] if clave in estado else None,
+                       "compiten": compiten}
+
+
+def clave_orden(inc: "Incidente") -> tuple:
+    """Urgencia, impacto y confianza (bases, objetivo 4); la hora desempata."""
+    return (inc.prioridad, not inc.impacto["vulnerables"], -inc.impacto["personas"],
+            CONFIANZA[inc.incertidumbre["corroboracion"]], inc.hora_unix)
 
 
 def _incidente(inc_id, rids, recibidos, priorizados, rutas, vinculos, propuesta, decision):
@@ -118,6 +175,15 @@ def _incidente(inc_id, rids, recibidos, priorizados, rutas, vinculos, propuesta,
             dec = {k: v for k, v in decision.datos.items() if k != "incidente_id"}
 
     tipos = Counter(recibidos[r]["tipo"] for r in rids)
+    personas = max(recibidos[r]["personas"] for r in rids)
+    vulnerables = any(recibidos[r]["vulnerables"] for r in rids)
+    ultimo = max(recibidos[r]["hora_unix"] for r in rids)
+    sin_noticias = max(0, int(time.time()) - ultimo)
+    motivo = [min(prioridades)]
+    if vulnerables:
+        motivo.append("niños o adultos mayores")
+    motivo += [f"{personas} persona{'s' if personas != 1 else ''}",
+               corroboracion.replace("_", " ")]
     return Incidente(
         id=inc_id,
         prioridad=min(prioridades),
@@ -141,11 +207,29 @@ def _incidente(inc_id, rids, recibidos, priorizados, rutas, vinculos, propuesta,
         estado=estado,
         accion_propuesta=accion,
         decision=dec,
+        impacto={"personas": personas, "vulnerables": vulnerables},
+        vigencia={"ultimo_reporte_unix": ultimo, "minutos_sin_noticias": sin_noticias // 60,
+                  "sin_noticias_recientes": sin_noticias > SIN_NOTICIAS_S},
+        motivo_orden=" · ".join(motivo),
     )
 
 
 def todos(conn: sqlite3.Connection) -> dict[str, Incidente]:
     return construir(eventos.leer(conn))
+
+
+def recursos(conn: sqlite3.Connection) -> list[dict[str, Any]]:
+    evs = eventos.leer(conn, tipos=["recurso_declarado", "decision_humana", "accion_propuesta"])
+    declaraciones, aprobaciones, props = {}, [], {}
+    for ev in sorted(evs, key=lambda e: e.creado_en):
+        if ev.tipo == "recurso_declarado":
+            declaraciones[(ev.datos["entidad"], ev.datos["recurso"])] = ev
+        elif ev.tipo == "accion_propuesta":
+            props[ev.id] = ev
+        elif ev.datos["decision"] == "aprobar":
+            aprobaciones.append(ev)
+    return sorted(estado_recursos(declaraciones, aprobaciones, props).values(),
+                  key=lambda r: (r["entidad"], r["recurso"]))
 
 
 def uno(conn: sqlite3.Connection, incidente_id: str) -> Incidente | None:

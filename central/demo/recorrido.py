@@ -85,8 +85,8 @@ def esperar_incidentes(nodo: str, esperados: set[str], limite_s: float = 40) -> 
 def mostrar(incs: list[dict]) -> None:
     for i in incs:
         inc = i["incertidumbre"]
-        print(f"\n  {i['id']}  {i['prioridad']} {i['tipo']}  {len(i['reportes'])} reporte(s)  "
-              f"estado: {i['estado']}")
+        print(f"\n  {i['id']}  {i['motivo_orden']}  ({len(i['reportes'])} reporte(s), "
+              f"estado: {i['estado']}, hace {i['vigencia']['minutos_sin_noticias']} min)")
         print(f"    corroboración: {inc['corroboracion']} · revisar: {inc['revisar']}"
               + (f" · sin análisis de IA" if inc["sin_analisis_ia"] else ""))
         for e in i["evidencia"]:
@@ -98,7 +98,12 @@ def mostrar(incs: list[dict]) -> None:
                 print(f"      señales: {senales}")
         if i["accion_propuesta"]:
             a = i["accion_propuesta"]
-            print(f"    propuesta: {a['entidad']}, {a['accion']}")
+            print(f"    propuesta: {a['accion']}")
+            if i["recurso"]:
+                rc = i["recurso"]
+                quedan = "sin declarar" if rc["disponibles"] is None else rc["disponibles"]
+                print(f"    recurso: {rc['recurso']} ({rc['entidad']}), quedan {quedan}"
+                      + (f"; compite con {', '.join(rc['compiten'])}" if rc["compiten"] else ""))
             if a["falta_confirmar"]:
                 print(f"    falta confirmar: {', '.join(a['falta_confirmar'])}")
 
@@ -118,10 +123,18 @@ def main() -> None:
         sard1("demo2", 2, "P3", "ATRAP", 2, "000", "estoy al frente, vi caer la casa de la esquina y hay gente adentro"),
         sard1("demo3", 3, "P4", "OTRO", 0, "000", "dicen que en el barrio de arriba se cayó un puente"),
         "SARD1|demo9-1|P9|ATRAP|x|1|zz|ayer|mensaje roto",
+        f"SARD1|demo5-{BASE + 5}|P1|MEDIC|1|1",  # truncado: la malla lo cortó
     ]
     nodo, ids1 = subir(lote1, "pasarela-1")
     print("  El mismo reporte llega otra vez por otra pasarela:")
     subir(lote1[:1], "pasarela-2")
+    print("  Lo que llegó incompleto (GET /rechazados), sin SACK para que el celular reintente:")
+    for x in pedir(f"{CENTRALES[nodo]}/rechazados")[:2]:
+        print(f"    {x['reporte_id']}: llegó {x['campos']}")
+    for entidad, recurso, n in [("Cruz Roja", "ambulancia", 1), ("Bomberos", "equipo de rescate", 2)]:
+        pedir(f"{CENTRALES[nodo]}/recursos", {"entidad": entidad, "recurso": recurso,
+                                              "disponibles": n, "coordinador": "sala de crisis"})
+    print("  La sala de crisis declara 1 ambulancia (Cruz Roja) y 2 equipos de rescate (Bomberos).")
 
     paso("Paso 5 · Triaje (reglas + Jev) y correlación en incidentes")
     mostrar(esperar_incidentes(nodo, ids1))

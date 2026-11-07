@@ -42,6 +42,14 @@ Las URLs de las centrales salen de `VITE_CENTRAL_A_URL` y `VITE_CENTRAL_B_URL` (
   cola. **Funciona sin internet**: todo lo dibujado es local; las calles de OpenStreetMap son una
   capa opcional que se apaga.
 - **Cerca del incidente**: hospitales/clínicas y estaciones de bomberos más cercanos en línea recta.
+- **Recursos** (pestaña): los recursos del contrato (equipo de rescate, máquina de bomberos,
+  ambulancia, equipo de búsqueda, cuadrilla) con libres, comprometidos y cuántos incidentes
+  pendientes los piden, con aviso si faltan. El coordinador declara las unidades libres
+  (`POST /recursos`); declarar reemplaza lo anterior. Un recurso sin declarar se marca: la
+  coordinación propone sin saber si hay.
+- **Rechazados** (pestaña, con el número sin recuperar): los mensajes mal formados o cortados, en el
+  orden de la central, con sus motivos y solo los campos que llegaron (`GET /rechazados`). Marca
+  "Recuperado" si después llegó una versión válida.
 - El nombre del coordinador, el tema (oscuro por defecto, claro para proyector) y la vista se
   recuerdan en el navegador.
 
@@ -81,8 +89,7 @@ Lógica de triaje (vive en la central), app Android, base de datos de la central
 
 - **Hito 2:** mostrar los reportes recibidos. Hecho (#9).
 - **Hito 3:** incidentes con evidencia, incertidumbre y aprobación. Hecho (#24).
-- **Hito 4:** estado de las centrales A/B y de Jev. Hecho. Falta: recursos (`GET/POST /recursos`) y
-  rechazados (`GET /rechazados`).
+- **Hito 4:** estado de las centrales A/B y de Jev, recursos y rechazados. Hecho.
 - **Hito 5:** pulido para la demo.
 
 ## Terminado

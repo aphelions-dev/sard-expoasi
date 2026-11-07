@@ -83,3 +83,22 @@ export interface Salud {
   central: "A" | "B";
   jev: "ok" | "caido";
 }
+
+export interface Recurso {
+  entidad: string;
+  recurso: string;
+  declarados: number;
+  comprometidos: number;
+  disponibles: number;
+  coordinador: string;
+  declarado_en: number;
+}
+
+export interface Rechazado {
+  reporte_id: string | null;
+  motivos: string[];
+  campos: Record<string, string>;
+  pasarela_id: string | null;
+  recibido_en: number;
+  recuperado: boolean;
+}

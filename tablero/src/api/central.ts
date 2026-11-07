@@ -1,5 +1,5 @@
 // Cliente de la API de la central. El tablero lee de la A mientras responda a /salud; si no, de la B.
-import type { Incidente, Salud } from "./tipos";
+import type { Incidente, Rechazado, Recurso, Salud } from "./tipos";
 
 export type Nodo = "A" | "B";
 
@@ -69,4 +69,27 @@ export function mensajeDecision(e: unknown): string {
     return `La central respondió ${e.estado}: ${e.message}`;
   }
   return "No se pudo hablar con la central. La decisión no se registró; inténtalo de nuevo.";
+}
+
+export function recursos(nodo: Nodo): Promise<Recurso[]> {
+  return pedir<Recurso[]>(`${CENTRALES[nodo]}/recursos`);
+}
+
+export interface EntradaRecurso {
+  entidad: string;
+  recurso: string;
+  disponibles: number;
+  coordinador: string;
+}
+
+export function declararRecurso(nodo: Nodo, entrada: EntradaRecurso): Promise<Recurso[]> {
+  return pedir<Recurso[]>(`${CENTRALES[nodo]}/recursos`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(entrada),
+  });
+}
+
+export function rechazados(nodo: Nodo): Promise<Rechazado[]> {
+  return pedir<Rechazado[]>(`${CENTRALES[nodo]}/rechazados`);
 }

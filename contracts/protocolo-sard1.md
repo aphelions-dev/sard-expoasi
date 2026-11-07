@@ -28,7 +28,7 @@ SARD1|a3f9-0042|P1|ATRAP|3|101|d29e4k|1762481000|edificio colapsado calle 23
 | 5 | banderas | 3 dígitos `0`/`1` | sí | Posición 1: atrapados. 2: heridos. 3: niños o adultos mayores. |
 | 6 | geohash | 6 caracteres o vacío | no | Vacío si no hay GPS (`\|\|` seguidos). |
 | 7 | hora_unix | entero (segundos) | sí | Hora de creación en el celular. |
-| 8 | texto | texto libre | no | Opcional y recortado. Longitud máxima: **por definir**. |
+| 8 | texto | texto libre | no | Opcional y recortado. Puede contener `\|`: todo lo que sigue al separador del campo 7 es texto. Longitud máxima: **por definir**. |
 
 ## Acuse
 
@@ -42,6 +42,8 @@ pasarela y la malla hasta el reportante.
 3. La central acepta cada `id` una sola vez; un duplicado recibe `SACK` pero no crea otro reporte.
 4. Ordenar por `hora_unix` del campo, no por la hora de llegada.
 5. Un reporte vencido queda marcado como "no entregado"; nunca se borra.
+6. Un mensaje mal formado no recibe `SACK`: la central lo rechaza con sus motivos y lo registra como
+   `reporte_rechazado`. El emisor no debe reintentarlo sin corregirlo.
 
 ## Palabras críticas
 
@@ -49,9 +51,17 @@ La lista vive en `contracts/palabras-criticas.txt`, con la regla de comparación
 archivo. La app y la central leen ese mismo archivo: un reporte que contenga una de ellas es P1
 y ningún modelo baja esa prioridad (ADR 0005).
 
+## Sincronización
+
+- **Pasarela.** Antes de subir, consulta `GET /salud` de la central A; si no responde, sube a la B.
+  Las dos aceptan los mismos mensajes y devuelven el mismo `SACK`.
+- **Centrales.** Cada central copia cada segundo los eventos de la otra con `GET /eventos` y los une
+  por id. Como el registro solo crece (ADR 0003), la unión no tiene conflictos, y un reporte que
+  llegó a las dos se cuenta una vez. Detalle en `contracts/api-central.md` y
+  `docs/fichas-agentes/resiliencia.md`.
+
 ## Por definir
 
-- Escape del carácter `|` dentro de `texto`.
-- Longitud máxima de `texto` y del mensaje completo (límite de la malla).
-- Cuándo vence un reporte.
-- Qué hace la central con un mensaje mal formado (rechazar y registrar es la propuesta).
+- Longitud máxima de `texto` y del mensaje completo (límite de la malla, P1).
+- Cuándo vence un reporte (P1).
+- Tiempos de la espera creciente entre reintentos (P1).

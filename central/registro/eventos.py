@@ -35,6 +35,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS un_respuesta
 
 CREATE INDEX IF NOT EXISTS ix_eventos_tipo ON eventos (tipo, seq);
 CREATE INDEX IF NOT EXISTS ix_eventos_causa ON eventos (causa);
+CREATE INDEX IF NOT EXISTS ix_eventos_incidente
+    ON eventos (json_extract(datos, '$.incidente_id'));
 CREATE INDEX IF NOT EXISTS ix_eventos_reporte ON eventos (reporte_id);
 
 CREATE TRIGGER IF NOT EXISTS eventos_sin_update BEFORE UPDATE ON eventos
@@ -95,8 +97,24 @@ def agregar(
     return Evento(cur.lastrowid, id_, nodo, tipo, reporte_id, causa, datos, creado_en)
 
 
+def importar(conn: sqlite3.Connection, ev: dict[str, Any]) -> bool:
+    """Copia un evento de otra central conservando su id, nodo y hora.
+
+    El registro se comporta como un conjunto que solo crece (G-Set): un evento que ya está,
+    o que choca con una restricción de unicidad, se ignora. Devuelve si se agregó.
+    """
+    cur = conn.execute(
+        "INSERT OR IGNORE INTO eventos (id, nodo, tipo, reporte_id, causa, datos, creado_en)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (ev["id"], ev["nodo"], ev["tipo"], ev["reporte_id"], ev["causa"],
+         json.dumps(ev["datos"], ensure_ascii=False), ev["creado_en"]),
+    )
+    return cur.rowcount == 1
+
+
 def leer(
-    conn: sqlite3.Connection, *, desde_seq: int = 0, tipos: list[str] | None = None
+    conn: sqlite3.Connection, *, desde_seq: int = 0, tipos: list[str] | None = None,
+    limite: int | None = None,
 ) -> list[Evento]:
     """Eventos con seq mayor que `desde_seq`, en orden de llegada."""
     sql = "SELECT * FROM eventos WHERE seq > ?"
@@ -104,7 +122,23 @@ def leer(
     if tipos:
         sql += f" AND tipo IN ({','.join('?' * len(tipos))})"
         params += tipos
-    return [_a_evento(f) for f in conn.execute(sql + " ORDER BY seq", params)]
+    sql += " ORDER BY seq"
+    if limite:
+        sql += " LIMIT ?"
+        params.append(limite)
+    return [_a_evento(f) for f in conn.execute(sql, params)]
+
+
+def de_incidente(conn: sqlite3.Connection, incidente_id: str) -> list[Evento]:
+    """Todos los eventos de un incidente: los de sus reportes y los que lo nombran."""
+    filas = conn.execute(
+        "SELECT * FROM eventos WHERE json_extract(datos, '$.incidente_id') = ?"
+        " OR reporte_id IN (SELECT reporte_id FROM eventos WHERE tipo = 'incidente_actualizado'"
+        "   AND json_extract(datos, '$.incidente_id') = ?)"
+        " ORDER BY seq",
+        (incidente_id, incidente_id),
+    )
+    return [_a_evento(f) for f in filas]
 
 
 def pendientes(

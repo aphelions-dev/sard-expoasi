@@ -79,11 +79,14 @@ class Jev:
     def disponible(self) -> bool:
         return self._cliente is not None
 
-    def evaluar(self, texto: str) -> Respuesta:
-        """Lanza excepción si Jev no responde: un fallo nunca se lee como un «no»."""
+    def preguntar(self, state, questions):
+        """Una llamada a Jev. Lanza excepción si no responde: un fallo nunca se lee como «no»."""
         if self._cliente is None:
             raise RuntimeError("JEV_API_KEY no configurada")
-        r = self._cliente.system_one(state={"reporte": texto}, questions=PREGUNTAS)
+        return self._cliente.system_one(state=state, questions=questions)
+
+    def evaluar(self, texto: str) -> Respuesta:
+        r = self.preguntar({"reporte": texto}, PREGUNTAS)
         tipo = r.choices["tipo"]
         return Respuesta(
             modelo=r.model,

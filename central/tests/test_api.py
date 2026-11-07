@@ -75,5 +75,45 @@ def test_registro_no_permite_modificar_ni_borrar(cliente):
     conn.close()
 
 
+def test_incidentes_y_aprobacion(cliente):
+    from agentes import ejecutor
+    from agentes.coordinacion import agente as coordinacion
+    from agentes.correlacion import agente as correlacion
+    from agentes.triaje import agente as triaje
+    from tests.test_triaje import JevFalso
+    import api.main
+
+    subir(cliente, ejemplo(1) + ejemplo(2))
+    assert cliente.get("/incidentes").json() == []  # aún sin correlacionar
+    conn = eventos.conectar(api.main.CONFIG.db)
+    for consume, produce, f in [
+        ("reporte_recibido", "reporte_priorizado", triaje.procesar(JevFalso())),
+        ("reporte_priorizado", "incidente_actualizado", correlacion.procesar(JevFalso(falla=True))),
+        ("incidente_actualizado", "accion_propuesta", coordinacion.procesar),
+    ]:
+        ejecutor.procesar_pendientes(conn, agente=produce, consume=consume, produce=produce,
+                                     procesar=f, nodo="A")
+    conn.close()
+
+    incs = cliente.get("/incidentes").json()
+    assert [i["prioridad"] for i in incs] == ["P1", "P2"]
+    assert all(i["estado"] == "pendiente" for i in incs)
+    assert cliente.get("/incidentes", params={"prioridad": "P2"}).json()[0]["id"] == "inc-b712-0007"
+
+    r = cliente.post("/incidentes/inc-a3f9-0042/aprobacion",
+                     json={"decision": "aprobar", "coordinador": "sala de crisis", "nota": "ok"})
+    assert r.status_code == 200 and r.json()["estado"] == "aprobada"
+    assert cliente.post("/incidentes/inc-x/aprobacion",
+                        json={"decision": "aprobar", "coordinador": "x"}).status_code == 404
+    assert len(cliente.get("/incidentes", params={"estado": "pendiente"}).json()) == 1
+
+
+def test_eventos_para_sincronizar(cliente):
+    subir(cliente, ejemplo(1) + ejemplo(2))
+    todo = cliente.get("/eventos").json()
+    assert todo["ultimo_seq"] == 2 and len(todo["eventos"]) == 2
+    assert len(cliente.get("/eventos", params={"desde_seq": 1}).json()["eventos"]) == 1
+
+
 def test_salud(cliente):
     assert cliente.get("/salud").json() == {"estado": "ok", "central": "A", "jev": "caido"}

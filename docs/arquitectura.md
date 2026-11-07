@@ -31,8 +31,19 @@
 - Tablero con incidentes priorizados, evidencia e incertidumbre.
 - Ninguna acción se ejecuta sin su aprobación.
 
+## 5. Agentes y sincronización de la central
+
+- Cada agente es un proceso aparte sobre el registro de eventos (patrón pizarra): recepción
+  (dentro de la API), triaje, correlación, coordinación y resiliencia. No hay orquestador; si
+  uno cae, los demás siguen y al volver retoma lo pendiente.
+- Flujo de eventos: `reporte_recibido` → `reporte_priorizado` → `incidente_actualizado` →
+  `accion_propuesta` → `decision_humana`.
+- Las centrales A y B corren a la vez y se copian los eventos en las dos direcciones
+  (`GET /eventos`), uniéndolos por id: el registro es un conjunto que solo crece, sin conflictos.
+  Los agentes de la B esperan mientras la A responda; si la A cae, la B toma el relevo. Detalle
+  en `central/README.md` y `docs/fichas-agentes/resiliencia.md`.
+
 ## Por definir
 
 - Stack del tablero.
-- Mecanismo de sincronización A → B.
 - Cómo se elige el rol de cada celular.

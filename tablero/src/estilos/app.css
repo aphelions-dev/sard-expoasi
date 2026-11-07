@@ -421,6 +421,25 @@ button:disabled {
   overflow: hidden;
 }
 
+.fila-motivo {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--texto-tenue);
+}
+
+.fila-vigencia {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  padding: 1px 7px;
+  border-radius: var(--radio-chico);
+  background: var(--aviso-fondo);
+  color: var(--aviso);
+  font-size: 12px;
+  font-weight: 500;
+}
+
 .dato {
   display: inline-flex;
   align-items: center;
@@ -942,9 +961,10 @@ button:disabled {
   .detalle-cuerpo {
     grid-template-columns: minmax(0, 1fr);
   }
+  /* La evidencia va antes que la propuesta: invita a pensar, no solo a confirmar (#40,
+     docs/referencias/investigacion-central.md). */
   .columna-accion {
     position: static;
-    order: -1;
   }
   .resumen {
     grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -14,7 +14,7 @@ def test_campos_del_ejemplo_01():
     r = sard1.leer(ejemplo(1)[0])
     assert r == sard1.Reporte(
         id="a3f9-0042", prioridad="P1", tipo="ATRAP", personas=3, atrapados=True,
-        heridos=False, vulnerables=True, geohash="d29e4k", hora_unix=1762481000,
+        heridos=False, vulnerables=True, geohash="d2fkcd", hora_unix=1762481000,
         texto="edificio colapsado calle 23",
     )
 

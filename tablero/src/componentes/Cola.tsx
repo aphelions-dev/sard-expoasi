@@ -1,6 +1,7 @@
 import { useRef } from "react";
-import { MapPinOff, Users } from "lucide-react";
+import { MapPin, MapPinOff, Users } from "lucide-react";
 import type { Incidente } from "../api/tipos";
+import type { Barrio } from "../geo/geo";
 import { FILTROS, conteos, filtrar, type Filtro } from "../cola";
 import { TIPO, haceCuanto } from "../formato";
 import { InsigniaConfianza, InsigniaEstado, InsigniaPrioridad, InsigniaRevisar } from "./Insignias";
@@ -12,9 +13,10 @@ interface Props {
   seleccion: string | null;
   onSeleccion: (id: string) => void;
   ahora: number;
+  barrio: (gh: string | null) => Barrio | null;
 }
 
-export function Cola({ incidentes, filtro, onFiltro, seleccion, onSeleccion, ahora }: Props) {
+export function Cola({ incidentes, filtro, onFiltro, seleccion, onSeleccion, ahora, barrio }: Props) {
   const lista = filtrar(incidentes, filtro);
   const n = conteos(incidentes);
   const ref = useRef<HTMLUListElement>(null);
@@ -72,6 +74,12 @@ export function Cola({ incidentes, filtro, onFiltro, seleccion, onSeleccion, aho
                     {inc.impacto.vulnerables && " · vulnerables"}
                   </span>
                   <span className="dato">{inc.reportes.length} rep.</span>
+                  {inc.geohash && barrio(inc.geohash) && (
+                    <span className="dato">
+                      <MapPin size={13} aria-hidden="true" />
+                      {barrio(inc.geohash)!.nombre}
+                    </span>
+                  )}
                   {inc.incertidumbre.sin_ubicacion && (
                     <span className="dato aviso">
                       <MapPinOff size={13} aria-hidden="true" />

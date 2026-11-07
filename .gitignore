@@ -1,0 +1,31 @@
+# Android / Gradle
+build/
+.gradle/
+local.properties
+*.apk
+*.aab
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node
+node_modules/
+dist/
+
+# Datos locales de la central
+*.sqlite
+*.db
+
+# Entorno y editores
+.env
+.idea/
+.vscode/
+*.iml
+.DS_Store

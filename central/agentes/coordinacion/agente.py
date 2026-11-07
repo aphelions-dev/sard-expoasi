@@ -24,6 +24,18 @@ ENTIDAD = {
     "OTRO": ("Sala de crisis", "verificación y asignación"),
 }
 
+# Recurso que usaría cada tipo (`contracts/api-central.md`, POST /recursos). Cuántos hay lo
+# declara el coordinador; la vista del incidente dice cuántos quedan.
+RECURSO = {
+    "ATRAP": "equipo de rescate",
+    "FUEGO": "máquina de bomberos",
+    "MEDIC": "ambulancia",
+    "DESAP": "equipo de búsqueda",
+    "VIA": "cuadrilla",
+    "OTRO": None,
+}
+RECURSOS = {(ENTIDAD[t][0], r) for t, r in RECURSO.items() if r}
+
 
 def proponer(inc: incidentes.Incidente) -> dict[str, Any]:
     entidad, tarea = ENTIDAD[inc.tipo]
@@ -53,6 +65,7 @@ def proponer(inc: incidentes.Incidente) -> dict[str, Any]:
     return {
         "incidente_id": inc.id,
         "entidad": entidad,
+        "recurso": RECURSO[inc.tipo],
         "accion": f"Enviar a {entidad} para {tarea} en {lugar}",
         "prioridad": inc.prioridad,
         "personas_estimadas": personas,

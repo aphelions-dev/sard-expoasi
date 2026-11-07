@@ -54,6 +54,9 @@ Para dos computadores, poner en el `.env` de cada uno las URLs reales de las dos
 | `iniciar.py` | Levanta una central completa |
 | `datos/` | Base local y registro de eventos (los `.sqlite` no se suben) |
 | `tests/` | Pruebas; las de protocolo y API usan `contracts/ejemplos/` |
+| `sesgo/` | Prueba de sesgo del triaje: el mismo suceso escrito de varias formas (`sesgo/README.md`) |
+| `calibracion/` | Elige el umbral de Jev con los reportes etiquetados de #13 (`calibracion/README.md`) |
+| `demo/` | Recorrido de la demo en la parte de la central (pasos 4, 5, 7 y 8): hace de pasarela, `python -m demo.recorrido` |
 
 ## Registro de eventos
 
@@ -73,6 +76,7 @@ dos veces el mismo reporte.
 | `decision_humana` | API (coordinador) | Aprobación o rechazo de la propuesta vigente |
 | `agente_error` | Cualquier agente | Un agente falló con un evento; se reintenta |
 | `par_caido`, `par_recuperado` | Resiliencia | La otra central dejó de responder o volvió |
+| `recurso_declarado` | API (coordinador) | Cuántas unidades hay de un recurso (`POST /recursos`); reemplaza la declaración anterior |
 
 ## Decisiones provisionales del contrato
 

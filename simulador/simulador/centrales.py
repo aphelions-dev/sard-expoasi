@@ -36,6 +36,7 @@ class CentralHttp:
         self.llegadas: dict[str, int] = {}
         self.creados: set[str] = set()
         self.usadas: dict[str, int] = {}  # cuántas subidas fueron a cada central
+        self.ultima: str | None = None    # central que respondió la última subida
         self.caida = False
 
     def _pedir(self, url: str, datos: dict | None = None):
@@ -62,6 +63,7 @@ class CentralHttp:
         except (urllib.error.URLError, OSError, TimeoutError):
             return None
         self.usadas[nodo] = self.usadas.get(nodo, 0) + 1
+        self.ultima = nodo
         ids = [s.split("|", 1)[1] for s in r["sack"]]
         for id_ in ids:
             self.llegadas[id_] = self.llegadas.get(id_, 0) + 1

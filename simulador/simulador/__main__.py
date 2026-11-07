@@ -41,6 +41,11 @@ def main() -> None:
     ec = sub.add_parser("escenarios-central", help="E4, E5 y E6/E7 contra centrales reales que levanta y apaga")
     ec.add_argument("--env-file", help="archivo .env con JEV_API_KEY para correr E6 con Jev")
 
+    rc = sub.add_parser("recorrido", help="recorrido de 8 pasos de la demo con visor web (http://localhost:8090)")
+    rc.add_argument("--seguido", action="store_true", help="avanzar solo, sin Enter (ensayo o video)")
+    rc.add_argument("--pausa", type=float, default=8.0, help="segundos por paso con --seguido")
+    rc.add_argument("--env-file", help="archivo .env con JEV_API_KEY")
+
     c = sub.add_parser("correr", help="corre la malla y guarda resultados en pruebas/resultados/")
     for f in fields(Parametros):
         ayuda = "desde,hasta en segundos" if f.name == "caida" else None
@@ -58,6 +63,11 @@ def main() -> None:
     if a.cmd == "escenarios-central":
         from .escenarios_central import correr as correr_central
         correr_central(a.env_file)
+        return
+
+    if a.cmd == "recorrido":
+        from .recorrido import main as recorrido
+        recorrido(a.seguido, a.env_file, a.pausa)
         return
 
     if a.cmd == "generar":

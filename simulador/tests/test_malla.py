@@ -60,3 +60,21 @@ def test_en_orden_de_llegada_la_prioridad_no_se_nota():
     con = correr(**kw)["latencia_por_prioridad"]
     sin = correr(**kw, por_prioridad=False)["latencia_por_prioridad"]
     assert con["P1"]["p50_s"] < sin["P1"]["p50_s"]
+
+
+def test_traza_y_reporte_a_pedido_para_el_recorrido():
+    sim = Simulacion(Parametros(semilla=3, reportes=0, duracion_s=200))
+    sim.traza, sim.continuo = [], False
+    r = sim.crear("n05", {"texto": "hay dos atrapados", "tipo_real": "ATRAP", "prioridad_real": "P1",
+                          "atrapados": "1", "heridos": "0"})
+    sim.correr()
+    tipos = [e["tipo"] for e in sim.traza if e.get("id") == r.id]
+    assert tipos[0] == "creado"
+    assert {"salto", "llegada", "confirmado"} <= set(tipos)
+    assert sim.seguimiento[r.id].confirmado is not None
+
+
+def test_palabras_criticas_del_contrato():
+    from simulador.recorrido import palabras_criticas
+    assert palabras_criticas("Hay tres personas ATRAPADAS") == ["atrapad"]
+    assert palabras_criticas("todo bien") == []

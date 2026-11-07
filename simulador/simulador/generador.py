@@ -32,8 +32,8 @@ class Generador:
         self.sin_gps = sin_gps  # fracción de celulares sin GPS: geohash vacío
         self.contadores: dict[str, int] = {}
 
-    def nuevo(self, disp: str, x: float, y: float, hora_unix: int) -> Reporte:
-        f = self.rng.choice(self.filas)
+    def nuevo(self, disp: str, x: float, y: float, hora_unix: int, fila: dict | None = None) -> Reporte:
+        f = fila or self.rng.choice(self.filas)
         n = self.contadores[disp] = self.contadores.get(disp, 0) + 1
         gh = "" if self.rng.random() < self.sin_gps else geohash(*a_latlon(x, y))
         return Reporte(

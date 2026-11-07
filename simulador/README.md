@@ -16,6 +16,7 @@ PYTHONUTF8=1 uv run python -m simulador correr --central --velocidad 10    # API
 PYTHONUTF8=1 uv run python -m simulador correr --desde ../pruebas/resultados/<corrida>/parametros.json
 PYTHONUTF8=1 uv run python -m simulador escenarios                         # E1–E4 de pruebas/escenarios.md
 PYTHONUTF8=1 uv run python -m simulador escenarios-central                 # E4 central, E5, E6/E7 (levanta A y B)
+PYTHONUTF8=1 uv run python -m simulador recorrido                          # demo de 8 pasos con visor web
 PYTHONUTF8=1 uv run pytest                                                 # pruebas
 ```
 
@@ -44,6 +45,15 @@ resultado exacto.
 - **Reportes**: el generador (#4) toma texto, tipo y prioridad de los 100 reportes etiquetados
   (`datos/sinteticos/reportes_etiquetados.csv`). La prioridad del CSV hace de "prioridad calculada
   en el celular" mientras la app (P1) no tenga sus reglas.
+
+## Recorrido de la demo
+
+`python -m simulador recorrido` corre los 8 pasos de `docs/pitch/guion-demo.md` con la malla
+simulada y las centrales reales (que levanta y apaga), y sirve un visor en `http://localhost:8090`
+(`simulador/visor/`, HTML/CSS/JS sin dependencias): celulares sobre el barrio, copias del reporte en
+tenue, el camino que llegó a la pasarela en grueso, `SACK` de vuelta, centrales A/B y el paso actual.
+Se avanza con Enter o con el botón del visor; `--seguido --pausa 6` avanza solo. Cómo se presenta:
+el guion.
 
 ## Parámetros por defecto
 

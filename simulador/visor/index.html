@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SARD · Recorrido de la demo</title>
+    <link rel="stylesheet" href="visor.css" />
+  </head>
+  <body>
+    <header class="barra">
+      <div class="marca"><span class="logo" aria-hidden="true">S</span><div><h1>SARD</h1><p>Malla simulada · recorrido de la demo</p></div></div>
+      <div class="centrales" id="centrales" role="status" aria-live="polite"></div>
+      <div class="reloj mono" id="reloj">t = 0 s</div>
+    </header>
+    <main class="principal">
+      <section class="lienzo" aria-label="Malla de celulares">
+        <svg id="malla" role="img" aria-label="Celulares, enlaces Bluetooth y mensajes en camino"></svg>
+        <div class="leyenda">
+          <span><i class="pt reportante"></i>Reportante</span>
+          <span><i class="pt relevo"></i>Relevo</span>
+          <span><i class="pt pasarela"></i>Pasarela</span>
+          <span><i class="pt apagado"></i>Sin batería</span>
+          <span><i class="ln p1"></i>P1</span><span><i class="ln p2"></i>P2</span><span><i class="ln p3"></i>P3</span><span><i class="ln p4"></i>P4</span>
+          <span><i class="ln sack"></i>SACK</span>
+        </div>
+        <div class="barrio" id="barrio" hidden></div>
+      </section>
+      <aside class="panel">
+        <ol class="pasos" id="pasos" aria-label="Pasos del recorrido"></ol>
+        <section class="paso-actual" aria-live="polite">
+          <p class="paso-num" id="paso-num">Preparando</p>
+          <h2 id="paso-titulo">—</h2>
+          <ul id="paso-detalle"></ul>
+        </section>
+        <section class="tarjeta" id="destacado" hidden>
+          <h3>Reporte que seguimos</h3>
+          <p class="mono linea" id="d-linea"></p>
+          <ol class="linea-tiempo" id="d-estado"></ol>
+        </section>
+        <dl class="cuentas" id="cuentas"></dl>
+        <button class="boton" id="siguiente">Siguiente paso</button>
+      </aside>
+    </main>
+    <script src="visor.js"></script>
+  </body>
+</html>

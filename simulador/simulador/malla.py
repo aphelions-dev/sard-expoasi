@@ -103,6 +103,13 @@ class Simulacion:
         self.emitidos = {"reportes": 0, "sacks": 0, "bytes": 0}
         self.subidas_fallidas = 0
         self.t = 0
+        self.traza: list[dict] | None = None  # lista = registrar eventos (para el visor del recorrido)
+        self.continuo = False                 # True = no parar aunque todo esté confirmado
+        self.detener = False
+
+    def _anotar(self, **ev) -> None:
+        if self.traza is not None:
+            self.traza.append({"t": self.t, **ev})
 
     # --- reglas de la malla ---
 
@@ -124,6 +131,7 @@ class Simulacion:
         s = self.seguimiento.get(id_)
         if s and s.nodo == n.id and s.confirmado is None:
             s.confirmado = self.t
+            self._anotar(tipo="confirmado", id=id_, nodo=n.id)
 
     def _recibir(self, v: Nodo, c: Copia) -> None:
         id_ = c.reporte.id
@@ -144,6 +152,7 @@ class Simulacion:
         n.bateria -= self.p.gasto_reposo
         if n.bateria <= 0:
             n.vivo, n.apagado_en = False, self.t
+            self._anotar(tipo="apagado", nodo=n.id)
             return
 
         if self.p.vence_s is not None:
@@ -157,6 +166,8 @@ class Simulacion:
         pend = self._pendientes(n)
         if n.pasarela and pend:
             ids = self.central.subir([c.linea for c in pend], n.id)
+            self._anotar(tipo="subida", pasarela=n.id, central=getattr(self.central, "ultima", None),
+                         ids=[c.reporte.id for c in pend if ids and c.reporte.id in ids], fallo=ids is None)
             if ids is None:
                 self.subidas_fallidas += 1
                 for c in pend:
@@ -168,11 +179,15 @@ class Simulacion:
                         s = self.seguimiento[c.reporte.id]
                         if s.llegada is None:
                             s.llegada, s.saltos = self.t, c.saltos
+                            self._anotar(tipo="llegada", id=c.reporte.id, saltos=c.saltos)
                         self._confirmar(n, c.reporte.id)
         elif not n.pasarela:
             for c in pend[: self.p.capacidad]:
                 self.emitidos["reportes"] += 1
-                for v in self._emitir(n, c.linea):
+                oyen = self._emitir(n, c.linea)
+                self._anotar(tipo="salto", id=c.reporte.id, prioridad=c.reporte.prioridad, de=n.id,
+                             a=[v.id for v in oyen], intento=c.intentos + 1)
+                for v in oyen:
                     self._recibir(v, c)
                 c.intentos += 1
                 c.proximo = self.t + self.espera(c.intentos)
@@ -180,7 +195,9 @@ class Simulacion:
         avisar, n.sacks_por_avisar = n.sacks_por_avisar, []
         for id_ in dict.fromkeys(avisar):
             self.emitidos["sacks"] += 1
-            for v in self._emitir(n, sack(id_)):
+            oyen = self._emitir(n, sack(id_))
+            self._anotar(tipo="sack", id=id_, de=n.id, a=[v.id for v in oyen])
+            for v in oyen:
                 self._confirmar(v, id_)
 
     def _crear_reportes(self) -> None:
@@ -189,10 +206,20 @@ class Simulacion:
             vivos = [n for n in self.nodos if n.vivo and not n.pasarela] or [n for n in self.nodos if n.vivo]
             if not vivos:
                 continue
-            n = self.rng.choice(vivos)
-            r = self.gen.nuevo(n.id, n.x, n.y, self.p.hora_base + self.t)
-            n.cola[r.id] = Copia(r, r.linea(), saltos=0, proximo=self.t)
-            self.seguimiento[r.id] = Seguimiento(r.id, r.prioridad, n.id, self.t)
+            self._guardar(self.rng.choice(vivos), self.gen.nuevo)
+
+    def _guardar(self, n: Nodo, nuevo) -> Reporte:
+        r = nuevo(n.id, n.x, n.y, self.p.hora_base + self.t)
+        n.cola[r.id] = Copia(r, r.linea(), saltos=0, proximo=self.t)
+        self.seguimiento[r.id] = Seguimiento(r.id, r.prioridad, n.id, self.t)
+        self._anotar(tipo="creado", id=r.id, nodo=n.id, prioridad=r.prioridad, linea=r.linea(),
+                     bytes=len(r.linea().encode()))
+        return r
+
+    def crear(self, nodo_id: str, fila: dict | None = None) -> Reporte:
+        """Un reporte nuevo ahora mismo en ese celular (para el recorrido de la demo)."""
+        n = next(x for x in self.nodos if x.id == nodo_id)
+        return self._guardar(n, lambda *a: self.gen.nuevo(*a, fila=fila))
 
     def _terminado(self) -> bool:
         """Todo confirmado al reportante, vencido, o entregado aunque el reportante ya se apagó.
@@ -227,7 +254,7 @@ class Simulacion:
             self.rng.shuffle(orden)
             for n in orden:
                 self._paso_nodo(n)
-            if self._terminado():
+            if self.detener or (self._terminado() and not self.continuo):
                 break
             if self.p.velocidad:
                 time.sleep(1 / self.p.velocidad)

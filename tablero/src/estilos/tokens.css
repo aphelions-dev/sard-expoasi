@@ -1,0 +1,104 @@
+/* Tokens del tablero. Base neutra pizarra; el color fuerte se reserva para la prioridad
+   (P1 rojo, P2 naranja, P3 ámbar, P4 gris) y el azul de seguridad para las acciones.
+   Todo texto sobre su fondo cumple 4,5:1. */
+
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b1220;
+  --superficie: #111a2c;
+  --superficie-2: #172238;
+  --superficie-hover: #1c2943;
+  --borde: #26334d;
+  --borde-fuerte: #3a4a69;
+  --texto: #e6ebf3;
+  --texto-tenue: #9aa7bb;
+
+  --accion: #2563eb;
+  --accion-hover: #1d4ed8;
+  --en-accion: #ffffff;
+  --accion-texto: #7cb0ff;
+  --foco: #7cb0ff;
+
+  --p1: #ef4444;
+  --p1-fondo: rgba(239, 68, 68, 0.16);
+  --p1-texto: #fca5a5;
+  --p2: #f97316;
+  --p2-fondo: rgba(249, 115, 22, 0.16);
+  --p2-texto: #fdba74;
+  --p3: #eab308;
+  --p3-fondo: rgba(234, 179, 8, 0.14);
+  --p3-texto: #fde047;
+  --p4: #64748b;
+  --p4-fondo: rgba(100, 116, 139, 0.2);
+  --p4-texto: #cbd5e1;
+
+  --ok: #34d399;
+  --ok-fondo: rgba(52, 211, 153, 0.14);
+  --aviso: #fbbf24;
+  --aviso-fondo: rgba(251, 191, 36, 0.14);
+  --error: #f87171;
+  --error-fondo: rgba(248, 113, 113, 0.14);
+  --rumor: #c4b5fd;
+  --rumor-fondo: rgba(196, 181, 253, 0.14);
+
+  --sombra: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f6f9;
+  --superficie: #ffffff;
+  --superficie-2: #f8fafc;
+  --superficie-hover: #eef2f7;
+  --borde: #dde3ec;
+  --borde-fuerte: #c3ccda;
+  --texto: #0f172a;
+  --texto-tenue: #4b5870;
+
+  --accion: #1d4ed8;
+  --accion-hover: #1e40af;
+  --en-accion: #ffffff;
+  --accion-texto: #1d4ed8;
+  --foco: #1d4ed8;
+
+  --p1: #dc2626;
+  --p1-fondo: #fee2e2;
+  --p1-texto: #991b1b;
+  --p2: #ea580c;
+  --p2-fondo: #ffedd5;
+  --p2-texto: #9a3412;
+  --p3: #ca8a04;
+  --p3-fondo: #fef3c7;
+  --p3-texto: #854d0e;
+  --p4: #64748b;
+  --p4-fondo: #e2e8f0;
+  --p4-texto: #334155;
+
+  --ok: #047857;
+  --ok-fondo: #d1fae5;
+  --aviso: #92400e;
+  --aviso-fondo: #fef3c7;
+  --error: #b91c1c;
+  --error-fondo: #fee2e2;
+  --rumor: #5b21b6;
+  --rumor-fondo: #ede9fe;
+
+  --sombra: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+:root {
+  --fuente: "Fira Sans", system-ui, sans-serif;
+  --mono: "Fira Code", ui-monospace, monospace;
+  --radio: 8px;
+  --radio-chico: 5px;
+  --e1: 4px;
+  --e2: 8px;
+  --e3: 12px;
+  --e4: 16px;
+  --e5: 24px;
+  --e6: 32px;
+  --alto-barra: 60px;
+  --ancho-cola: 400px;
+  --rapido: 150ms;
+}

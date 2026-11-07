@@ -78,8 +78,78 @@ Uso responsable de la IA: `docs/uso-responsable-ia.md`. Riesgos y planes B: `doc
 - Si la central A cae justo después de confirmar un reporte, la B lo recibe cuando la A vuelve (#49).
 - Todos los datos son sintéticos.
 
-## Equipo
+## Equipo: qué hace cada uno
 
-Persona 1 **@samcastroca** (app y malla) · Persona 2 **@lufigir** (central y agentes) · Persona 3
-**@CrArenas** (tablero, simulador y pruebas). Cómo trabajamos (ramas, commits, issues):
-`docs/equipo.md`.
+Antes de tocar nada, cada uno lee [`CLAUDE.md`](CLAUDE.md),
+[`contracts/protocolo-sard1.md`](contracts/protocolo-sard1.md) y el README y el `CLAUDE.md` de su
+carpeta. Comandos para clonar, cambiarse de rama y abrir Claude Code, más ramas, commits e issues:
+[`docs/equipo.md`](docs/equipo.md). Hitos y tareas: [`docs/plan.md`](docs/plan.md).
+
+### Persona 1 — @samcastroca · app y malla (rama `p1/app-malla`)
+
+Hace la app Android sobre el fork de bitchat: formulario sin internet, prioridad por reglas,
+almacenamiento local, cola de reenvío por prioridad con `SACK` y modo pasarela con failover entre
+las centrales A y B. Es la parte que falta para pasar la demo de la malla simulada a celulares reales.
+
+- Pendiente: #1 compilar el fork y lograr mensajes entre 3 celulares · #5 formulario y prioridad ·
+  #6 almacenamiento local · #7 pasarela y `SACK` · #10 cola y reintentos · #50 tope de reintentos o
+  vencimiento · #14 failover A/B.
+- Leer: [`app/README.md`](app/README.md) · [`app/CLAUDE.md`](app/CLAUDE.md) ·
+  [`docs/fichas-agentes/comunicacion.md`](docs/fichas-agentes/comunicacion.md) ·
+  [`contracts/api-central.md`](contracts/api-central.md) (`POST /reportes` y `GET /salud`) ·
+  [ADR 0001](docs/decisiones/0001-usar-port-android-bitchat.md) ·
+  [ADR 0002](docs/decisiones/0002-solo-android.md).
+- Por definir con el equipo, en una rama `contrato/...`: largo máximo del texto, vencimiento y
+  tiempos de reintento.
+
+### Persona 2 — @lufigir · central y agentes (rama `p2/central-agentes`)
+
+Mantiene la central (API, registro de eventos solo-agregar y central B) y los agentes de recepción,
+triaje, correlación, coordinación y resiliencia.
+
+- Pendiente: #43 falsos positivos y variantes en el triaje por reglas · #49 `SACK` antes de
+  sincronizar con la B.
+- Leer: [`central/README.md`](central/README.md) · [`central/CLAUDE.md`](central/CLAUDE.md) ·
+  agentes ([recepción](central/agentes/recepcion/README.md),
+  [triaje](central/agentes/triaje/README.md),
+  [correlación](central/agentes/correlacion/README.md),
+  [coordinación](central/agentes/coordinacion/README.md),
+  [resiliencia](central/agentes/resiliencia/README.md)) ·
+  [calibración](central/calibracion/README.md) · [sesgo](central/sesgo/README.md) y
+  [sus resultados](central/sesgo/resultados.md) ·
+  [investigación de la central](docs/referencias/investigacion-central.md) ·
+  [ADR 0003](docs/decisiones/0003-registro-eventos-solo-agregar.md) ·
+  [ADR 0004](docs/decisiones/0004-jev-solo-en-central.md) ·
+  [ADR 0005](docs/decisiones/0005-reglas-ganan-palabra-critica.md).
+
+### Persona 3 — @CrArenas · tablero, simulador y pruebas (rama `p3/tablero-pruebas`)
+
+Hace el tablero del coordinador, el simulador de la malla (que es el plan B de la demo), los
+reportes sintéticos y las pruebas con métricas, además del README final y el pitch.
+
+- Pendiente: #16 pruebas E1–E7 (falta E6, que necesita `JEV_API_KEY`) · #21 README final y pitch.
+- Leer: [`tablero/README.md`](tablero/README.md) · [`tablero/CLAUDE.md`](tablero/CLAUDE.md) ·
+  [`simulador/README.md`](simulador/README.md) · [`simulador/CLAUDE.md`](simulador/CLAUDE.md) ·
+  [`datos/sinteticos/README.md`](datos/sinteticos/README.md) ·
+  [`pruebas/escenarios.md`](pruebas/escenarios.md) ·
+  [`pruebas/resultados/README.md`](pruebas/resultados/README.md) ·
+  [`docs/pitch/README.md`](docs/pitch/README.md).
+
+### Los tres
+
+#17 recorrido de 8 pasos integrado con los celulares · #22 dos ensayos de la demo
+([`docs/pitch/guion-demo.md`](docs/pitch/guion-demo.md)). Los cambios al contrato
+([`contracts/`](contracts/protocolo-sard1.md)) los revisan los tres.
+
+## Documentación
+
+| Tema | Documentos |
+|------|------------|
+| Contrato | [Protocolo SARD1](contracts/protocolo-sard1.md) · [API de la central](contracts/api-central.md) · [Ejemplos](contracts/ejemplos/README.md) |
+| Arquitectura y decisiones | [Arquitectura](docs/arquitectura.md) · [ADR 0001](docs/decisiones/0001-usar-port-android-bitchat.md) · [0002](docs/decisiones/0002-solo-android.md) · [0003](docs/decisiones/0003-registro-eventos-solo-agregar.md) · [0004](docs/decisiones/0004-jev-solo-en-central.md) · [0005](docs/decisiones/0005-reglas-ganan-palabra-critica.md) |
+| Fichas de agentes | [Recepción](docs/fichas-agentes/recepcion.md) · [Triaje](docs/fichas-agentes/triaje.md) · [Correlación](docs/fichas-agentes/correlacion.md) · [Coordinación](docs/fichas-agentes/coordinacion.md) · [Resiliencia](docs/fichas-agentes/resiliencia.md) · [Comunicación](docs/fichas-agentes/comunicacion.md) · [Plantilla](docs/fichas-agentes/_plantilla.md) |
+| Pruebas | [Escenarios](pruebas/escenarios.md) · [Resultados](pruebas/resultados/README.md): [E1](pruebas/resultados/E1/resumen.md) · [E2](pruebas/resultados/E2/resumen.md) · [E3](pruebas/resultados/E3/resumen.md) · [E4](pruebas/resultados/E4/resumen.md) ([central](pruebas/resultados/E4/resumen-central.md)) · [E5](pruebas/resultados/E5/resumen-central.md) · [E7](pruebas/resultados/E7/resumen-central.md) · [Base S1](pruebas/resultados/base-s1/resumen.md) |
+| Proyecto | [Plan por hitos](docs/plan.md) · [Entregables](docs/entregables.md) · [Riesgos](docs/riesgos.md) · [Uso responsable de la IA](docs/uso-responsable-ia.md) · [Cómo trabajamos](docs/equipo.md) |
+| Demo y pitch | [Guion de la demo](docs/pitch/guion-demo.md) · [Pitch](docs/pitch/README.md) |
+| Por área | [App](app/README.md) · [Central](central/README.md) · [Tablero](tablero/README.md) · [Simulador](simulador/README.md) · [Datos sintéticos](datos/sinteticos/README.md) |
+| Referencias | [Bases de la hackathon (PDF)](docs/referencias/HackathonExpoASI2026.pdf) · [Investigación de la central](docs/referencias/investigacion-central.md) |

@@ -12,7 +12,7 @@ Con las centrales arriba (`central/README.md`), desde `tablero/`:
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm test           # pruebas de la lógica (failover, filtros, mensajes de error)
+npm test           # pruebas de la lógica (failover, filtros, mensajes de error, barrios y mapa)
 npm run build      # versión de producción en dist/
 ```
 
@@ -33,8 +33,30 @@ Las URLs de las centrales salen de `VITE_CENTRAL_A_URL` y `VITE_CENTRAL_B_URL` (
   aprobar exige una nota (el `422` del contrato).
 - **Salud** de la central A, la B y Jev (`GET /salud` cada 3 s). Si la A no responde, el tablero lee
   y decide en la B y lo avisa.
-- El nombre del coordinador y el tema (oscuro por defecto, claro para proyector) se recuerdan en el
-  navegador.
+- **Barrio** de cada incidente en la cola y el detalle ("Chipre · comuna 01"), calculado desde el
+  geohash con los límites oficiales. Fuera de Manizales (Villamaría) dice "sin barrio": no se
+  inventa un nombre.
+- **Mapa** (pestaña "Mapa"): cada incidente es la **celda de su geohash** (~600 m × 1,2 km)
+  coloreada por prioridad, no un punto, porque la ubicación real está en algún lugar de ese
+  rectángulo. Encima, barrios, hospitales, clínicas y bomberos; clic en una celda la elige en la
+  cola. **Funciona sin internet**: todo lo dibujado es local; las calles de OpenStreetMap son una
+  capa opcional que se apaga.
+- **Cerca del incidente**: hospitales/clínicas y estaciones de bomberos más cercanos en línea recta.
+- El nombre del coordinador, el tema (oscuro por defecto, claro para proyector) y la vista se
+  recuerdan en el navegador.
+
+## Datos geográficos
+
+En `public/geo/`, archivos fijos para que el mapa no dependa de internet:
+
+| Archivo | Fuente | Licencia / uso |
+|---------|--------|----------------|
+| `barrios.geojson` | "Límite de barrios Municipio de Manizales", SIG Alcaldía de Manizales (Acuerdo 589 de 2004). Tomado de [lufigir/manizalesdepie](https://github.com/lufigir/manizalesdepie), con permiso | Dato abierto de la Alcaldía |
+| `lugares.geojson` | Hospitales, clínicas y bomberos de OpenStreetMap. Se regenera con `node scripts/lugares-osm.mjs` (adaptado de `scripts/import-osm-sites.mjs` de manizalesdepie) | © colaboradores de OpenStreetMap, ODbL |
+
+La capa de calles usa las teselas estándar de OpenStreetMap (con atribución en el mapa). El punto
+en polígono (`src/geo/geo.ts`) viene de `lib/geo.ts` de manizalesdepie. MapLibre se mantiene en
+**v5**: la v6 cambió las exportaciones.
 
 ## Diseño
 

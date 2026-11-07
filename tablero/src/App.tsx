@@ -1,11 +1,16 @@
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useState } from "react";
+import { FileText, Map as IconoMapa } from "lucide-react";
 import { elegirActiva, incidentes, salud, type Nodo } from "./api/central";
 import type { Incidente, Salud } from "./api/tipos";
 import { porDecidir, type Filtro } from "./cola";
 import { BarraSuperior } from "./componentes/BarraSuperior";
 import { Cola } from "./componentes/Cola";
 import { Detalle } from "./componentes/Detalle";
+import { barrioDe, cargarGeo, type Barrio, type Geo } from "./geo/geo";
 import { usarPreferencia, usarSondeo } from "./usarSondeo";
+
+// MapLibre pesa ~1 MB: se baja solo al abrir el mapa, no para ver la cola.
+const Mapa = lazy(() => import("./componentes/Mapa").then((m) => ({ default: m.Mapa })));
 
 const CADA_MS = 3000;
 
@@ -21,6 +26,17 @@ export function App() {
   const [seleccion, setSeleccion] = useState<string | null>(null);
   const [verDetalle, setVerDetalle] = useState(false); // en pantallas angostas
   const [ahora, setAhora] = useState(() => Date.now() / 1000);
+  const [vista, setVista] = usarPreferencia("sard.vista", "incidente");
+  const [geo, setGeo] = useState<Geo | null>(null);
+
+  useEffect(() => {
+    cargarGeo().then(setGeo, () => setGeo(null)); // sin archivos geo, el tablero sigue sin mapa
+  }, []);
+
+  const barrio = useCallback(
+    (gh: string | null): Barrio | null => (geo && gh ? barrioDe(geo.barrios, gh) : null),
+    [geo],
+  );
 
   const saludes = usarSondeo(leerSaludes, CADA_MS);
   const activa = saludes.datos ? elegirActiva(saludes.datos) : null;
@@ -81,14 +97,37 @@ export function App() {
             setVerDetalle(true);
           }}
           ahora={ahora}
+          barrio={barrio}
         />
-        <div id="principal" className="zona-detalle" tabIndex={-1}>
-          {elegido ? (
+        <div id="principal" className={`zona-detalle${vista === "mapa" && geo ? " en-mapa" : ""}`} tabIndex={-1}>
+          {geo && (
+            <div className="vistas" role="tablist" aria-label="Vista">
+              <button role="tab" aria-selected={vista !== "mapa"} className={vista !== "mapa" ? "activo" : ""} onClick={() => setVista("incidente")}>
+                <FileText size={15} aria-hidden="true" /> Incidente
+              </button>
+              <button role="tab" aria-selected={vista === "mapa"} className={vista === "mapa" ? "activo" : ""} onClick={() => setVista("mapa")}>
+                <IconoMapa size={15} aria-hidden="true" /> Mapa
+              </button>
+            </div>
+          )}
+          {vista === "mapa" && geo ? (
+            <Suspense fallback={<p className="vacio">Cargando mapa…</p>}>
+              <Mapa
+                geo={geo}
+                incidentes={incs}
+                seleccion={elegido?.id ?? null}
+                onSeleccion={(id) => setSeleccion(id)}
+                tema={tema}
+              />
+            </Suspense>
+          ) : elegido ? (
             <Detalle
               inc={elegido}
               nodo={activa}
               coordinador={coordinador}
               ahora={ahora}
+              geo={geo}
+              barrio={barrio(elegido.geohash)}
               onDecidido={refrescar}
               onVolver={() => setVerDetalle(false)}
             />

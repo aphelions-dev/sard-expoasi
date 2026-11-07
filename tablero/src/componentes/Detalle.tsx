@@ -2,6 +2,7 @@ import { ArrowLeft, Clock, MapPin, Users } from "lucide-react";
 import type { Evidencia, Incidente } from "../api/tipos";
 import type { Nodo } from "../api/central";
 import { FUENTE, ORIGEN, TIPO, coordenadas, haceCuanto, horaLocal } from "../formato";
+import { cercanos, type Barrio, type Geo } from "../geo/geo";
 import { Decision } from "./Decision";
 import { InsigniaConfianza, InsigniaEstado, InsigniaPrioridad, InsigniaRevisar } from "./Insignias";
 
@@ -10,11 +11,13 @@ interface Props {
   nodo: Nodo | null;
   coordinador: string;
   ahora: number;
+  geo: Geo | null;
+  barrio: Barrio | null;
   onDecidido: () => void;
   onVolver: () => void;
 }
 
-export function Detalle({ inc, nodo, coordinador, ahora, onDecidido, onVolver }: Props) {
+export function Detalle({ inc, nodo, coordinador, ahora, geo, barrio, onDecidido, onVolver }: Props) {
   const u = inc.incertidumbre;
   return (
     <article className="detalle" aria-labelledby="t-incidente">
@@ -42,8 +45,17 @@ export function Detalle({ inc, nodo, coordinador, ahora, onDecidido, onVolver }:
           </span>
           {inc.geohash ? (
             <span>
-              <span className="mono">{inc.geohash}</span>
-              <span className="tenue pequeno"> · {coordenadas(inc.geohash)}</span>
+              {barrio ? (
+                <>
+                  <strong>{barrio.nombre}</strong>
+                  <span className="tenue pequeno"> · comuna {barrio.comuna}</span>
+                </>
+              ) : (
+                geo && <span className="tenue">Sin barrio conocido (fuera de Manizales o en Villamaría)</span>
+              )}
+              <span className="tenue pequeno ubicacion-codigo">
+                <span className="mono">{inc.geohash}</span> · {coordenadas(inc.geohash)} · ±600 m
+              </span>
             </span>
           ) : (
             <span className="aviso-texto">Sin ubicación: el reporte no trajo GPS</span>
@@ -91,9 +103,41 @@ export function Detalle({ inc, nodo, coordinador, ahora, onDecidido, onVolver }:
         </div>
         <aside className="columna-accion">
           <Decision key={inc.accion_propuesta?.id ?? inc.id} inc={inc} nodo={nodo} coordinador={coordinador} onDecidido={onDecidido} />
+          {geo && inc.geohash && <Cerca geo={geo} gh={inc.geohash} />}
         </aside>
       </div>
     </article>
+  );
+}
+
+function distancia(m: number): string {
+  return m < 1000 ? `${Math.round(m / 50) * 50} m` : `${(m / 1000).toFixed(1).replace(".", ",")} km`;
+}
+
+/** Lo más cercano según OpenStreetMap, medido desde el centro de la celda: es una referencia. */
+function Cerca({ geo, gh }: { geo: Geo; gh: string }) {
+  const grupos = [
+    { titulo: "Hospitales y clínicas", lista: cercanos(geo.lugares, gh, ["hospital", "clinica"], 3) },
+    { titulo: "Bomberos", lista: cercanos(geo.lugares, gh, ["bomberos"], 2) },
+  ];
+  return (
+    <section className="panel cerca" aria-labelledby="t-cerca">
+      <h2 id="t-cerca">Cerca del incidente</h2>
+      {grupos.map((g) => (
+        <div key={g.titulo}>
+          <h3>{g.titulo}</h3>
+          <ul className="cerca-lista">
+            {g.lista.map((l) => (
+              <li key={l.id}>
+                <span>{l.nombre}</span>
+                <span className="mono tenue pequeno">{distancia(l.metros)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+      <p className="pequeno tenue">En línea recta desde el centro de la celda. Fuente: OpenStreetMap.</p>
+    </section>
   );
 }
 

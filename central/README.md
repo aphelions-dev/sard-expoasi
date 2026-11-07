@@ -10,11 +10,14 @@ Desde `central/`, con el `.env` de la raíz (copia de `.env.example` con `JEV_AP
 
 ```bash
 uv sync
-uv run --env-file ../.env uvicorn api.main:app --port 8001                 # central A
-SARD_NODO=B uv run --env-file ../.env uvicorn api.main:app --port 8002     # central B
-uv run --env-file ../.env python -m agentes.triaje                         # agente de triaje
-uv run pytest                                                              # pruebas
+uv run --env-file ../.env python iniciar.py A     # central A completa en :8001 (API + 4 agentes)
+uv run --env-file ../.env python iniciar.py B     # central B completa en :8002, en otra terminal
+uv run pytest                                     # pruebas
 ```
+
+Ctrl+C en la terminal de una central la apaga entera: así se muestra la caída en la demo. Cada
+pieza también se puede levantar sola (`uvicorn api.main:app --port 8001`,
+`python -m agentes.triaje`, `agentes.correlacion`, `agentes.coordinacion`, `agentes.resiliencia`).
 
 Cada agente es un proceso aparte (patrón pizarra): lee del registro de eventos lo que le falta
 procesar y escribe su resultado como evento nuevo. Si uno cae, los demás siguen, y al volver
@@ -25,7 +28,19 @@ El ejecutor común está en `agentes/ejecutor.py`.
 |----------|-------------|--------|
 | `SARD_NODO` | `A` | Qué central es (`A` o `B`) |
 | `SARD_DB` | `datos/central-<nodo>.sqlite` | Base de la instancia |
-| `JEV_API_KEY` | — | Clave de Jev; sin ella el triaje queda solo con reglas |
+| `JEV_API_KEY` | — | Clave de Jev; sin ella el triaje y la correlación quedan solo con reglas |
+| `CENTRAL_A_URL`, `CENTRAL_B_URL` | `http://localhost:8001` y `:8002` | Dónde está cada central, para sincronizarse y para el relevo |
+
+## Centrales A y B
+
+Las dos corren a la vez. El agente de resiliencia de cada una copia cada segundo los eventos de
+la otra (`GET /eventos`) y los une por id; como el registro solo crece, la unión no tiene
+conflictos. Los agentes de la B esperan mientras la A responda a `/salud`: si la A cae, la B
+procesa lo que le llega (la pasarela le manda a la B), y cuando la A vuelve, trae lo que hizo
+la B y retoma. Probado con Jev real: caída de la A, reporte y aprobación en la B, vuelta de la A,
+y `GET /incidentes` igual en las dos.
+
+Para dos computadores, poner en el `.env` de cada uno las URLs reales de las dos centrales.
 
 ## Estructura
 
@@ -35,6 +50,8 @@ El ejecutor común está en `agentes/ejecutor.py`.
 | `agentes/` | Una subcarpeta por agente, cada una con su README de alcance |
 | `protocolo/` | Lectura y validación de SARD1 |
 | `registro/` | Registro de eventos (solo agrega) |
+| `vista/` | Incidentes para el tablero, calculados a partir de los eventos |
+| `iniciar.py` | Levanta una central completa |
 | `datos/` | Base local y registro de eventos (los `.sqlite` no se suben) |
 | `tests/` | Pruebas; las de protocolo y API usan `contracts/ejemplos/` |
 
@@ -51,8 +68,11 @@ dos veces el mismo reporte.
 | `reporte_duplicado` | Recepción | Llega otra vez un id ya registrado (guarda la pasarela, para contar rutas) |
 | `reporte_rechazado` | Recepción | El mensaje no cumple el protocolo (guarda los motivos) |
 | `reporte_priorizado` | Triaje | Prioridad final, la de reglas y la de Jev, evidencia, fuente (directa, de oídas) y motivos de revisión |
+| `incidente_actualizado` | Correlación | El reporte abre un incidente o se vincula a uno (similitud, posibles vínculos, contradicciones) |
+| `accion_propuesta` | Coordinación | Entidad, acción, justificación y lo que falta confirmar; queda pendiente |
+| `decision_humana` | API (coordinador) | Aprobación o rechazo de la propuesta vigente |
 | `agente_error` | Cualquier agente | Un agente falló con un evento; se reintenta |
-| `incidente_actualizado` | Correlación | Por implementar (#12) |
+| `par_caido`, `par_recuperado` | Resiliencia | La otra central dejó de responder o volvió |
 
 ## Decisiones provisionales del contrato
 

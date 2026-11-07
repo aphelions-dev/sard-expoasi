@@ -24,6 +24,12 @@ def mas_alta(*prioridades: str | None) -> str:
     return min(p for p in prioridades if p)  # "P1" < "P2" < ...
 
 
+def senales_jev(nouls: dict[str, float], si: float = jev_mod.SI) -> list[reglas.Senal]:
+    """Señales que Jev da por ciertas con el umbral `si`. La calibración prueba otros umbrales."""
+    return [reglas.Senal(nombre, "jev", p, probabilidad=nouls[nombre])
+            for nombre, p in jev_mod.QUE_SUBE.items() if nouls[nombre] >= si]
+
+
 def triar(reporte: dict[str, Any], cliente: jev_mod.Jev) -> dict[str, Any]:
     senales = reglas.senales(reporte)
     p_reglas = mas_alta(*(s.prioridad for s in senales))
@@ -42,10 +48,9 @@ def triar(reporte: dict[str, Any], cliente: jev_mod.Jev) -> dict[str, Any]:
         else:
             datos.update(jev="ok", jev_modelo=r.modelo, jev_nouls=r.nouls,
                          tipo_jev=r.tipo, tipo_jev_probabilidad=r.tipo_probabilidad)
-            for nombre, p in jev_mod.QUE_SUBE.items():
-                if r.nouls[nombre] >= jev_mod.SI:
-                    senales.append(reglas.Senal(nombre, "jev", p, probabilidad=r.nouls[nombre]))
-            subidas = [s.prioridad for s in senales if s.origen == "jev"]
+            de_jev = senales_jev(r.nouls)
+            senales += de_jev
+            subidas = [s.prioridad for s in de_jev]
             datos["prioridad_jev"] = mas_alta(*subidas) if subidas else None
 
             riesgo = r.nouls["riesgo_vital"]

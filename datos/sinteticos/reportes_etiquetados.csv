@@ -1,1 +1,101 @@
 id,texto,tipo_real,prioridad_real,atrapados,heridos,notas
+r001,"Se cayó el edificio de la calle 23, hay tres personas atrapadas en el segundo piso",ATRAP,P1,1,0,claro
+r002,"mi mamá quedó debajo de la placa del techo, la escucho pero no la puedo sacar",ATRAP,P1,0,0,dudoso: sin palabra crítica ni bandera; solo Jev puede subirlo
+r003,"el niño no respira, ayuda por favor",MEDIC,P1,0,0,claro
+r004,"mi papá se desplomó, está morado y no se mueve",MEDIC,P1,0,0,dudoso: sin palabra crítica
+r005,se está quemando el segundo piso y hay gente adentro,FUEGO,P1,0,0,claro
+r006,huele mucho a gas en todo el edificio y hay niños adentro,FUEGO,P1,0,0,claro: fuga de gas con personas
+r007,"creo que mi vecino está atrapado, no contesta desde el temblor",ATRAP,P1,0,0,dudoso: «creo que»; la palabra crítica lo sube igual
+r008,señora mayor convulsionando en la tienda de la esquina,MEDIC,P1,0,0,claro
+r009,"un hombre sangra mucho de la pierna, se cortó con un vidrio",MEDIC,P1,0,1,claro
+r010,hay un muchacho que no reacciona en el parque,MEDIC,P1,0,0,claro
+r011,"no sé si respira mi abuela, está muy pálida y fría",MEDIC,P1,0,0,dudoso: «no sé si respira» no coincide con «no respira»
+r012,"quedamos encerrados en el ascensor del centro comercial, somos 5 y uno es asmático",ATRAP,P1,1,0,claro
+r013,colapsó el puente peatonal y hay gente abajo,ATRAP,P1,0,0,dudoso: sin palabra crítica
+r014,se escucha a alguien pidiendo auxilio entre los escombros del colegio,ATRAP,P1,0,0,dudoso: «entre los escombros» no coincide con «bajo escombros»
+r015,mi hijo de 3 años se tragó algo y se está ahogando,MEDIC,P1,0,0,dudoso: «ahogando» no está en la lista
+r016,"explosión en la estación de servicio de la avenida, hay heridos",FUEGO,P1,0,1,claro
+r017,estamos atrapados en el sótano y está entrando agua,ATRAP,P1,1,0,claro
+r018,"mi esposa está embarazada, empezó a sangrar mucho y está mareada",MEDIC,P1,0,0,dudoso: «sangrar mucho» no coincide con «sangra mucho»
+r019,"la casa se derrumbó con la familia adentro, son 4 con dos niños",ATRAP,P1,0,0,dudoso: sin palabra crítica ni bandera
+r020,"humo negro saliendo del hospital, están evacuando pacientes",FUEGO,P1,0,0,claro
+r021,"un señor inconsciente en la vía, lo atropelló una moto",MEDIC,P1,0,1,claro
+r022,"ayuda no puedo salir, la puerta quedó trabada y el techo se está cediendo",ATRAP,P1,1,0,claro
+r023,"llamas en la cocina del restaurante, el cocinero se quemó los brazos",FUEGO,P1,0,1,claro
+r024,persona aplastada por una pared en la carrera 5,ATRAP,P1,0,0,dudoso: «aplastada» no está en la lista
+r025,mi bebé no se despierta y tiene fiebre muy alta,MEDIC,P1,0,0,dudoso: sin palabra crítica
+r026,"hay alguien colgado del balcón del cuarto piso, se va a caer",OTRO,P1,0,0,dudoso: riesgo vital sin palabra crítica
+r027,se desmayó mi tía diabética y no despierta,MEDIC,P1,0,0,claro
+r028,edif caido gnt atrapda cll 10 ayu,ATRAP,P1,0,0,dudoso: escrito con prisa; «atrapda» no coincide con «atrapad»
+r029,dicen que en el colegio hay niños atrapados,ATRAP,P1,0,0,"dudoso: de oídas; riesgo vital no se baja por rumor, la confianza la mide la correlación"
+r030,la bodega de pinturas está ardiendo al lado del jardín infantil,FUEGO,P1,0,0,dudoso: «ardiendo» no está en la lista
+r031,"me fracturé el brazo cuando salía de la casa, estoy consciente pero duele mucho",MEDIC,P2,0,1,claro
+r032,señor de 80 años sin sus pastillas del corazón desde ayer,MEDIC,P2,0,0,dudoso: vulnerable sin bandera
+r033,"niña de 7 años perdida desde el temblor, la buscamos en el barrio San José",DESAP,P2,0,0,claro: niño desaparecido
+r034,mi hijo es diabético y se nos acabó la insulina,MEDIC,P2,0,0,claro
+r035,la pared de la escuela tiene una grieta enorme y hay familias refugiadas al lado,OTRO,P2,0,0,dudoso: estructura en riesgo con gente cerca
+r036,"tengo una cortada en la cabeza, ya dejó de salir",MEDIC,P2,0,1,claro
+r037,"el niño se quemó la mano con agua hirviendo, llora pero está consciente",MEDIC,P2,0,1,claro
+r038,"mi abuelo usa oxígeno y la bala se acaba en dos horas, no hay luz",MEDIC,P2,0,0,dudoso: puede volverse P1 si no se atiende
+r039,"se torció el tobillo y no puede caminar, estamos en el cerro",MEDIC,P2,0,1,claro
+r040,"creo que mi hermano está herido, me dijo por radio que le cayó algo encima",MEDIC,P2,0,0,dudoso: «creo que»; podría ser P1 si quedó atrapado
+r041,el edificio se está inclinando y la gente sigue adentro,OTRO,P2,0,0,dudoso: puede volverse P1
+r042,embarazada con contracciones y no hay cómo llegar al hospital,MEDIC,P2,0,0,claro
+r043,"perdimos a mi papá que tiene alzhéimer, salió caminando después del sismo",DESAP,P2,0,0,claro: adulto vulnerable desaparecido
+r044,un señor con la pierna rota en la portería del conjunto,MEDIC,P2,0,1,claro
+r045,niño con asma en crisis y se le acabó el inhalador,MEDIC,P2,0,0,dudoso: puede volverse P1
+r046,me toca diálisis hoy y la clínica está cerrada,MEDIC,P2,0,0,dudoso: vulnerable sin bandera
+r047,"la señora se golpeó la cabeza, está mareada y vomitando",MEDIC,P2,0,0,dudoso: puede volverse P1
+r048,"se volcó el bus de la ruta, hay pasajeros golpeados pero todos salieron",MEDIC,P2,0,1,claro
+r049,"dos niños solos en el apartamento 302, los papás no han vuelto",OTRO,P2,0,0,dudoso: menores solos
+r050,"se cayó un muro sobre un carro, el conductor salió pero tiene sangre en la cara",MEDIC,P2,0,1,sobretriaje esperado: «sangre» lo sube a P1 (ADR 0005)
+r051,cables caídos en el agua frente a la escuela y los niños están saliendo,OTRO,P2,0,0,dudoso: riesgo eléctrico con niños
+r052,mi vecino tiene un clavo enterrado en el pie,MEDIC,P2,0,1,claro
+r053,"muchacho de 15 años no aparece, era el que cuidaba a la abuela",DESAP,P2,0,0,dudoso: menor desaparecido
+r054,"abuela en silla de ruedas en un cuarto piso, el ascensor no sirve y sigue temblando",OTRO,P2,0,0,dudoso: vulnerable sin poder evacuar
+r055,parece que un perro mordió a un niño en el albergue,MEDIC,P2,0,0,dudoso: «parece que»
+r056,"la vía a Chinchiná está bloqueada por un derrumbe, no hay carros atrapados",VIA,P3,0,0,sobretriaje esperado: la regla no entiende la negación «no hay … atrapados»
+r057,poste de luz caído en la calle 15 con carrera 8,VIA,P3,0,0,claro
+r058,tubo de agua roto inundando la cuadra,OTRO,P3,0,0,claro
+r059,"mi tío de 40 años no contesta el celular desde ayer, vive en Villamaría",DESAP,P3,0,0,dudoso: adulto sin indicio de peligro
+r060,árbol caído tapando la entrada del barrio,VIA,P3,0,0,claro
+r061,"el puente de la quebrada quedó con grietas, mejor no pasar",VIA,P3,0,0,claro
+r062,"raspones y golpes leves en el polideportivo, ya los curamos",MEDIC,P3,0,1,sobretriaje esperado: la bandera de heridos lo sube a P2
+r063,"se cayó la fachada de una casa abandonada, no había nadie",OTRO,P3,0,0,claro
+r064,semáforos apagados y el cruce de la avenida Santander es un caos,VIA,P3,0,0,claro
+r065,"deslizamiento en la ladera detrás del barrio, todavía no toca casas",OTRO,P3,0,0,dudoso: puede crecer
+r066,"busco a mi hermana, estaba en el centro cuando tembló",DESAP,P3,0,0,dudoso: adulto sin indicio de peligro
+r067,"el muro del colegio quedó agrietado, hoy no hay clases",OTRO,P3,0,0,claro
+r068,hay vidrios rotos por toda la calle 23,VIA,P3,0,0,claro
+r069,"se cayó el tanque de agua del edificio, no hay heridos",OTRO,P3,0,0,claro
+r070,"la carretera al aeropuerto tiene huecos grandes, solo pasan motos",VIA,P3,0,0,claro
+r071,un señor dice que se le cayó la casa del campo pero él está bien,OTRO,P3,0,0,dudoso: de oídas
+r072,"fuga de agua en el tercer piso, ya cerramos el registro",OTRO,P3,0,0,claro
+r073,"la quebrada viene crecida y café, el agua está subiendo despacio",OTRO,P3,0,0,dudoso: puede crecer
+r074,no sé nada de mi primo que trabaja en la obra de la 50,DESAP,P3,0,0,dudoso: adulto sin indicio de peligro
+r075,"ya apagamos el fuego de la cocina, nadie salió lastimado",FUEGO,P3,0,0,sobretriaje esperado: «fuego» lo sube a P1 aunque ya se apagó
+r076,el transformador de la esquina está sonando raro,OTRO,P3,0,0,dudoso: riesgo posible
+r077,"rocas en la vía al Magdalena, hay un carril habilitado",VIA,P3,0,0,claro
+r078,"evacuaron el edificio por las grietas, todos afuera y bien",OTRO,P3,0,0,claro
+r079,se cayó una antena sobre el parqueadero vacío,OTRO,P3,0,0,claro
+r080,hay gente saqueando la tienda de la esquina,OTRO,P3,0,0,dudoso: orden público
+r081,"estamos bien, solo sin luz ni agua",OTRO,P4,0,0,claro
+r082,¿dónde hay albergues en Manizales?,OTRO,P4,0,0,claro: pregunta
+r083,necesitamos agua potable para 6 personas,OTRO,P4,0,0,claro
+r084,dicen que esta noche viene un terremoto más fuerte,OTRO,P4,0,0,dudoso: rumor
+r085,mi familia está a salvo en el albergue de la Universidad,OTRO,P4,0,0,claro
+r086,se nos dañó la comida de la nevera,OTRO,P4,0,0,claro
+r087,hay un perro perdido en el parque Caldas,OTRO,P4,0,0,claro
+r088,dicen que se cayó el edificio del banco pero no sé,OTRO,P4,0,0,dudoso: rumor sin detalle; la correlación decide si se corrobora
+r089,¿cuándo vuelve la luz?,OTRO,P4,0,0,claro: pregunta
+r090,"necesito cargar el celular, ¿hay alguna planta eléctrica cerca?",OTRO,P4,0,0,claro
+r091,todo bien en la vereda La Cabaña,OTRO,P4,0,0,claro
+r092,"se agrietó una pared de mi cuarto, es pequeña",OTRO,P4,0,0,claro
+r093,ayu,OTRO,P4,0,0,"dudoso: truncado; sin información, decide el formulario"
+r094,,OTRO,P4,0,0,dudoso: sin texto; decide el formulario
+r095,"se escucha una sirena por el norte, ¿alguien sabe qué pasa?",OTRO,P4,0,0,dudoso: sin dato concreto
+r096,"en el WhatsApp dicen que hay gas tóxico en el aire, no salgan",OTRO,P4,0,0,sobretriaje esperado: rumor con «gas» sube a P1
+r097,hay fila larga en la única droguería abierta,OTRO,P4,0,0,claro
+r098,¿los buses intermunicipales están saliendo?,OTRO,P4,0,0,claro: pregunta
+r099,ofrezco mi casa para 3 personas en Chipre,OTRO,P4,0,0,claro
+r100,"Mamá, ¿llegaste bien a la casa? Avísame",OTRO,P4,0,0,"sobretriaje esperado: falso positivo, «gas» dentro de «llegaste»"

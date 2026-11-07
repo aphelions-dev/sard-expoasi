@@ -1,11 +1,13 @@
 import { Suspense, lazy, useCallback, useEffect, useState } from "react";
-import { FileText, Map as IconoMapa } from "lucide-react";
-import { elegirActiva, incidentes, salud, type Nodo } from "./api/central";
-import type { Incidente, Salud } from "./api/tipos";
+import { Ban, FileText, Map as IconoMapa, Truck } from "lucide-react";
+import { elegirActiva, incidentes, rechazados, recursos, salud, type Nodo } from "./api/central";
+import type { Incidente, Rechazado, Recurso, Salud } from "./api/tipos";
 import { porDecidir, type Filtro } from "./cola";
 import { BarraSuperior } from "./componentes/BarraSuperior";
 import { Cola } from "./componentes/Cola";
 import { Detalle } from "./componentes/Detalle";
+import { Rechazados } from "./componentes/Rechazados";
+import { Recursos } from "./componentes/Recursos";
 import { barrioDe, cargarGeo, type Barrio, type Geo } from "./geo/geo";
 import { usarPreferencia, usarSondeo } from "./usarSondeo";
 
@@ -41,6 +43,8 @@ export function App() {
   const saludes = usarSondeo(leerSaludes, CADA_MS);
   const activa = saludes.datos ? elegirActiva(saludes.datos) : null;
   const lista = usarSondeo<Incidente[] | null>(() => (activa ? incidentes(activa) : Promise.resolve(null)), CADA_MS);
+  const recs = usarSondeo<Recurso[] | null>(() => (activa ? recursos(activa) : Promise.resolve(null)), CADA_MS);
+  const rech = usarSondeo<Rechazado[] | null>(() => (activa ? rechazados(activa) : Promise.resolve(null)), CADA_MS);
 
   useEffect(() => {
     document.documentElement.dataset.theme = tema;
@@ -59,6 +63,21 @@ export function App() {
 
   const incs = lista.datos ?? [];
   const elegido = incs.find((i) => i.id === seleccion) ?? incs[0] ?? null;
+  const sinRecuperar = rech.datos?.filter((r) => !r.recuperado).length ?? 0;
+  const enMapa = vista === "mapa" && !!geo;
+
+  // En pantallas angostas la cola y la zona derecha se alternan: otra pestaña muestra la zona.
+  function irA(v: string) {
+    setVista(v);
+    setVerDetalle(v !== "incidente");
+  }
+  const volver = () => irA("incidente");
+  const VISTAS = [
+    { id: "incidente", etiqueta: "Incidente", icono: FileText, n: 0 },
+    ...(geo ? [{ id: "mapa", etiqueta: "Mapa", icono: IconoMapa, n: 0 }] : []),
+    { id: "recursos", etiqueta: "Recursos", icono: Truck, n: 0 },
+    { id: "rechazados", etiqueta: "Rechazados", icono: Ban, n: sinRecuperar },
+  ];
 
   return (
     <div className="app">
@@ -86,6 +105,15 @@ export function App() {
         </p>
       )}
 
+      <nav className="vistas" role="tablist" aria-label="Vista">
+        {VISTAS.map((v) => (
+          <button key={v.id} role="tab" aria-selected={vista === v.id} className={vista === v.id ? "activo" : ""} onClick={() => irA(v.id)}>
+            <v.icono size={15} aria-hidden="true" /> {v.etiqueta}
+            {v.n > 0 && <span className="vistas-n" aria-label={`${v.n} sin recuperar`}>{v.n}</span>}
+          </button>
+        ))}
+      </nav>
+
       <main className={`principal${verDetalle ? " con-detalle" : ""}`}>
         <Cola
           incidentes={incs}
@@ -94,23 +122,29 @@ export function App() {
           seleccion={elegido?.id ?? null}
           onSeleccion={(id) => {
             setSeleccion(id);
+            if (vista !== "incidente" && vista !== "mapa") setVista("incidente");
             setVerDetalle(true);
           }}
           ahora={ahora}
           barrio={barrio}
         />
-        <div id="principal" className={`zona-detalle${vista === "mapa" && geo ? " en-mapa" : ""}`} tabIndex={-1}>
-          {geo && (
-            <div className="vistas" role="tablist" aria-label="Vista">
-              <button role="tab" aria-selected={vista !== "mapa"} className={vista !== "mapa" ? "activo" : ""} onClick={() => setVista("incidente")}>
-                <FileText size={15} aria-hidden="true" /> Incidente
-              </button>
-              <button role="tab" aria-selected={vista === "mapa"} className={vista === "mapa" ? "activo" : ""} onClick={() => setVista("mapa")}>
-                <IconoMapa size={15} aria-hidden="true" /> Mapa
-              </button>
-            </div>
-          )}
-          {vista === "mapa" && geo ? (
+        <div id="principal" className={`zona-detalle${enMapa ? " en-mapa" : ""}`} tabIndex={-1}>
+          {vista === "recursos" ? (
+            <Recursos
+              declarados={recs.datos}
+              incidentes={incs}
+              nodo={activa}
+              coordinador={coordinador}
+              ahora={ahora}
+              onDeclarado={() => {
+                recs.refrescar();
+                refrescar();
+              }}
+              onVolver={volver}
+            />
+          ) : vista === "rechazados" ? (
+            <Rechazados lista={rech.datos} ahora={ahora} onVolver={volver} />
+          ) : enMapa ? (
             <Suspense fallback={<p className="vacio">Cargando mapa…</p>}>
               <Mapa
                 geo={geo}
@@ -128,7 +162,10 @@ export function App() {
               ahora={ahora}
               geo={geo}
               barrio={barrio(elegido.geohash)}
-              onDecidido={refrescar}
+              onDecidido={() => {
+                refrescar();
+                recs.refrescar();
+              }}
               onVolver={() => setVerDetalle(false)}
             />
           ) : (

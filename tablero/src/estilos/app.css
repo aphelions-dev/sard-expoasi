@@ -1224,3 +1224,195 @@ button:disabled {
     min-height: 60vh;
   }
 }
+
+/* ---------- Barra de vistas, recursos y rechazados ---------- */
+
+nav.vistas {
+  margin: 0;
+  align-self: stretch;
+  border-width: 0 0 1px;
+  border-radius: 0;
+  padding: 6px var(--e4);
+  background: var(--superficie);
+}
+
+.vistas-n {
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--aviso-fondo);
+  color: var(--aviso);
+}
+
+.vista-panel {
+  padding: var(--e5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e4);
+  max-width: 1080px;
+}
+
+.vista-cabeza {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vista-cabeza h2 {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.vista-cabeza p {
+  font-size: 14px;
+  max-width: 75ch;
+}
+
+.recursos,
+.rechazados {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--e3);
+}
+
+.recurso {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) minmax(220px, 1.4fr) minmax(220px, 1fr);
+  gap: var(--e4);
+  align-items: start;
+  padding: var(--e4);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--superficie);
+}
+
+.recurso h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.recurso h3::first-letter {
+  text-transform: uppercase;
+}
+
+.recurso-estado {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.recurso-num {
+  font-family: var(--mono);
+  font-size: 22px;
+}
+
+.recurso-num.agotado {
+  color: var(--error);
+}
+
+.medidor {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--superficie-hover);
+  overflow: hidden;
+}
+
+.medidor span {
+  display: block;
+  height: 100%;
+  background: var(--accion);
+}
+
+.en-linea {
+  vertical-align: -2px;
+  margin-right: 4px;
+}
+
+.recurso-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.recurso-fila {
+  display: flex;
+  gap: var(--e2);
+}
+
+.recurso-fila input {
+  width: 90px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--radio-chico);
+  background: var(--superficie-2);
+  font-family: var(--mono);
+}
+
+.recurso-fila .boton {
+  flex: 1;
+}
+
+.ok-texto {
+  color: var(--ok);
+  font-weight: 500;
+}
+
+.rechazado {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e2);
+  padding: var(--e3) var(--e4);
+  border: 1px solid var(--borde);
+  border-left: 4px solid var(--aviso);
+  border-radius: var(--radio);
+  background: var(--superficie);
+}
+
+.rechazado.recuperado {
+  border-left-color: var(--ok);
+}
+
+.rechazado-cabeza {
+  display: flex;
+  align-items: center;
+  gap: var(--e2);
+  flex-wrap: wrap;
+}
+
+.campos {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px var(--e4);
+  font-size: 13px;
+}
+
+.campos div {
+  display: flex;
+  gap: 6px;
+}
+
+.campos dt {
+  color: var(--texto-tenue);
+}
+
+.campos dd {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  nav.vistas {
+    overflow-x: auto;
+  }
+  .vista-panel {
+    padding: var(--e4);
+  }
+  .recurso {
+    grid-template-columns: 1fr;
+  }
+}

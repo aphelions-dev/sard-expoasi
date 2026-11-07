@@ -1,0 +1,51 @@
+{
+  "creados": 40,
+  "entregados_central": 40,
+  "tasa_entrega": 1.0,
+  "confirmados_reportante": 40,
+  "vencidos": 0,
+  "latencia_por_prioridad": {
+    "P1": {
+      "creados": 13,
+      "entregados": 13,
+      "p50_s": 2,
+      "p95_s": 4,
+      "max_s": 4
+    },
+    "P2": {
+      "creados": 11,
+      "entregados": 11,
+      "p50_s": 2,
+      "p95_s": 4,
+      "max_s": 4
+    },
+    "P3": {
+      "creados": 8,
+      "entregados": 8,
+      "p50_s": 3,
+      "p95_s": 5,
+      "max_s": 5
+    },
+    "P4": {
+      "creados": 8,
+      "entregados": 8,
+      "p50_s": 3,
+      "p95_s": 5,
+      "max_s": 5
+    }
+  },
+  "saltos_promedio": 2.77,
+  "llegadas_duplicadas": 0,
+  "max_llegadas_por_id": 1,
+  "reportes_creados_en_central_por_id": 1,
+  "emitidos": {
+    "reportes": 1008,
+    "sacks": 1192,
+    "bytes": 113392
+  },
+  "subidas_fallidas": 0,
+  "nodos_apagados": 0,
+  "nodos_sin_vecinos": 0,
+  "nodos_con_camino_a_pasarela": 30,
+  "segundos_simulados": 600
+}

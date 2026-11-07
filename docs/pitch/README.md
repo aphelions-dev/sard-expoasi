@@ -4,6 +4,7 @@
 |---------|--------|
 | `pitch.pdf` | La presentación ejecutiva (9 diapositivas, unos 5 minutos) en PDF. **Pendiente**: se exporta desde la presentación cuando el equipo apruebe la versión. |
 | `guion-demo.md` | La demo de 5 minutos: los 8 pasos, quién los muestra y el plan B de cada uno. |
+| `sard-demo-respaldo.mp4` | Video de respaldo (2 min 56 s, sin audio): el recorrido de 8 pasos grabado el 7 de noviembre de 2026 con la malla simulada y las centrales y el tablero reales, incluida la aprobación en el tablero y la caída de la central A. Plan B si la demo en vivo falla. |
 
 Orden: pitch (5 min) y luego la demo (5 min).
 

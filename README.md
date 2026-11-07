@@ -85,61 +85,14 @@ Antes de tocar nada, cada uno lee [`CLAUDE.md`](CLAUDE.md),
 carpeta. Comandos para clonar, cambiarse de rama y abrir Claude Code, más ramas, commits e issues:
 [`docs/equipo.md`](docs/equipo.md). Hitos y tareas: [`docs/plan.md`](docs/plan.md).
 
-### Persona 1 — @samcastroca · app y malla (rama `p1/app-malla`)
+| Integrante | Qué hace | Empieza por | Tareas |
+|------------|----------|-------------|--------|
+| **@samcastroca** (P1) · rama `p1/app-malla` | App Android sobre el fork de bitchat: formulario sin internet, prioridad por reglas, almacenamiento local, cola de reenvío con `SACK` y pasarela con failover A/B | [`app/README.md`](app/README.md) · [ficha de comunicación](docs/fichas-agentes/comunicacion.md) | [Issues abiertos](https://github.com/aphelions-dev/sard-expoasi/issues?q=is%3Aissue%20is%3Aopen%20assignee%3Asamcastroca) |
+| **@lufigir** (P2) · rama `p2/central-agentes` | Central (API, registro de eventos solo-agregar, central B) y agentes de recepción, triaje, correlación, coordinación y resiliencia | [`central/README.md`](central/README.md) · [arquitectura](docs/arquitectura.md) | [Issues abiertos](https://github.com/aphelions-dev/sard-expoasi/issues?q=is%3Aissue%20is%3Aopen%20assignee%3Alufigir) |
+| **@CrArenas** (P3) · rama `p3/tablero-pruebas` | Tablero del coordinador, simulador de la malla (plan B de la demo), reportes sintéticos, pruebas con métricas, README y pitch | [`tablero/README.md`](tablero/README.md) · [`simulador/README.md`](simulador/README.md) · [resultados](pruebas/resultados/README.md) | [Issues abiertos](https://github.com/aphelions-dev/sard-expoasi/issues?q=is%3Aissue%20is%3Aopen%20assignee%3ACrArenas) |
 
-Hace la app Android sobre el fork de bitchat: formulario sin internet, prioridad por reglas,
-almacenamiento local, cola de reenvío por prioridad con `SACK` y modo pasarela con failover entre
-las centrales A y B. Es la parte que falta para pasar la demo de la malla simulada a celulares reales.
-
-- Pendiente: #1 compilar el fork y lograr mensajes entre 3 celulares · #5 formulario y prioridad ·
-  #6 almacenamiento local · #7 pasarela y `SACK` · #10 cola y reintentos · #50 tope de reintentos o
-  vencimiento · #14 failover A/B.
-- Leer: [`app/README.md`](app/README.md) · [`app/CLAUDE.md`](app/CLAUDE.md) ·
-  [`docs/fichas-agentes/comunicacion.md`](docs/fichas-agentes/comunicacion.md) ·
-  [`contracts/api-central.md`](contracts/api-central.md) (`POST /reportes` y `GET /salud`) ·
-  [ADR 0001](docs/decisiones/0001-usar-port-android-bitchat.md) ·
-  [ADR 0002](docs/decisiones/0002-solo-android.md).
-- Por definir con el equipo, en una rama `contrato/...`: largo máximo del texto, vencimiento y
-  tiempos de reintento.
-
-### Persona 2 — @lufigir · central y agentes (rama `p2/central-agentes`)
-
-Mantiene la central (API, registro de eventos solo-agregar y central B) y los agentes de recepción,
-triaje, correlación, coordinación y resiliencia.
-
-- Pendiente: #43 falsos positivos y variantes en el triaje por reglas · #49 `SACK` antes de
-  sincronizar con la B.
-- Leer: [`central/README.md`](central/README.md) · [`central/CLAUDE.md`](central/CLAUDE.md) ·
-  agentes ([recepción](central/agentes/recepcion/README.md),
-  [triaje](central/agentes/triaje/README.md),
-  [correlación](central/agentes/correlacion/README.md),
-  [coordinación](central/agentes/coordinacion/README.md),
-  [resiliencia](central/agentes/resiliencia/README.md)) ·
-  [calibración](central/calibracion/README.md) · [sesgo](central/sesgo/README.md) y
-  [sus resultados](central/sesgo/resultados.md) ·
-  [investigación de la central](docs/referencias/investigacion-central.md) ·
-  [ADR 0003](docs/decisiones/0003-registro-eventos-solo-agregar.md) ·
-  [ADR 0004](docs/decisiones/0004-jev-solo-en-central.md) ·
-  [ADR 0005](docs/decisiones/0005-reglas-ganan-palabra-critica.md).
-
-### Persona 3 — @CrArenas · tablero, simulador y pruebas (rama `p3/tablero-pruebas`)
-
-Hace el tablero del coordinador, el simulador de la malla (que es el plan B de la demo), los
-reportes sintéticos y las pruebas con métricas, además del README final y el pitch.
-
-- Pendiente: #16 pruebas E1–E7 (falta E6, que necesita `JEV_API_KEY`) · #21 README final y pitch.
-- Leer: [`tablero/README.md`](tablero/README.md) · [`tablero/CLAUDE.md`](tablero/CLAUDE.md) ·
-  [`simulador/README.md`](simulador/README.md) · [`simulador/CLAUDE.md`](simulador/CLAUDE.md) ·
-  [`datos/sinteticos/README.md`](datos/sinteticos/README.md) ·
-  [`pruebas/escenarios.md`](pruebas/escenarios.md) ·
-  [`pruebas/resultados/README.md`](pruebas/resultados/README.md) ·
-  [`docs/pitch/README.md`](docs/pitch/README.md).
-
-### Los tres
-
-#17 recorrido de 8 pasos integrado con los celulares · #22 dos ensayos de la demo
-([`docs/pitch/guion-demo.md`](docs/pitch/guion-demo.md)). Los cambios al contrato
-([`contracts/`](contracts/protocolo-sard1.md)) los revisan los tres.
+Las tareas compartidas (recorrido integrado, ensayos de la demo, revisión del contrato) aparecen en
+el filtro de cada uno.
 
 ## Documentación
 

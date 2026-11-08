@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 
 from .centrales import CentralSimulada
 from .generador import Generador
+from .geo import FOCOS, a_metros
 from .sard1 import Reporte, sack
 
 
@@ -22,6 +23,7 @@ class Parametros:
     nodos: int = 30
     pasarelas: int = 1
     lado_m: float = 150.0          # los celulares se reparten en un cuadrado de este lado
+    focos: int = 1                 # mallas separadas en barrios distintos (geo.FOCOS), cada una con sus pasarelas
     alcance_m: float = 50.0        # alcance Bluetooth LE entre dos celulares
     perdida: float = 0.1           # probabilidad de perder cada mensaje en cada salto
     reportes: int = 40
@@ -88,9 +90,14 @@ class Simulacion:
         self.rng = random.Random(p.semilla)
         self.central = central or CentralSimulada()
         self.gen = Generador(self.rng, filas, p.sin_gps)
+        if not 1 <= p.focos <= len(FOCOS):
+            raise ValueError(f"focos debe estar entre 1 y {len(FOCOS)}")
+        origen = [a_metros(*lugar) for _, lugar in FOCOS[: p.focos]]
+        # Los celulares se reparten entre los focos por turno; los primeros de cada foco son pasarela.
         self.nodos = [
-            Nodo(f"{p.prefijo}{i:02d}", self.rng.uniform(0, p.lado_m), self.rng.uniform(0, p.lado_m),
-                 self.rng.uniform(p.bateria_min, p.bateria_max), pasarela=i < p.pasarelas)
+            Nodo(f"{p.prefijo}{i:02d}", origen[i % p.focos][0] + self.rng.uniform(0, p.lado_m),
+                 origen[i % p.focos][1] + self.rng.uniform(0, p.lado_m),
+                 self.rng.uniform(p.bateria_min, p.bateria_max), pasarela=i // p.focos < p.pasarelas)
             for i in range(p.nodos)
         ]
         self.vecinos = {

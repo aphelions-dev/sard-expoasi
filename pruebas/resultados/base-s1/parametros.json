@@ -3,6 +3,7 @@
   "nodos": 30,
   "pasarelas": 1,
   "lado_m": 150.0,
+  "focos": 1,
   "alcance_m": 50.0,
   "perdida": 0.1,
   "reportes": 40,

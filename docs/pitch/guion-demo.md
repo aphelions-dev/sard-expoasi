@@ -9,7 +9,7 @@ Mientras no haya celulares (la app es de P1), los pasos 1 a 3 usan el **plan B**
 de celulares y malla. Las centrales A y B, los agentes y el tablero son los reales.
 
 ```bash
-cd tablero && npm run dev                                         # terminal 1: tablero (paso 6)
+cd tablero && npm run dev -- -p 5173                              # terminal 1: tablero (paso 6)
 cd simulador && PYTHONUTF8=1 uv run python -m simulador recorrido  # terminal 2: el recorrido
 ```
 
@@ -32,7 +32,7 @@ mismos incidentes.
 
 | Paso | Qué se ve | Quién lo muestra | Plan B si falla |
 |------|-----------|------------------|-----------------|
-| 1. Reporte | Sin internet se crea el reporte; prioridad P1 por reglas («atrapad» y atrapados marcado); el mensaje SARD1 de 133 bytes | P1 | Celulares: visor del simulador (lo que se usa hoy) |
+| 1. Reporte | Sin internet se crea el reporte; prioridad P1 por reglas («atrap» y atrapados marcado); el mensaje SARD1 de 133 bytes | P1 | Celulares: visor del simulador (lo que se usa hoy) |
 | 2. Almacenamiento | El reporte queda «pendiente» en la cola del celular | P1 | Visor del simulador |
 | 3. Transmisión | Salta por los relevos hasta la pasarela; dos vecinos reportan lo mismo; se resalta el camino que llegó | P1 | Visor del simulador |
 | 4. Agentes | La central A responde `SACK`, que vuelve hasta el reportante: «entregado» | P2 | `central/demo/recorrido.py` |

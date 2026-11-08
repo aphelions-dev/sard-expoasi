@@ -100,7 +100,8 @@ La entidad registra una unidad (el ingreso del SCI-211). Entra como `disponible`
 
 - Entrada: `{ "entidad": "Cruz Roja", "recurso": "ambulancia", "matricula": "CR-114", "reportado_por": "..." }`
 - Salida: la lista de `GET /recursos`.
-- `409` si la matrícula ya está registrada.
+- `409` si la matrícula ya está registrada; `422` si la entidad y el recurso no son un par de la
+  lista de recursos por tipo.
 
 ### POST /recursos/unidades/{matricula}/estado
 

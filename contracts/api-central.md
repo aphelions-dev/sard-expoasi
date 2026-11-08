@@ -136,3 +136,19 @@ Para que las centrales se sincronicen entre sí; no es para el tablero ni la pas
 
 - Parámetros: `desde_seq` (por defecto 0), `limite` (por defecto 500, máximo 1000).
 - Salida: `{ "eventos": [{seq, id, nodo, tipo, reporte_id, causa, datos, creado_en}], "ultimo_seq": n }`
+
+## POST /eventos
+
+La central que recibe un reporte le entrega a la otra su evento `reporte_recibido` antes de dar el
+`SACK`, para que un reporte confirmado esté en las dos aunque la primera caiga enseguida. No es
+para el tablero ni la pasarela.
+
+- Entrada: `{ "eventos": [{id, nodo, tipo, reporte_id, causa, datos, creado_en}] }`, con el mismo
+  `id`, `nodo` y `creado_en` que en la central de origen.
+- Solo acepta `tipo = "reporte_recibido"`; cualquier otro tipo responde 422 y no agrega nada. Los
+  demás eventos siguen llegando por `GET /eventos`.
+- Se une al registro igual que la sincronización: un evento que ya estaba se ignora.
+- Salida: `{ "agregados": n }`.
+- Quien envía espera la respuesta hasta 1 s. Si la otra central no responde a tiempo, da el `SACK`
+  igual: la copia la completa después `GET /eventos`.
+- Autenticación entre centrales: por definir (hoy `GET /eventos` tampoco la tiene).

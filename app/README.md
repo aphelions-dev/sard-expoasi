@@ -6,20 +6,42 @@
 
 - Port oficial de bitchat para Android: **https://github.com/permissionlesstech/bitchat-android**
   (organización permissionlesstech; verificado en noviembre de 2026, última versión v2.2.0).
-- Licencia: **GPLv3** desde febrero de 2026 (antes MIT). No es de dominio público; ver ADR 0001.
-- Kotlin, Android 8.0+.
+- Licencia: **GPLv3** desde febrero de 2026 (antes MIT). Su README todavía dice "dominio público",
+  pero manda el `LICENSE.md`. Ver ADR 0001.
+- Kotlin, Android 8.0+ (API 26).
 
-## Integrar el fork como submódulo
+## Fork y submódulo
 
-1. Hacer fork de `permissionlesstech/bitchat-android` en la organización del equipo
-   (nombre: por definir, propuesta `aphelions-dev/bitchat-android`).
-2. Desde la raíz del repo, en la rama `p1/app-malla`:
-   ```
-   git submodule add https://github.com/aphelions-dev/bitchat-android app/bitchat-android
-   git commit -m "chore: agregar fork de bitchat-android como submódulo"
-   ```
-3. Quien clone: `git clone --recurse-submodules ...` o, si ya clonó, `git submodule update --init`.
-4. Los cambios a bitchat se hacen y suben en el fork; aquí solo se actualiza el puntero.
+- Fork: **https://github.com/aphelions-dev/bitchat-android**, en `app/bitchat-android`. Base:
+  v2.2.0 (`2fc6f474`).
+- Quien clone: `git clone --recurse-submodules ...` o, si ya clonó, `git submodule update --init`.
+- Los cambios a bitchat se hacen y se suben en el fork; aquí solo se actualiza el puntero del
+  submódulo.
+
+## Compilar
+
+Requisitos (de `.java-version`, `gradle/libs.versions.toml` y el wrapper del fork): **JDK 21**,
+**Android SDK 37** (compileSdk y targetSdk), AGP 9.3.1, Kotlin 2.4.10 y Gradle 9.6.1, que lo baja
+el wrapper.
+
+1. Instalar Android Studio, que trae su propio JDK 21. En *SDK Manager*: Android API 37 y
+   *Platform-Tools* (`adb`).
+2. Abrir `app/bitchat-android` en Android Studio y dejar que sincronice Gradle.
+3. Compilar: *Build → Build APK(s)* o `./gradlew assembleDebug`. El APK queda en
+   `app/build/outputs/apk/debug/app-debug.apk`.
+4. Instalar en cada celular, con *Depuración USB* activada:
+   `adb install -r app/build/outputs/apk/debug/app-debug.apk`.
+
+La app pide permisos de Bluetooth, ubicación (Android la exige para escanear BLE) y notificaciones.
+
+## Lo que ya hace bitchat-android (leído en el código, por confirmar con celulares)
+
+| Tema | En bitchat-android | Para SARD |
+|------|--------------------|-----------|
+| Tamaño | Más de 512 bytes se parten en fragmentos de 469 (`AppConstants.Fragmentation`), que se reensamblan con un plazo de 30 s | Un SARD1 típico (133 bytes) cabe en un paquete. El largo máximo del texto se fija midiendo la cabecera, para no fragmentar. |
+| Saltos | TTL de 7 (`AppConstants.MESSAGE_TTL_HOPS`) | Suficiente para la demo. |
+| Vecino nuevo | `MeshDelegate.didUpdatePeerList(peerIDs)` avisa cuando cambia la lista de pares | Comparar con la lista anterior sirve para reactivar un reporte vencido (regla 5). |
+| Quien llega después | `StoreForwardManager` no guarda broadcasts, solo privados. `GossipSyncManager` reenvía a cada vecino que se conecta los broadcasts públicos que le faltan, con capacidad limitada | Si el SARD1 viaja como mensaje público, un relevo que llega tarde lo recibiría. Puede resolver el riesgo de `docs/riesgos.md`. |
 
 ## Roles del celular (mismo build, cambia la configuración)
 
@@ -57,12 +79,19 @@ Agentes, triaje con Jev, base de datos de la central, tablero, simulador.
 
 ### Checklist Hito 1
 
-- [ ] Fork creado y agregado como submódulo en `app/bitchat-android`.
+- [x] Fork creado y agregado como submódulo en `app/bitchat-android`.
 - [ ] Compila en Android Studio sin cambios.
-- [ ] APK instalado en 3 celulares Android.
-- [ ] Un mensaje de A llega a C pasando por B (A y C fuera de alcance directo).
-- [ ] Anotar alcance aproximado, retardo y si bitchat guarda mensajes para quien llega después.
-- [ ] Si no funciona: avisar para decidir el plan B (transporte simulado) antes del Hito 2.
+- [ ] APK instalado en 3 celulares Android (A, B, C).
+- [ ] **Salto:** un mensaje público de A llega a C pasando por B, con A y C fuera de alcance
+      directo (en otra habitación o a más de unos 30 m).
+- [ ] **Alcance:** distancia a la que dos celulares dejan de verse, en interior y en exterior.
+- [ ] **Retardo:** segundos de A a C, en 5 envíos.
+- [ ] **Tamaño:** se envía un SARD1 de 133 bytes y otro cerca de 500 bytes, y se anota si llegan
+      completos. El resultado fija el largo máximo del texto en el contrato.
+- [ ] **Quien llega después:** con C apagado, A envía; luego se enciende C cerca de B y se anota si
+      le llega el mensaje (gossip sync).
+- [ ] Resultados en un comentario del issue #1. Si no funciona, avisar para decidir el plan B
+      (transporte simulado) antes del Hito 2.
 
 ## Terminado
 

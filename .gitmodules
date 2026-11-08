@@ -1,0 +1,3 @@
+[submodule "app/bitchat-android"]
+	path = app/bitchat-android
+	url = https://github.com/aphelions-dev/bitchat-android

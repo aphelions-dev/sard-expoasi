@@ -11,7 +11,7 @@ import csv
 import random
 from pathlib import Path
 
-from .geo import a_latlon, geohash
+from .geo import a_latlon, caracteres, geohash, radio_gps
 from .sard1 import Reporte
 
 CSV = Path(__file__).parents[2] / "datos" / "sinteticos" / "reportes_etiquetados.csv"
@@ -35,7 +35,10 @@ class Generador:
     def nuevo(self, disp: str, x: float, y: float, hora_unix: int, fila: dict | None = None) -> Reporte:
         f = fila or self.rng.choice(self.filas)
         n = self.contadores[disp] = self.contadores.get(disp, 0) + 1
-        gh = "" if self.rng.random() < self.sin_gps else geohash(*a_latlon(x, y))
+        # El largo del geohash sale del radio del GPS (contrato, «Ubicación»). Se sortea aparte, con
+        # el id como semilla, para no mover la secuencia del resto de la simulación.
+        precision = caracteres(radio_gps(random.Random(f"{disp}-{n}")))
+        gh = "" if self.rng.random() < self.sin_gps else geohash(*a_latlon(x, y), precision)
         return Reporte(
             id=f"{disp}-{n}",
             prioridad=f["prioridad_real"],

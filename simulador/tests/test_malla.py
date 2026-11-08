@@ -94,3 +94,16 @@ def test_focos_son_mallas_separadas_con_su_pasarela():
     assert all(foco[v.id] == foco[a] for a, vs in sim.vecinos.items() for v in vs)
     assert len({geohash(*a_latlon(n.x, n.y)) for n in sim.nodos}) >= 6
     assert Simulacion(replace(p, focos=1)).nodos[0].x < p.lado_m  # un foco: lo de siempre
+
+
+def test_largo_del_geohash_segun_precision_del_gps():
+    import random
+    from collections import Counter
+
+    from simulador.generador import Generador
+    from simulador.geo import caracteres
+
+    assert [caracteres(r) for r in (3, 5, 6, 20, 21, 75, 76)] == [9, 9, 8, 8, 7, 7, 6]
+    gen = Generador(random.Random(1), sin_gps=0)
+    largos = Counter(len(gen.nuevo(f"n{i}", 10, 10, 0).geohash) for i in range(400))
+    assert set(largos) == {6, 7, 8, 9} and largos[8] > largos[6]

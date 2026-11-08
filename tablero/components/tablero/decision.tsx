@@ -73,7 +73,6 @@ export function Propuesta({ inc, lugar }: { inc: Incidente; lugar: (texto: strin
         </p>
       )}
 
-      <p className="text-muted-foreground">{lugar(a.justificacion)}</p>
 
       {a.falta_confirmar.length > 0 && (
         <div>

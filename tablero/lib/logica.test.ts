@@ -3,7 +3,7 @@ import { ErrorApi, elegirActiva, mensajeDecision } from "./api/central";
 import type { Incidente, Prioridad, Salud } from "./api/tipos";
 import { conteos, filtrar, porDecidir } from "./cola";
 import { haceCuanto, lugarLegible } from "./formato";
-import { enPalabras, senalLegible } from "./lenguaje";
+import { citaLegible, enPalabras, motivoRechazo, palabraCompleta, senalLegible } from "./lenguaje";
 
 const ok = (central: "A" | "B"): Salud => ({ estado: "ok", central, jev: "ok" });
 
@@ -52,8 +52,8 @@ describe("haceCuanto", () => {
 describe("lugarLegible", () => {
   it("cambia el geohash por el barrio", () =>
     expect(lugarLegible("Enviar a Cruz Roja en la zona d2fkcd", "d2fkcd", "Centro")).toBe("Enviar a Cruz Roja en Centro"))
-  it("sin barrio, deja el geohash: es la única ubicación", () =>
-    expect(lugarLegible("Bomberos en la zona d2fkcd", "d2fkcd", null)).toBe("Bomberos en la zona d2fkcd"))
+  it("sin barrio, remite al mapa en vez de mostrar el código", () =>
+    expect(lugarLegible("Bomberos en la zona d2fkcd", "d2fkcd", null)).toBe("Bomberos en la zona marcada en el mapa"))
   it("sin geohash, deja el texto igual", () => expect(lugarLegible("ubicación sin confirmar", null, null)).toBe("ubicación sin confirmar"))
 })
 
@@ -72,4 +72,25 @@ describe("enPalabras", () => {
     expect(senalLegible("riesgo_vital")).toBe("riesgo para la vida")
     expect(senalLegible("palabra crítica «llamas»")).toBe("palabra de alerta «llamas»")
   })
+})
+
+describe("palabras del mensaje, no raíces de la lista", () => {
+  it("completa la raíz con la palabra del mensaje", () => {
+    expect(palabraCompleta("atrap", ["no hay carros atrapados"])).toBe("atrapados")
+    expect(senalLegible("palabra crítica «atrap»", "Gente atrapda en el edificio")).toBe("palabra de alerta «atrapda»")
+  })
+  it("sin mensaje deja la raíz", () => expect(palabraCompleta("atrap", [])).toBe("atrap"))
+  it("la cita no parte palabras", () =>
+    expect(citaLegible("umbe, no hay carros atrapados", "bloqueada por un derrumbe, no hay carros atrapados")).toBe(
+      "…derrumbe, no hay carros atrapados",
+    ))
+  it("la posible negación se explica con la palabra del mensaje", () =>
+    expect(enPalabras("Reporte 1: posible negación de «atrap»: la prioridad no baja, confirmar si aplica", ["no hay carros atrapados"])).toBe(
+      "Reporte 1: el mensaje podría estar diciendo que no hay «atrapados»: la prioridad sigue alta hasta que lo confirmes",
+    ))
+})
+
+describe("motivoRechazo", () => {
+  it("cortado", () => expect(motivoRechazo("truncado: 6 de 9 campos")).toBe("Llegó cortado: trae 6 de los 9 datos."))
+  it("dato inválido sin nombres del protocolo", () => expect(motivoRechazo("geohash inválido: 'zz'")).toBe("Dato no válido (zona): 'zz'."))
 })

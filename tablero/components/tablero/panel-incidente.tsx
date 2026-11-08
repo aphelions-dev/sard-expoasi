@@ -7,7 +7,7 @@ import type { Nodo } from "@/lib/api/central"
 import type { Evidencia, Incidente } from "@/lib/api/tipos"
 import {
   CORROBORACION,
-  FUENTE,
+  fuenteLegible,
   TIPO,
   coordenadas,
   haceCuanto,
@@ -17,7 +17,7 @@ import {
 import { cercanos, type Barrio, type Geo } from "@/lib/geo"
 import { cn } from "@/lib/utils"
 
-import { ORIGEN_LEGIBLE, enPalabras, senalLegible } from "@/lib/lenguaje"
+import { ORIGEN_LEGIBLE, citaLegible, enPalabras, senalLegible } from "@/lib/lenguaje"
 
 import { BarraDecision, Propuesta } from "./decision"
 import { ICONO_TIPO } from "./iconos"
@@ -129,7 +129,7 @@ export function PanelIncidente({
 
   // Todo lo que pide cautela, junto y en lenguaje llano.
   const atencion = [
-    ...u.motivos.map((m) => enPalabras(legible(m))),
+    ...u.motivos.map((m) => enPalabras(legible(m), inc.evidencia.map((e) => e.texto))),
     ...(u.sin_analisis_ia
       ? ["Sin análisis automático: se clasificó solo con las palabras de alerta."]
       : []),
@@ -183,7 +183,7 @@ export function PanelIncidente({
                 }
               >
                 {inc.geohash ? (
-                  (barrio?.nombre ?? "Sin barrio")
+                  (barrio?.nombre ?? "Fuera de los barrios del mapa")
                 ) : (
                   <span className="text-p2">Sin ubicación</span>
                 )}
@@ -373,7 +373,7 @@ function ItemEvidencia({
             Reporte {n}
           </span>
           <Prioridad p={ev.prioridad} />
-          <span>{ev.fuente ? FUENTE[ev.fuente] : "Fuente sin dato"}</span>·
+          <span>{fuenteLegible(ev.fuente)}</span>·
           <span>{haceCuanto(ev.hora_unix, ahora)}</span>·
           <span>
             {ev.personas} persona{ev.personas === 1 ? "" : "s"}
@@ -390,7 +390,7 @@ function ItemEvidencia({
               aria-hidden="true"
               className="size-3 transition-transform group-open:rotate-90"
             />
-            Por qué esta prioridad ({ev.senales.length} razón{ev.senales.length === 1 ? "" : "es"})
+            Por qué esta prioridad ({ev.senales.length} {ev.senales.length === 1 ? "razón" : "razones"})
           </summary>
           <ul className="space-y-1 px-2 pb-2" aria-label="Señales del triaje">
             {ev.senales.map((s, i) => (
@@ -408,7 +408,7 @@ function ItemEvidencia({
                 >
                   {ORIGEN_LEGIBLE[s.origen]}
                 </span>
-                <span>{senalLegible(s.senal)}</span>
+                <span>{senalLegible(s.senal, ev.texto)}</span>
                 <Prioridad p={s.prioridad} />
                 {s.probabilidad !== null && (
                   <span className="font-mono text-[0.6875rem]">
@@ -416,7 +416,7 @@ function ItemEvidencia({
                   </span>
                 )}
                 {s.cita && (
-                  <q className="text-muted-foreground italic">{s.cita}</q>
+                  <q className="text-muted-foreground italic">{citaLegible(s.cita, ev.texto)}</q>
                 )}
               </li>
             ))}

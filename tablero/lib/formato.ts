@@ -18,10 +18,13 @@ export const CORROBORACION: Record<Corroboracion, string> = {
 };
 
 export const FUENTE: Record<Fuente, string> = {
-  directa: "Testigo directo",
-  de_oidas: "De oídas",
-  incierta: "Fuente incierta",
+  directa: "Lo vio en persona",
+  de_oidas: "Lo supo por otros",
+  incierta: "No está claro si lo vio",
 };
+
+/** Quién cuenta lo que pasó, también cuando el análisis automático no pudo saberlo. */
+export const fuenteLegible = (f: Fuente | null) => (f ? FUENTE[f] : "No se sabe si lo vio");
 
 export const ESTADO: Record<Estado, string> = {
   sin_propuesta: "Sin sugerencia",
@@ -51,9 +54,10 @@ export function coordenadas(gh: string): string {
 }
 
 /** La central nombra los lugares por su geohash ("en la zona d2fkcd"), que al coordinador no le dice
- *  nada: se cambia por el barrio. Sin barrio (fuera de Manizales, o mapas sin cargar) el texto queda
- *  como vino: el geohash es la única ubicación y no se borra. */
+ *  nada: se cambia por el barrio. Sin barrio (fuera de Manizales, o mapas sin cargar) se remite al
+ *  mapa, que sí muestra la zona; el código queda en el detalle técnico. */
 export function lugarLegible(texto: string, gh: string | null, barrio: string | null): string {
-  if (!gh || !barrio) return texto
-  return texto.replaceAll(`la zona ${gh}`, barrio).replaceAll(gh, barrio)
+  if (!gh) return texto
+  const nombre = barrio ?? "la zona marcada en el mapa"
+  return texto.replaceAll(`la zona ${gh}`, nombre).replaceAll(gh, nombre)
 }

@@ -1,8 +1,9 @@
 "use client"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
-import type { Prioridad as TPrioridad, Rechazado } from "@/lib/api/tipos"
-import { haceCuanto } from "@/lib/formato"
+import type { Prioridad as TPrioridad, Rechazado, Tipo } from "@/lib/api/tipos"
+import { TIPO, haceCuanto } from "@/lib/formato"
+import { motivoRechazo } from "@/lib/lenguaje"
 import { cn } from "@/lib/utils"
 
 import { Prioridad } from "./insignias"
@@ -11,12 +12,12 @@ const PRIORIDADES = new Set(["P1", "P2", "P3", "P4"])
 
 // Los campos del mensaje con el nombre que entiende quien coordina.
 const CAMPO: Record<string, string> = {
-  id: "identificador",
+  id: "código del reporte",
   prioridad: "prioridad",
   tipo: "tipo",
   personas: "personas",
   banderas: "marcas (atrapados, heridos, niños o mayores)",
-  geohash: "código de zona",
+  geohash: "zona",
   hora_unix: "hora",
   texto: "mensaje",
 }
@@ -63,12 +64,12 @@ export function Rechazados({ lista, ahora }: { lista: Rechazado[] | null; ahora:
                       {r.recuperado ? "Llegó completo" : "Pendiente"}
                     </span>
                     <span className="ml-auto text-[0.6875rem] text-muted-foreground">
-                      {r.pasarela_id ? `subido por ${r.pasarela_id}` : "sin dato de quién lo subió"} · {haceCuanto(r.recibido_en, ahora)}
+                      {r.pasarela_id ? `entregado por el celular con internet «${r.pasarela_id}»` : "sin dato de qué celular lo entregó"} · {haceCuanto(r.recibido_en, ahora)}
                     </span>
                   </div>
                   <ul className="list-disc pl-4">
                     {r.motivos.map((m) => (
-                      <li key={m}>{m}</li>
+                      <li key={m}>{motivoRechazo(m)}</li>
                     ))}
                   </ul>
                   {Object.keys(r.campos).length > 0 ? (
@@ -76,7 +77,7 @@ export function Rechazados({ lista, ahora }: { lista: Rechazado[] | null; ahora:
                       {Object.entries(r.campos).map(([k, v]) => (
                         <div key={k} className="contents">
                           <dt className="text-muted-foreground">{CAMPO[k] ?? k.replaceAll("_", " ")}</dt>
-                          <dd className="font-mono break-all">{v === "" ? <em className="text-muted-foreground">vacío</em> : v}</dd>
+                          <dd className="font-mono break-all">{v === "" ? <em className="text-muted-foreground">vacío</em> : k === "tipo" && v in TIPO ? TIPO[v as Tipo] : v}</dd>
                         </div>
                       ))}
                     </dl>

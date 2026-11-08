@@ -1,0 +1,66 @@
+# Demo completa de SARD en un solo comando, con datos sintéticos:
+#
+#   docker compose up --build                     # centrales A y B + tablero en http://localhost:5173
+#   docker compose run --rm simulador             # carga reportes sintéticos por la malla simulada
+#   docker compose stop central-a                 # la condición adversa: cae la A, sigue la B
+#
+# Jev es opcional: con JEV_API_KEY en .env el triaje usa la IA; sin ella, solo reglas.
+# Cada central guarda su registro de eventos en su propio volumen.
+
+x-central: &central
+  build:
+    context: .
+    dockerfile: central/Dockerfile
+  env_file:
+    - path: .env
+      required: false
+  environment:
+    CENTRAL_A_URL: http://central-a:8001
+    CENTRAL_B_URL: http://central-b:8002
+  restart: unless-stopped
+  healthcheck:
+    test: ["CMD", "python", "-c", "import os,urllib.request; urllib.request.urlopen(os.environ['SALUD'], timeout=2)"]
+    interval: 5s
+    retries: 10
+
+services:
+  central-a:
+    <<: *central
+    command: ["python", "iniciar.py", "A"]
+    ports: ["8001:8001"]
+    environment:
+      CENTRAL_A_URL: http://central-a:8001
+      CENTRAL_B_URL: http://central-b:8002
+      SALUD: http://localhost:8001/salud
+    volumes: ["datos-a:/repo/central/datos"]
+
+  central-b:
+    <<: *central
+    command: ["python", "iniciar.py", "B"]
+    ports: ["8002:8002"]
+    environment:
+      CENTRAL_A_URL: http://central-a:8001
+      CENTRAL_B_URL: http://central-b:8002
+      SALUD: http://localhost:8002/salud
+    volumes: ["datos-b:/repo/central/datos"]
+
+  tablero:
+    build: ./tablero
+    ports: ["5173:80"]
+    depends_on: [central-a, central-b]
+    restart: unless-stopped
+
+  simulador:
+    build:
+      context: .
+      dockerfile: simulador/Dockerfile
+    environment:
+      CENTRAL_A_URL: http://central-a:8001
+      CENTRAL_B_URL: http://central-b:8002
+    depends_on:
+      central-a: { condition: service_healthy }
+    profiles: ["datos"]
+
+volumes:
+  datos-a:
+  datos-b:

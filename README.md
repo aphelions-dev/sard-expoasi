@@ -30,6 +30,21 @@ transmisión, agentes, priorización, aprobación en el tablero, **caída de la 
 y recuperación. Sin `JEV_API_KEY` el triaje corre solo con reglas; con ella, copiar `.env.example` a
 `.env` y agregar `--env-file ../.env`. Guion y plan B de cada paso: `docs/pitch/guion-demo.md`.
 
+### Con Docker, sin instalar nada más
+
+Requisito: Docker. Levanta las centrales A y B con sus agentes y el tablero, cada central con su
+propio volumen para el registro de eventos:
+
+```bash
+docker compose up --build -d          # centrales en :8001 y :8002, tablero en http://localhost:5173
+docker compose run --rm simulador     # carga reportes sintéticos por la malla simulada
+docker compose stop central-a         # condición adversa: cae la A y el tablero sigue con la B
+docker compose start central-a        # vuelve la A y trae lo que hizo la B
+docker compose down -v                # apaga todo y borra los registros
+```
+
+Con `JEV_API_KEY` en `.env` el triaje usa Jev; sin ella, solo reglas.
+
 ## Entregables
 
 | # | Entregable | Dónde | Estado |

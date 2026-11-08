@@ -113,8 +113,10 @@ sequenceDiagram
     C->>C: decision_humana
 ```
 
-El `SACK` sale apenas el reporte queda registrado, antes del triaje: confirma la entrega, no la
-atención. Mientras no llegue, cada nodo reintenta con espera creciente (los tiempos los define la
+El `SACK` sale apenas el reporte queda registrado en las dos centrales, antes del triaje: confirma
+la entrega, no la atención. La central que lo recibe le entrega el `reporte_recibido` a la otra
+(`POST /eventos`) y espera hasta 1 s; si la otra no responde, da el `SACK` igual y la copia llega
+después por `GET /eventos`. Mientras no llegue, cada nodo reintenta con espera creciente (los tiempos los define la
 app). Un id repetido recibe `SACK` otra vez pero no crea otro reporte; queda como
 `reporte_duplicado` con la pasarela por la que llegó, para contar rutas.
 

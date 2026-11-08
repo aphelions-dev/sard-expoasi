@@ -52,7 +52,8 @@ tablero dibuja la zona del tamaño que llegó: lo preciso casi como un punto, lo
 ## Acuse
 
 `SACK|<id>`: la central confirma que recibió y registró el reporte `<id>`. Viaja de vuelta por la
-pasarela y la malla hasta el reportante.
+pasarela y la malla hasta el reportante. Antes de darlo, la central le entrega el reporte a la otra
+(`POST /eventos`), salvo que la otra no responda en 1 s.
 
 ## Reglas
 
@@ -79,7 +80,7 @@ y ningún modelo baja esa prioridad (ADR 0005).
 - **Pasarela.** Antes de subir, consulta `GET /salud` de la central A; si no responde, sube a la B.
   Las dos aceptan los mismos mensajes y devuelven el mismo `SACK`.
 - **Centrales.** Cada central copia cada segundo los eventos de la otra con `GET /eventos` y los une
-  por id. Como el registro solo crece (ADR 0003), la unión no tiene conflictos, y un reporte que
+  por id. Los reportes nuevos, además, se entregan a la otra antes del `SACK` (`POST /eventos`). Como el registro solo crece (ADR 0003), la unión no tiene conflictos, y un reporte que
   llegó a las dos se cuenta una vez. Detalle en `contracts/api-central.md` y
   `docs/fichas-agentes/resiliencia.md`.
 

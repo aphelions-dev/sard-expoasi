@@ -1,15 +1,25 @@
 "use client"
 
-import { ChevronRight, Clock, MapPin, TriangleAlert, Users } from "lucide-react"
+import {
+  ChevronRight,
+  CircleHelp,
+  Clock,
+  MapPin,
+  MessageCircleQuestion,
+  ShieldCheck,
+  TriangleAlert,
+  Users,
+} from "lucide-react"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
 import type { Nodo } from "@/lib/api/central"
-import type { Evidencia, Incidente } from "@/lib/api/tipos"
+import type { Corroboracion, Evidencia, Incidente } from "@/lib/api/tipos"
 import {
   CORROBORACION,
   fuenteLegible,
   TIPO,
   coordenadas,
+  precision,
   haceCuanto,
   horaLocal,
   lugarLegible,
@@ -221,18 +231,11 @@ export function PanelIncidente({
 
         <div className="space-y-2 p-2">
           <Tarjeta n={1} titulo="Qué tan seguro es">
-            <p>
-              <strong className="font-medium">
-                {CORROBORACION[u.corroboracion]}
-              </strong>
-              <span className="text-muted-foreground">
-                {" "}
-                · {u.dispositivos} celular{u.dispositivos === 1 ? "" : "es"} distinto{u.dispositivos === 1 ? "" : "s"}{" "}
-                · {u.fuentes_directas} testigo
-                {u.fuentes_directas === 1 ? "" : "s"} directo
-                {u.fuentes_directas === 1 ? "" : "s"}
-              </span>
-            </p>
+            <Confianza
+              nivel={u.corroboracion}
+              celulares={u.dispositivos}
+              testigos={u.fuentes_directas}
+            />
             {atencion.length > 0 && (
               <div
                 className={cn(
@@ -298,7 +301,7 @@ export function PanelIncidente({
                 <>
                   <dt className="text-muted-foreground">Código de zona</dt>
                   <dd className="font-mono">
-                    {inc.geohash} · {coordenadas(inc.geohash)} · ±600 m
+                    {inc.geohash} · {coordenadas(inc.geohash)} · {precision(inc.geohash)}
                   </dd>
                 </>
               )}
@@ -351,6 +354,80 @@ export function PanelIncidente({
         onDecidido={onDecidido}
       />
     </article>
+  )
+}
+
+const NIVEL: Record<
+  Corroboracion,
+  { n: number; Icono: typeof ShieldCheck; tono: string; dice: string }
+> = {
+  posible_rumor: {
+    n: 1,
+    Icono: MessageCircleQuestion,
+    tono: "text-p2",
+    dice: "Nadie dice haberlo visto en persona.",
+  },
+  sin_confirmar: {
+    n: 2,
+    Icono: CircleHelp,
+    tono: "text-foreground",
+    dice: "Falta otra persona que lo haya visto.",
+  },
+  corroborado: {
+    n: 3,
+    Icono: ShieldCheck,
+    tono: "text-ok",
+    dice: "Lo cuentan varias personas y al menos una lo vio.",
+  },
+}
+
+/** Qué tan seguro es, de un vistazo: tres escalones, del rumor a lo corroborado. */
+function Confianza({
+  nivel,
+  celulares,
+  testigos,
+}: {
+  nivel: Corroboracion
+  celulares: number
+  testigos: number
+}) {
+  const { n, Icono, tono, dice } = NIVEL[nivel]
+  return (
+    <div className="flex items-center gap-2.5">
+      <Icono aria-hidden="true" className={cn("size-5 shrink-0", tono)} />
+      <div className="min-w-0 flex-1">
+        <p className="flex items-center gap-2">
+          <strong className={cn("font-medium", tono)}>
+            {CORROBORACION[nivel]}
+          </strong>
+          <span
+            className="flex gap-0.5"
+            role="meter"
+            aria-valuemin={1}
+            aria-valuemax={3}
+            aria-valuenow={n}
+            aria-label={`Confianza ${n} de 3`}
+          >
+            {[1, 2, 3].map((k) => (
+              <span
+                key={k}
+                className={cn(
+                  "h-1.5 w-5 rounded-full",
+                  k <= n ? "bg-current" : "bg-muted",
+                  tono
+                )}
+              />
+            ))}
+          </span>
+        </p>
+        <p className="text-muted-foreground">
+          {dice} {celulares} celular{celulares === 1 ? "" : "es"} ·{" "}
+          {testigos === 0
+            ? "nadie lo vio en persona"
+            : `${testigos} lo ${testigos === 1 ? "vio" : "vieron"} en persona`}
+        </p>
+      </div>
+    </div>
   )
 }
 

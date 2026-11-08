@@ -289,7 +289,7 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
         })}
         {/* Cuántos hay en cada zona y si alguno pide revisión, encima de todo. */}
         {grupos.map(([gh, grupo]) => (
-          <MarcaZona key={gh} grupo={grupo} centro={centroDe(gh)} seleccion={seleccion} onSeleccion={onSeleccion} />
+          <MarcaZona key={gh} gh={gh} grupo={grupo} centro={centroDe(gh)} seleccion={seleccion} onSeleccion={onSeleccion} />
         ))}
         <MapControls position="top-right" />
         <Botones grupos={grupos} completo={completo} onCompleto={onCompleto} />
@@ -307,7 +307,7 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
         </button>
         {leyenda && (
           <div className="space-y-2 border-t px-2.5 py-2">
-            <p>Cada incidente es la zona donde ocurrió (~1 km): el reporte no trae el sitio exacto.</p>
+            <p>Cada incidente es la zona donde ocurrió, tan grande como la incertidumbre del GPS. Si el GPS fue preciso (~20 m), es un punto con el icono del tipo.</p>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               {(["P1", "P2", "P3", "P4"] as const).map((p) => (
                 <span key={p} className="flex items-center gap-1 font-mono">

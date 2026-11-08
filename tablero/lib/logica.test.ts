@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ErrorApi, elegirActiva, mensajeDecision } from "./api/central";
 import type { Incidente, Prioridad, Salud } from "./api/tipos";
-import { conteos, filtrar, porDecidir } from "./cola";
+import { agrupar, conteos, filtrar, porDecidir } from "./cola";
 import { haceCuanto, lugarLegible } from "./formato";
 import { citaLegible, enPalabras, motivoRechazo, palabraCompleta, senalLegible } from "./lenguaje";
 
@@ -94,3 +94,19 @@ describe("motivoRechazo", () => {
   it("cortado", () => expect(motivoRechazo("truncado: 6 de 9 campos")).toBe("Llegó cortado: trae 6 de los 9 datos."))
   it("dato inválido sin nombres del protocolo", () => expect(motivoRechazo("geohash inválido: 'zz'")).toBe("Dato no válido (zona): 'zz'."))
 })
+
+describe("cola por estado", () => {
+  const inc = (id: string, estado: Incidente["estado"], asignadas: string[] | null = null) =>
+    ({ id, estado, recurso: asignadas === null ? null : { asignadas } }) as unknown as Incidente;
+  it("separa por lo que falta hacer, sin reordenar dentro de cada sección", () => {
+    const s = agrupar([
+      inc("a", "aprobada", []), inc("b", "pendiente"), inc("c", "rechazada"),
+      inc("d", "aprobada", ["CR-114"]), inc("e", "sin_propuesta"), inc("f", "aprobada"),
+    ]);
+    expect(s.map((x) => [x.grupo.id, x.incidentes.map((i) => i.id)])).toEqual([
+      ["decidir", ["b", "e"]], ["esperando", ["a"]], ["atencion", ["d", "f"]], ["descartados", ["c"]],
+    ]);
+  });
+  it("«Por decidir» aparece aunque esté vacía; las demás, solo si tienen algo", () =>
+    expect(agrupar([]).map((x) => x.grupo.id)).toEqual(["decidir"]));
+});

@@ -1,12 +1,12 @@
 "use client"
 
-// Una zona del mapa con incidentes. El protocolo manda una zona aproximada (geohash de 6
-// caracteres, ~1,2 × 0,6 km), no un punto: por eso el incidente se dibuja como el área sombreada
-// del color de su prioridad (capa `celdas` de `mapa.tsx`) y no como un icono, que haría creer que
-// se sabe el sitio exacto. Aquí solo va lo que el área no dice sola: cuántos hay y si piden revisión.
+// Una zona del mapa con incidentes. El geohash dice la precisión con su largo: con 6 o 7 caracteres
+// (~1 km o ~150 m) el incidente se dibuja como el área sombreada del color de su prioridad (capa
+// `celdas` de `mapa.tsx`), no como un icono, que haría creer que se sabe el sitio exacto; aquí solo
+// va lo que el área no dice sola, cuántos hay y si piden revisión. Con 8 o más (~20 m), un punto.
 import { MapMarker, MarkerContent } from "@/components/ui/map"
 import type { Incidente, Prioridad } from "@/lib/api/tipos"
-import { TIPO } from "@/lib/formato"
+import { TIPO, precision } from "@/lib/formato"
 import { cn } from "@/lib/utils"
 
 import { ICONO_TIPO } from "./iconos"
@@ -21,19 +21,57 @@ export function siguienteDeZona(grupo: Incidente[], seleccion: string | null): s
   return grupo[(i + 1) % grupo.length].id
 }
 
-/** Cuántos incidentes hay en la zona y si alguno pide revisión. Sin nada que decir, no se dibuja. */
+const FONDO: Record<Prioridad, string> = { P1: "bg-p1", P2: "bg-p2", P3: "bg-p3", P4: "bg-p4" }
+
+/** Con 8 caracteres o más el geohash mide unos 38 × 19 m (protocolo, «Ubicación»): eso ya es un
+ *  sitio, y se marca como punto con el icono del tipo. Con menos, el área dice la verdad. */
+export const PRECISO = 8
+
+/** Un incidente con ubicación precisa: punto del color de la prioridad, con el icono del tipo. */
+function Punto({ inc, elegido, revisar }: { inc: Incidente; elegido: boolean; revisar: boolean }) {
+  const Icono = ICONO_TIPO[inc.tipo]
+  return (
+    <span
+      className={cn(
+        "relative grid size-7 place-items-center rounded-full border-2 border-background text-card shadow-md",
+        FONDO[inc.prioridad],
+        elegido && "outline-2 outline-offset-2 outline-foreground",
+        !pendiente(inc) && "opacity-50",
+      )}
+      aria-label={`${inc.prioridad} ${TIPO[inc.tipo]}, ubicación precisa`}
+    >
+      <Icono aria-hidden="true" stroke={2.25} className="size-4" />
+      {revisar && <span aria-hidden="true" className="absolute -right-0.5 -bottom-0.5 size-2.5 rounded-full border-2 border-background bg-revisar" />}
+    </span>
+  )
+}
+
+/** Cuántos incidentes hay en la zona y si alguno pide revisión; si la ubicación es precisa, el
+ *  punto. Sin nada que decir, no se dibuja. */
 export function MarcaZona({
+  gh,
   grupo,
   centro,
   seleccion,
   onSeleccion,
 }: {
+  gh: string
   grupo: Incidente[]
   centro: [number, number]
   seleccion: string | null
   onSeleccion: (id: string) => void
 }) {
   const revisar = grupo.some((i) => i.incertidumbre.revisar && pendiente(i))
+  if (gh.length >= PRECISO) {
+    const inc = grupo.find((i) => i.id === seleccion) ?? grupo[0]
+    return (
+      <MapMarker longitude={centro[0]} latitude={centro[1]} onClick={() => onSeleccion(siguienteDeZona(grupo, seleccion))}>
+        <MarkerContent>
+          <Punto inc={inc} elegido={inc.id === seleccion} revisar={revisar} />
+        </MarkerContent>
+      </MapMarker>
+    )
+  }
   if (grupo.length === 1 && !revisar) return null
   return (
     <MapMarker longitude={centro[0]} latitude={centro[1]} onClick={() => onSeleccion(siguienteDeZona(grupo, seleccion))}>
@@ -76,7 +114,10 @@ export function TarjetaZona({ grupo, barrio, seleccion }: { grupo: Incidente[]; 
       </ul>
       {grupo.length > 5 && <p className="border-t px-2.5 py-1 text-muted-foreground">y {grupo.length - 5} más en la cola</p>}
       <p className="border-t px-2.5 py-1 text-[0.6875rem] text-muted-foreground">
-        El sitio exacto está en algún lugar de esta zona (~1 km). {grupo.length > 1 ? "Clic: ver el siguiente." : "Clic: ver el incidente."}
+        {grupo[0].geohash && grupo[0].geohash.length >= PRECISO
+          ? "Ubicación precisa del GPS."
+          : `El sitio exacto está en algún lugar de esta zona (${grupo[0].geohash ? precision(grupo[0].geohash) : "sin dato"}).`}{" "}
+        {grupo.length > 1 ? "Clic: ver el siguiente." : "Clic: ver el incidente."}
       </p>
     </div>
   )

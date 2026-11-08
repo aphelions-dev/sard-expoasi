@@ -47,7 +47,13 @@ export function horaLocal(horaUnix: number): string {
   return new Date(horaUnix * 1000).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
 }
 
-/** Centro aproximado de un geohash de 6 caracteres (±0,6 km). */
+/** Cuánto se puede alejar el sitio real del centro de la zona, según el largo del geohash
+ *  (protocolo, «Ubicación»): de 6 caracteres (~1,2 × 0,6 km) a 9 (~5 m). */
+export function precision(gh: string): string {
+  return ({ 6: "±600 m", 7: "±75 m", 8: "±20 m" } as Record<number, string>)[gh.length] ?? "±3 m";
+}
+
+/** Centro de la zona de un geohash. */
 export function coordenadas(gh: string): string {
   const { latitude, longitude } = geohash.decode(gh);
   return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;

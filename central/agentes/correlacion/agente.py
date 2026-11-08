@@ -8,7 +8,7 @@ Consume `reporte_priorizado` y produce `incidente_actualizado`. Ficha:
 2. Jev compara el reporte con cada candidato.
 3. p(mismo) >= 0,7: se vincula al incidente. Entre 0,3 y 0,7: incidente nuevo, con el candidato
    anotado como «posible mismo incidente» para que decida el coordinador. Menos: incidente nuevo.
-4. Sin Jev: solo se vincula si coincide la celda del geohash, el tipo y la hora con 30 min de
+4. Sin Jev: solo se vincula si coincide la celda de 6 caracteres del geohash, el tipo y la hora con 30 min de
    diferencia; si no, incidente nuevo. Ante la duda no se junta nada.
 
 El id de un incidente es `inc-<id del reporte que lo abrió>`, así las dos centrales le ponen
@@ -30,6 +30,11 @@ VENTANA_S = 2 * 3600
 RADIO_M = 1500
 VENTANA_SIN_JEV_S = 30 * 60
 
+
+
+def misma_celda(a: str, b: str) -> bool:
+    """La misma zona de ~1 km aunque un reporte traiga más precisión que el otro (6 a 9 caracteres)."""
+    return a[:6] == b[:6]
 
 def candidatos(conn: sqlite3.Connection, rep: dict[str, Any]) -> dict[str, list[dict]]:
     """Incidentes cercanos en espacio y tiempo, con sus reportes."""
@@ -100,7 +105,8 @@ def correlacionar(conn: sqlite3.Connection, rep: dict[str, Any], cliente: Jev) -
 
     # Sin Jev: regla conservadora.
     for inc, rs in cands.items():
-        if any(r["geohash"] and r["geohash"] == rep["geohash"] and r["tipo"] == rep["tipo"]
+        if any(r["geohash"] and rep["geohash"] and misma_celda(r["geohash"], rep["geohash"])
+               and r["tipo"] == rep["tipo"]
                and abs(r["hora_unix"] - rep["hora_unix"]) <= VENTANA_SIN_JEV_S for r in rs):
             return {**base, "metodo": "reglas", "vinculo": "mismo", "incidente_id": inc}
     return {**base, "metodo": "reglas"}

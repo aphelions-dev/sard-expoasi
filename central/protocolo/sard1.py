@@ -14,7 +14,7 @@ NOMBRES = ("id", "prioridad", "tipo", "personas", "banderas", "geohash", "hora_u
 
 RE_ID = re.compile(r"^[0-9A-Za-z]+-[0-9]+$")
 RE_BANDERAS = re.compile(r"^[01]{3}$")
-RE_GEOHASH = re.compile(r"^[0-9b-hjkmnp-z]{6}$")  # alfabeto base32 de geohash
+RE_GEOHASH = re.compile(r"^[0-9b-hjkmnp-z]{6,9}$")  # base32 de geohash; el largo dice la precisión
 RE_ENTERO = re.compile(r"^[0-9]+$")
 
 

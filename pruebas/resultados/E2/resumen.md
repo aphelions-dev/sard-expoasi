@@ -6,14 +6,14 @@ Terreno de 250 m × 250 m, pérdida 10 %: cuántos celulares y con qué alcance.
 
 | Caso | Entrega (peor) | SACK al reportante | Saltos | Duplicados | Con camino a pasarela | Apagados |
 |---|---|---|---|---|---|---|
-| 15 celulares · 30 m | 3.8% (0.0%) | 3.8% | 1.0 | 0 | 1.7 de 15 | 1 |
-| 15 celulares · 50 m | 14.5% (0.0%) | 14.5% | 1.2 | 0 | 3.1 de 15 | 3.1 |
+| 15 celulares · 30 m | 3.8% (0.0%) | 3.8% | 1.0 | 0 | 1.7 de 15 | 0 |
+| 15 celulares · 50 m | 14.5% (0.0%) | 14.5% | 1.2 | 0 | 3.1 de 15 | 0.7 |
 | 15 celulares · 100 m | 96.0% (75.0%) | 96.0% | 2.24 | 0 | 14.6 de 15 | 0 |
-| 30 celulares · 30 m | 1.2% (0.0%) | 1.2% | 1.17 | 0 | 1.8 de 30 | 2 |
-| 30 celulares · 50 m | 26.2% (2.5%) | 26.2% | 2.43 | 0 | 8.9 de 30 | 9.9 |
+| 30 celulares · 30 m | 1.2% (0.0%) | 1.2% | 1.17 | 0 | 1.8 de 30 | 0 |
+| 30 celulares · 50 m | 26.2% (2.5%) | 26.2% | 2.43 | 0 | 8.9 de 30 | 3.3 |
 | 30 celulares · 100 m | 100.0% (100.0%) | 100.0% | 2.04 | 0 | 30 de 30 | 0 |
-| 60 celulares · 30 m | 16.2% (0.0%) | 16.2% | 4.52 | 0 | 10 de 60 | 4 |
-| 60 celulares · 50 m | 97.8% (87.5%) | 97.8% | 4.86 | 0 | 58.6 de 60 | 0.3 |
+| 60 celulares · 30 m | 16.2% (0.0%) | 16.2% | 4.52 | 0 | 10 de 60 | 0.6 |
+| 60 celulares · 50 m | 97.8% (87.5%) | 97.8% | 4.86 | 0 | 58.6 de 60 | 0 |
 | 60 celulares · 100 m | 100.0% (100.0%) | 100.0% | 1.93 | 0 | 60 de 60 | 0 |
 
 Latencia hasta la central, en segundos: mediana promedio (p95 en el peor caso).

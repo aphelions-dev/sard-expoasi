@@ -36,7 +36,10 @@ resultado exacto.
 - **Guardar y reenviar**: cada celular guarda los reportes que oye y los reenvía, **P1/P2
   primero** (luego por hora), hasta `capacidad` mensajes por segundo. P3/P4 nunca se descartan:
   esperan su turno.
-- **Reintentos** con espera creciente hasta ver el `SACK`.
+- **Reintentos** con espera creciente hasta ver el `SACK`, y **vencimiento** a los 600 s de la
+  `hora_unix` (contrato, reglas 2 y 5): vencido, el reporte se marca "no entregado" y deja de
+  reintentarse, sin borrarse. La reactivación al aparecer un vecino nuevo no se modela: con los
+  celulares quietos, un celular aislado nunca gana camino.
 - **Pasarela**: sube lo que tiene a la central; con el `SACK`, lo difunde de vuelta por la malla.
   Si un vecino sigue reenviando algo ya confirmado, se le repite el `SACK`.
 - **Central**: simulada (acepta cada id una vez, cuenta duplicados, se puede "caer" con
@@ -67,8 +70,8 @@ el guion.
 | `capacidad` | 4 mensajes/s por celular | Supuesto del simulador |
 | `bateria_min`–`bateria_max` | 5–20 % | Bases, escenario 1 |
 | `gasto_reposo`, `gasto_envio` | 0,002 %/s, 0,02 %/mensaje | Supuesto del simulador |
-| `espera_base_s`, `espera_tope_s`, `variacion` | 2, 4, 8… s hasta 60 s, ±20 % | **Propuesta para P1** (el contrato lo deja por definir) |
-| `vence_s` | sin vencimiento | **Por definir** (P1); con valor, lo vencido se marca y no se borra |
+| `espera_base_s`, `espera_tope_s`, `variacion` | 2, 4, 8, 16, 32 s y luego 60 s, ±20 % | Contrato, regla 2 (#58) |
+| `vence_s` | 600 s desde la `hora_unix` | Contrato, regla 5 (#58); `None` = nunca vence |
 
 ## Métricas
 

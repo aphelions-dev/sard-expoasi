@@ -18,7 +18,7 @@
    "espera_base_s": 2.0,
    "espera_tope_s": 60.0,
    "variacion": 0.2,
-   "vence_s": null,
+   "vence_s": 600,
    "sin_gps": 0.1,
    "hora_base": 1786338000,
    "caida": null,
@@ -76,7 +76,7 @@
    "un_reporte_por_id": true,
    "nodos_apagados_prom": 0,
    "conectados_a_pasarela_prom": 29.9,
-   "emitidos_prom": 2183.4
+   "emitidos_prom": 2182.3
   },
   "por_semilla": [
    {
@@ -543,7 +543,7 @@
     "entregados_central": 39,
     "tasa_entrega": 0.975,
     "confirmados_reportante": 39,
-    "vencidos": 0,
+    "vencidos": 1,
     "latencia_por_prioridad": {
      "P1": {
       "creados": 9,
@@ -579,15 +579,15 @@
     "max_llegadas_por_id": 1,
     "reportes_creados_en_central_por_id": 1,
     "emitidos": {
-     "reportes": 427,
+     "reportes": 416,
      "sacks": 1134,
-     "bytes": 53115
+     "bytes": 51938
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
     "nodos_sin_vecinos": 1,
     "nodos_con_camino_a_pasarela": 29,
-    "segundos_simulados": 1800
+    "segundos_simulados": 1173
    }
   ]
  },
@@ -610,7 +610,7 @@
    "espera_base_s": 2.0,
    "espera_tope_s": 60.0,
    "variacion": 0.2,
-   "vence_s": null,
+   "vence_s": 600,
    "sin_gps": 0.1,
    "hora_base": 1786338000,
    "caida": null,
@@ -668,7 +668,7 @@
    "un_reporte_por_id": true,
    "nodos_apagados_prom": 0,
    "conectados_a_pasarela_prom": 29.9,
-   "emitidos_prom": 1856
+   "emitidos_prom": 1853
   },
   "por_semilla": [
    {
@@ -1135,7 +1135,7 @@
     "entregados_central": 38,
     "tasa_entrega": 0.95,
     "confirmados_reportante": 38,
-    "vencidos": 0,
+    "vencidos": 2,
     "latencia_por_prioridad": {
      "P1": {
       "creados": 12,
@@ -1171,15 +1171,15 @@
     "max_llegadas_por_id": 2,
     "reportes_creados_en_central_por_id": 1,
     "emitidos": {
-     "reportes": 461,
+     "reportes": 431,
      "sacks": 1106,
-     "bytes": 57768
+     "bytes": 54762
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
     "nodos_sin_vecinos": 1,
     "nodos_con_camino_a_pasarela": 29,
-    "segundos_simulados": 1800
+    "segundos_simulados": 998
    }
   ]
  },
@@ -1202,7 +1202,7 @@
    "espera_base_s": 2.0,
    "espera_tope_s": 60.0,
    "variacion": 0.2,
-   "vence_s": null,
+   "vence_s": 600,
    "sin_gps": 0.1,
    "hora_base": 1786338000,
    "caida": null,
@@ -1260,7 +1260,7 @@
    "un_reporte_por_id": true,
    "nodos_apagados_prom": 0,
    "conectados_a_pasarela_prom": 29.9,
-   "emitidos_prom": 1585.5
+   "emitidos_prom": 1583.9
   },
   "por_semilla": [
    {
@@ -1727,7 +1727,7 @@
     "entregados_central": 39,
     "tasa_entrega": 0.975,
     "confirmados_reportante": 39,
-    "vencidos": 0,
+    "vencidos": 1,
     "latencia_por_prioridad": {
      "P1": {
       "creados": 11,
@@ -1763,15 +1763,15 @@
     "max_llegadas_por_id": 2,
     "reportes_creados_en_central_por_id": 1,
     "emitidos": {
-     "reportes": 355,
+     "reportes": 339,
      "sacks": 1137,
-     "bytes": 45396
+     "bytes": 44148
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
     "nodos_sin_vecinos": 1,
     "nodos_con_camino_a_pasarela": 29,
-    "segundos_simulados": 1800
+    "segundos_simulados": 866
    }
   ]
  }

@@ -6,8 +6,8 @@
 
 | Caso | Entrega (peor) | SACK al reportante | Saltos | Duplicados | Con camino a pasarela | Apagados |
 |---|---|---|---|---|---|---|
-| con prioridad | 98.4% (95.0%) | 97.9% | 2.84 | 0 | 29.9 de 30 | 7.2 |
-| orden de llegada | 98.4% (95.5%) | 98.0% | 2.81 | 0 | 29.9 de 30 | 6.8 |
+| con prioridad | 98.4% (95.0%) | 97.9% | 2.84 | 0 | 29.9 de 30 | 6.7 |
+| orden de llegada | 98.4% (95.5%) | 98.0% | 2.81 | 0 | 29.9 de 30 | 6.3 |
 
 Latencia hasta la central, en segundos: mediana promedio (p95 en el peor caso).
 

@@ -16,10 +16,11 @@
   "espera_base_s": 2.0,
   "espera_tope_s": 60.0,
   "variacion": 0.2,
-  "vence_s": null,
+  "vence_s": 600,
   "sin_gps": 0.1,
   "hora_base": 1786338000,
   "caida": null,
   "velocidad": 0.0,
-  "prefijo": "n"
+  "prefijo": "n",
+  "por_prioridad": true
 }

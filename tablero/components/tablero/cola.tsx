@@ -1,0 +1,141 @@
+"use client"
+
+import { useRef } from "react"
+import { Clock, MapPinOff, TriangleAlert, Users } from "lucide-react"
+
+import { ScrollArea } from "@/components/ui/scroll-area"
+import type { Incidente } from "@/lib/api/tipos"
+import { FILTROS, conteos, filtrar, type Filtro } from "@/lib/cola"
+import { TIPO, haceCuanto } from "@/lib/formato"
+import type { Barrio } from "@/lib/geo"
+import { cn } from "@/lib/utils"
+
+import { ICONO_TIPO } from "./iconos"
+import { BARRA_PRIORIDAD, EstadoInsignia, Prioridad } from "./insignias"
+
+interface Props {
+  incidentes: Incidente[]
+  cargando: boolean
+  filtro: Filtro
+  onFiltro: (f: Filtro) => void
+  seleccion: string | null
+  onSeleccion: (id: string) => void
+  ahora: number
+  barrio: (gh: string | null) => Barrio | null
+}
+
+/** Cola en filas densas, en el orden que decide la central. Los filtros esconden, no reordenan. */
+export function Cola({ incidentes, cargando, filtro, onFiltro, seleccion, onSeleccion, ahora, barrio }: Props) {
+  const lista = filtrar(incidentes, filtro)
+  const n = conteos(incidentes)
+  const ref = useRef<HTMLOListElement>(null)
+
+  // Flechas arriba/abajo recorren la cola sin soltar el teclado.
+  function teclado(e: React.KeyboardEvent, i: number) {
+    const paso = e.key === "ArrowDown" ? 1 : e.key === "ArrowUp" ? -1 : 0
+    if (!paso) return
+    e.preventDefault()
+    const sig = lista[i + paso]
+    if (!sig) return
+    onSeleccion(sig.id)
+    ref.current?.querySelectorAll<HTMLButtonElement>("button[data-fila]")[i + paso]?.focus()
+  }
+
+  return (
+    <section className="flex h-full min-h-0 flex-col" aria-label="Cola de incidentes">
+      <div className="flex h-9 shrink-0 items-center gap-0.5 border-b px-1.5" role="tablist" aria-label="Filtrar incidentes">
+        {FILTROS.map((f) => (
+          <button
+            key={f.id}
+            role="tab"
+            aria-selected={filtro === f.id}
+            onClick={() => onFiltro(f.id)}
+            className={cn(
+              "flex h-6 items-center gap-1.5 rounded-sm px-2 text-xs text-muted-foreground transition-colors hover:text-foreground",
+              filtro === f.id && "bg-accent font-medium text-foreground",
+            )}
+          >
+            {f.etiqueta}
+            <span className="font-mono text-[0.6875rem] opacity-70">{n[f.id]}</span>
+          </button>
+        ))}
+      </div>
+
+      {lista.length === 0 ? (
+        <p className="p-4 text-xs text-muted-foreground">
+          {cargando ? "Cargando…" : incidentes.length ? "Ningún incidente con este filtro." : "Todavía no hay incidentes."}
+        </p>
+      ) : (
+        <ScrollArea className="min-h-0 flex-1">
+          <ol ref={ref} className="divide-y">
+            {lista.map((inc, i) => {
+              const b = barrio(inc.geohash)
+              const elegida = seleccion === inc.id
+              const Icono = ICONO_TIPO[inc.tipo]
+              const decidido = inc.estado === "aprobada" || inc.estado === "rechazada"
+              const avisos = inc.incertidumbre.revisar || inc.impacto.vulnerables || inc.incertidumbre.sin_ubicacion || inc.vigencia.sin_noticias_recientes || decidido
+              return (
+                <li key={inc.id}>
+                  {/* Dos líneas fijas (qué, dónde, cuántos, cuándo · lo que dijo la gente) y una
+                      tercera solo si hay algo fuera de lo normal. El resto, en el panel. */}
+                  <button
+                    data-fila
+                    aria-current={elegida}
+                    onClick={() => onSeleccion(inc.id)}
+                    onKeyDown={(e) => teclado(e, i)}
+                    title={inc.motivo_orden}
+                    className={cn(
+                      "relative grid w-full gap-0.5 py-2 pr-2.5 pl-3.5 text-left text-xs transition-colors hover:bg-accent/60 focus-visible:bg-accent focus-visible:outline-none",
+                      elegida && "bg-accent",
+                      decidido && !elegida && "opacity-60",
+                    )}
+                  >
+                    <span aria-hidden="true" className={cn("absolute inset-y-0 left-0 w-1", BARRA_PRIORIDAD[inc.prioridad])} />
+                    <span className="flex min-w-0 items-center gap-1.5">
+                      <Prioridad p={inc.prioridad} />
+                      <Icono aria-hidden="true" className="size-3.5 shrink-0" />
+                      <span className="shrink-0 font-medium">{TIPO[inc.tipo]}</span>
+                      {b && <span className="truncate text-muted-foreground">· {b.nombre}</span>}
+                      <span className="ml-auto flex shrink-0 items-center gap-2 font-mono text-[0.6875rem] text-muted-foreground">
+                        <span className="flex items-center gap-0.5" title={`${inc.impacto.personas} personas`}>
+                          <Users className="size-3" aria-hidden="true" />
+                          {inc.impacto.personas}
+                        </span>
+                        {haceCuanto(inc.hora_unix, ahora).replace("hace ", "")}
+                      </span>
+                    </span>
+                    <span className="truncate text-muted-foreground">«{inc.evidencia[0]?.texto || "sin texto"}»</span>
+                    {avisos && (
+                      <span className="mt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[0.6875rem]">
+                        {inc.incertidumbre.revisar && (
+                          <span className="flex items-center gap-1 font-medium text-revisar">
+                            <TriangleAlert className="size-3" aria-hidden="true" />
+                            Revisar
+                          </span>
+                        )}
+                        {inc.impacto.vulnerables && <span className="font-medium">Niños o mayores</span>}
+                        {inc.incertidumbre.sin_ubicacion && (
+                          <span className="flex items-center gap-1 text-p2">
+                            <MapPinOff className="size-3" aria-hidden="true" />
+                            Sin ubicación
+                          </span>
+                        )}
+                        {inc.vigencia.sin_noticias_recientes && (
+                          <span className="flex items-center gap-1 text-vencido">
+                            <Clock className="size-3" aria-hidden="true" />
+                            {inc.vigencia.minutos_sin_noticias} min sin noticias
+                          </span>
+                        )}
+                        {decidido && <EstadoInsignia e={inc.estado} />}
+                      </span>
+                    )}
+                  </button>
+                </li>
+              )
+            })}
+          </ol>
+        </ScrollArea>
+      )}
+    </section>
+  )
+}

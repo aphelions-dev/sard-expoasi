@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils"
 import { enZona, resumenPorBarrio, type Zona } from "@/lib/zonas"
 
 import { EncuadrarZona, EstadoBarrios, EtiquetasBarrios, Zoom, pinturaBarrios, useReproduccion } from "./barrios-mapa"
-import { MarcaZona, PRECISO, TarjetaZona, siguienteDeZona } from "./zona-incidentes"
+import { MarcaZona, TarjetaZona, siguienteDeZona } from "./zona-incidentes"
 
 /** Desde este zoom se ven las celdas de cada incidente en vez del resumen por barrio. */
 const ZOOM_CELDAS = 14
@@ -221,11 +221,12 @@ export function Mapa({ geo, incidentes: todos, seleccion, onSeleccion, barrio, z
   // El tema sale de la misma clase que los colores, para que nunca vayan desfasados.
   const tema = clase.split(" ").includes("dark") ? "dark" : "light"
 
-  // De cerca (o con un barrio elegido) se ven todas las celdas; de lejos, solo las que no caen en
-  // ningún barrio (Villamaría, afueras) y los puntos precisos, que el resumen por barrio no muestra.
+  // De cerca (o con un barrio elegido) se ven las celdas y los puntos de ubicación precisa; de lejos,
+  // solo lo que no cae en ningún barrio (Villamaría, afueras). Los puntos de un mismo barrio quedan a
+  // unos metros entre sí: de lejos serían una mancha debajo de la etiqueta del barrio.
   const cerca = zoom >= ZOOM_CELDAS || zona?.tipo === "barrio"
   const grupos = useMemo(
-    () => porCelda(incidentes).filter(([gh]) => cerca || gh.length >= PRECISO || !barrio(gh)),
+    () => porCelda(incidentes).filter(([gh]) => cerca || !barrio(gh)),
     [incidentes, cerca, barrio],
   )
   // Con una zona elegida, las celdas de afuera se apagan como lo ya decidido.
@@ -329,7 +330,7 @@ export function Mapa({ geo, incidentes: todos, seleccion, onSeleccion, barrio, z
           )
         })}
         {/* De lejos, el nombre y el número de cada barrio; de cerca, cuántos hay en cada celda. */}
-        {!cerca && <EtiquetasBarrios barrios={geo.barrios} resumen={resumen} zona={zona} destellan={destellan} onZona={onZona} />}
+        {!cerca && <EtiquetasBarrios barrios={geo.barrios} resumen={resumen} zona={zona} destellan={destellan} onZona={onZona} onEncima={setEncima} />}
         {grupos.map(([gh, grupo]) => (
           <MarcaZona key={gh} gh={gh} grupo={grupo} centro={centroDe(gh)} seleccion={seleccion} onSeleccion={onSeleccion} />
         ))}
@@ -352,7 +353,7 @@ export function Mapa({ geo, incidentes: todos, seleccion, onSeleccion, barrio, z
         {leyenda && (
           <div className="space-y-2 border-t px-2.5 py-2">
             <p>De lejos, cada barrio toma el color de lo más grave que tiene por decidir, más intenso cuantos más incidentes tiene. Clic en un barrio: ver solo ese barrio en la cola.</p>
-            <p>De cerca, cada incidente es la zona donde ocurrió, tan grande como la incertidumbre del GPS. Si el GPS fue preciso (~20 m), es un punto con el icono del tipo.</p>
+            <p>Acércate o haz clic en un barrio para ver cada incidente: si el GPS fue preciso (hasta ~20 m), un punto con el icono del tipo en el sitio exacto; si no, la zona donde ocurrió, tan grande como la incertidumbre.</p>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               {(["P1", "P2", "P3", "P4"] as const).map((p) => (
                 <span key={p} className="flex items-center gap-1 font-mono">

@@ -30,7 +30,7 @@ export function pinturaBarrios(c: { barrio: string; borde: string; texto: string
   // Sin incidentes, el barrio es fondo; con ellos, de 0,4 a 0,7 según cuántos tiene.
   const base = [
     "case",
-    ["==", p, "-"], 0.22,
+    ["==", p, "-"], 0.45,
     ["boolean", ["feature-state", "apagado"], false], 0.22,
     ["min", 0.7, ["+", 0.32, ["*", 0.08, n]]],
   ]
@@ -39,8 +39,10 @@ export function pinturaBarrios(c: { barrio: string; borde: string; texto: string
     fill: { "fill-color": color, "fill-opacity": opacidad } as never,
     hover: { "fill-opacity": ["min", 0.9, ["+", opacidad, 0.15]] } as never,
     line: {
-      "line-color": ["case", ["boolean", ["feature-state", "sel"], false], c.texto, ["==", p, "-"], c.borde, color],
-      "line-width": ["case", ["boolean", ["feature-state", "sel"], false], 2.5, ["==", p, "-"], 0.6, 1.2],
+      "line-color": ["case", ["boolean", ["feature-state", "sel"], false], c.texto, ["==", p, "-"], c.texto, color],
+      "line-width": ["case", ["boolean", ["feature-state", "sel"], false], 2.5, ["==", p, "-"], 0.9, 1.4],
+      // Los barrios sin incidentes se ven como contorno tenue: el mapa de barrios entero, sin competir.
+      "line-opacity": ["case", ["boolean", ["feature-state", "sel"], false], 1, ["==", p, "-"], 0.28, 0.9],
     } as never,
   }
 }
@@ -124,12 +126,15 @@ export function EtiquetasBarrios({
   zona,
   destellan,
   onZona,
+  onEncima,
 }: {
   barrios: ColeccionBarrios
   resumen: Map<string, ResumenBarrio>
   zona: Zona | null
   destellan: Set<string>
   onZona: (z: Zona | null) => void
+  /** La etiqueta tapa el barrio: al pasar sobre ella se muestra lo mismo que sobre el barrio. */
+  onEncima: (b: { id: string; nombre: string } | null) => void
 }) {
   return barrios.features
     .filter((f) => resumen.has(f.properties.id))
@@ -146,6 +151,8 @@ export function EtiquetasBarrios({
         >
           <MarkerContent>
             <span
+              onMouseEnter={() => onEncima({ id, nombre: name })}
+              onMouseLeave={() => onEncima(null)}
               data-p={r.apagado ? undefined : r.prioridad}
               data-sel={elegido}
               className={cn(

@@ -4,7 +4,7 @@
 // (~1 km o ~150 m) el incidente se dibuja como el área sombreada del color de su prioridad (capa
 // `celdas` de `mapa.tsx`), no como un icono, que haría creer que se sabe el sitio exacto; aquí solo
 // va lo que el área no dice sola, cuántos hay y si piden revisión. Con 8 o más (~20 m), un punto.
-import { MapMarker, MarkerContent } from "@/components/ui/map"
+import { MapMarker, MarkerContent, MarkerTooltip } from "@/components/ui/map"
 import type { Incidente, Prioridad } from "@/lib/api/tipos"
 import { TIPO, precision } from "@/lib/formato"
 import { cn } from "@/lib/utils"
@@ -69,6 +69,19 @@ export function MarcaZona({
         <MarkerContent>
           <Punto inc={inc} elegido={inc.id === seleccion} revisar={revisar} />
         </MarkerContent>
+        <MarkerTooltip className="rounded-none bg-transparent p-0 text-popover-foreground shadow-none">
+          <div className="w-60 rounded-sm border bg-popover px-2.5 py-1.5 text-xs text-popover-foreground shadow-md">
+            <p className="flex items-center gap-1.5">
+              <span className={cn("font-mono font-semibold", TEXTO[inc.prioridad])}>{inc.prioridad}</span>
+              <span className="font-medium">{TIPO[inc.tipo]}</span>
+              <span className="ml-auto font-mono text-muted-foreground">{inc.impacto.personas} p.</span>
+            </p>
+            <p className="mt-0.5 line-clamp-2 text-muted-foreground">«{inc.evidencia[0]?.texto || "sin texto"}»</p>
+            <p className="mt-1 text-[0.6875rem] text-muted-foreground">
+              Ubicación precisa ({precision(gh)}).{grupo.length > 1 ? ` ${grupo.length} incidentes en este punto. Clic: el siguiente.` : " Clic: ver el incidente."}
+            </p>
+          </div>
+        </MarkerTooltip>
       </MapMarker>
     )
   }

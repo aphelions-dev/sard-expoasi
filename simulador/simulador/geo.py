@@ -28,6 +28,26 @@ def a_latlon(x: float, y: float, centro: tuple[float, float] = CENTRO) -> tuple[
     return lat, lon
 
 
+# Radio de precisión del GPS (metros, como Location.getAccuracy() de Android) → caracteres del
+# geohash: la tabla de «Ubicación» de contracts/protocolo-sard1.md.
+def caracteres(radio_m: float) -> int:
+    return 9 if radio_m <= 5 else 8 if radio_m <= 20 else 7 if radio_m <= 75 else 6
+
+
+# Cuánto suele medir ese radio. Supuesto del simulador, no una medición: a cielo abierto un
+# celular da de 3 a 20 m; entre edificios o bajo techo, de decenas a cientos de metros.
+RADIOS_GPS = ((0.15, 2, 5), (0.45, 5, 20), (0.25, 20, 75), (0.15, 75, 300))  # (peso, desde, hasta)
+
+
+def radio_gps(rng) -> float:
+    r, acum = rng.random(), 0.0
+    for peso, desde, hasta in RADIOS_GPS:
+        acum += peso
+        if r <= acum:
+            return rng.uniform(desde, hasta)
+    return RADIOS_GPS[-1][2]
+
+
 def a_metros(lat: float, lon: float, centro: tuple[float, float] = CENTRO) -> tuple[float, float]:
     """(lat, lon) → (x, y) en metros desde `centro`; la inversa de `a_latlon`."""
     lat0, lon0 = centro

@@ -4,8 +4,9 @@
 // locales, así que sin internet se ve igual; las calles de OpenStreetMap son una capa opcional.
 //
 // Jerarquía visual (Du et al. 2021, diseño de mapas de crisis): el mapa base va lo menos saliente
-// posible; los incidentes, lo más. Color y tamaño marcan la gravedad; la forma (rombo = incidente,
-// círculo = punto de atención, como en la simbología de la FGDC) dice qué es cada cosa.
+// posible; los incidentes, lo más. El reporte trae una zona aproximada, no un punto, así que cada
+// incidente es el área de esa zona con el color de su prioridad: un icono haría creer que se sabe
+// el sitio exacto. Hospitales y bomberos (círculos, simbología de la FGDC) van apagados por defecto.
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react"
 import type { StyleSpecification } from "maplibre-gl"
 import { ChevronDown, FireExtinguisher, Maximize2, Minimize2, Scan } from "lucide-react"
@@ -14,12 +15,10 @@ import "@/lib/maplibre-local" // antes que el mapa: worker local, sin internet
 import { Map, MapControls, MapGeoJSON, MapMarker, MarkerContent, MarkerTooltip, useMap } from "@/components/ui/map"
 import type { Incidente } from "@/lib/api/tipos"
 import { token } from "@/lib/color"
-import { TIPO } from "@/lib/formato"
 import { celda, type Barrio, type Geo } from "@/lib/geo"
 import { cn } from "@/lib/utils"
 
-import { ICONO_TIPO } from "./iconos"
-import { MarcadorIncidente } from "./marcador-incidente"
+import { MarcaZona, TarjetaZona, siguienteDeZona } from "./zona-incidentes"
 
 interface Props {
   geo: Geo
@@ -114,7 +113,8 @@ function centroDe(gh: string): [number, number] {
 }
 
 /** Una celda por geohash, con la prioridad más alta de sus incidentes: varios incidentes en la
- *  misma celda no deben apilar rellenos hasta volverla opaca. */
+ *  misma celda no deben apilar rellenos hasta volverla opaca. Lo ya decidido o sin noticias
+ *  recientes se apaga para que lo pendiente sobresalga. */
 function celdas(grupos: [string, Incidente[]][], seleccion: string | null): GeoJSON.FeatureCollection {
   const orden = (p: string) => Number(p.slice(1))
   return {
@@ -124,12 +124,15 @@ function celdas(grupos: [string, Incidente[]][], seleccion: string | null): GeoJ
         gh,
         prioridad: grupo.map((i) => i.prioridad).sort((a, b) => orden(a) - orden(b))[0],
         sel: grupo.some((i) => i.id === seleccion),
+        apagada:
+          grupo.every((i) => i.estado === "aprobada" || i.estado === "rechazada") ||
+          grupo.every((i) => i.vigencia.sin_noticias_recientes),
       }))
       // Lo último se dibuja encima: P4 primero, P1 al final y la elegida sobre todo.
       .sort((a, b) => Number(a.sel) - Number(b.sel) || orden(b.prioridad) - orden(a.prioridad))
-      .map(({ gh, prioridad, sel }) => ({
+      .map(({ gh, prioridad, sel, apagada }) => ({
         type: "Feature",
-        properties: { gh, prioridad, sel },
+        properties: { gh, prioridad, sel, apagada },
         geometry: { type: "Polygon", coordinates: [celda(gh)] },
       })),
   }
@@ -188,8 +191,9 @@ function Botones({ grupos, completo, onCompleto }: { grupos: [string, Incidente[
 export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo, onCompleto }: Props) {
   const [calles, setCalles] = useState(true)
   const [leyenda, setLeyenda] = useState(false)
-  const [lugares, setLugares] = useState(true)
+  const [lugares, setLugares] = useState(false)
   const [encima, setEncima] = useState<string | null>(null)
+  const [zona, setZona] = useState<string | null>(null)
 
   // Los tokens dependen de la clase de <html>, que next-themes cambia fuera de React.
   const clase = useSyncExternalStore(observarClase, () => document.documentElement.className, () => "")
@@ -200,6 +204,8 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
   const grupos = useMemo(() => porCelda(incidentes), [incidentes])
   const datos = useMemo(() => celdas(grupos, seleccion), [grupos, seleccion])
   const sinUbicacion = incidentes.filter((i) => !i.geohash).length
+  const grupoDe = (gh: string) => grupos.find(([g]) => g === gh)?.[1] ?? null
+  const enZona = zona ? grupoDe(zona) : null
 
   if (!colores) return <div className="h-full bg-mapa-fondo" />
 
@@ -226,15 +232,27 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
           linePaint={{ "line-color": colores.borde, "line-width": 0.6 }}
           onHover={(e) => setEncima((e?.feature.properties?.name as string | undefined) ?? null)}
         />
-        {/* La celda es la incertidumbre de la ubicación: tenue y punteada; la elegida, marcada. */}
+        {/* El incidente es su zona: relleno del color de la prioridad y borde punteado, porque el
+            sitio exacto no se sabe; la elegida, con el borde marcado. */}
         <MapGeoJSON
           id="celdas"
           data={datos}
-          fillPaint={{ "fill-color": porPrioridad as never, "fill-opacity": ["case", ["get", "sel"], 0.28, 0.12] as never }}
+          promoteId="gh"
+          interactive
+          fillPaint={{
+            "fill-color": porPrioridad as never,
+            "fill-opacity": ["case", ["get", "sel"], 0.6, ["get", "apagada"], 0.15, 0.4] as never,
+          }}
+          fillHoverPaint={{ "fill-opacity": 0.6 }}
           linePaint={{
             "line-color": ["case", ["get", "sel"], colores.texto, porPrioridad] as never,
-            "line-width": ["case", ["get", "sel"], 2, 1] as never,
+            "line-width": ["case", ["get", "sel"], 2.5, 1.25] as never,
             "line-dasharray": [2, 1.5],
+          }}
+          onHover={(e) => setZona((e?.feature.properties?.gh as string | undefined) ?? null)}
+          onClick={(e) => {
+            const g = grupoDe(e.feature.properties?.gh as string)
+            if (g) onSeleccion(siguienteDeZona(g, seleccion))
           }}
         />
         {/* Puntos de atención: contexto, en círculo y atenuados. */}
@@ -269,16 +287,9 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
             </MapMarker>
           )
         })}
-        {/* Incidentes al final, para que queden encima de todo. */}
+        {/* Cuántos hay en cada zona y si alguno pide revisión, encima de todo. */}
         {grupos.map(([gh, grupo]) => (
-          <MarcadorIncidente
-            key={gh}
-            grupo={grupo}
-            centro={centroDe(gh)}
-            barrio={barrio(gh)?.nombre ?? null}
-            seleccion={seleccion}
-            onSeleccion={onSeleccion}
-          />
+          <MarcaZona key={gh} gh={gh} grupo={grupo} centro={centroDe(gh)} seleccion={seleccion} onSeleccion={onSeleccion} />
         ))}
         <MapControls position="top-right" />
         <Botones grupos={grupos} completo={completo} onCompleto={onCompleto} />
@@ -296,26 +307,25 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
         </button>
         {leyenda && (
           <div className="space-y-2 border-t px-2.5 py-2">
+            <p>Cada incidente es la zona donde ocurrió, tan grande como la incertidumbre del GPS. Si el GPS fue preciso (~20 m), es un punto con el icono del tipo.</p>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               {(["P1", "P2", "P3", "P4"] as const).map((p) => (
                 <span key={p} className="flex items-center gap-1 font-mono">
                   <span
                     aria-hidden="true"
                     className={cn(
-                      "size-2.5 rotate-45 rounded-[1px]",
-                      p === "P1" && "bg-p1",
-                      p === "P2" && "bg-p2",
-                      p === "P3" && "bg-p3",
-                      p === "P4" && "bg-p4",
+                      "size-3 border border-dashed",
+                      p === "P1" && "border-p1 bg-p1/40",
+                      p === "P2" && "border-p2 bg-p2/40",
+                      p === "P3" && "border-p3 bg-p3/40",
+                      p === "P4" && "border-p4 bg-p4/40",
                     )}
                   />
                   {p}
                 </span>
               ))}
-              <span className="flex items-center gap-1">
-                <span aria-hidden="true" className="size-2.5 rounded-full bg-revisar" />
-                revisar
-              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span className="flex items-center gap-1">
                 <span
                   aria-hidden="true"
@@ -323,25 +333,14 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
                 >
                   3
                 </span>
-                en la misma zona
+                incidentes en la misma zona
               </span>
-            </div>
-            <div className="grid grid-cols-2 gap-x-3 gap-y-1">
-              {(Object.keys(ICONO_TIPO) as (keyof typeof ICONO_TIPO)[]).map((t) => {
-                const I = ICONO_TIPO[t]
-                return (
-                  <span key={t} className="flex items-center gap-1.5">
-                    <I aria-hidden="true" className="size-3.5 text-foreground" />
-                    {TIPO[t]}
-                  </span>
-                )
-              })}
+              <span className="flex items-center gap-1">
+                <span aria-hidden="true" className="size-2.5 rounded-full bg-revisar" />
+                para revisar
+              </span>
             </div>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <span className="flex items-center gap-1">
-                <span aria-hidden="true" className="size-3 border border-dashed border-foreground/60" />
-                zona aproximada (~600 m)
-              </span>
               <span className="flex items-center gap-1">
                 <span aria-hidden="true" className="grid size-3.5 place-items-center rounded-full border border-lugar-salud text-[0.5rem] font-bold text-lugar-salud">
                   H
@@ -353,7 +352,7 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
                 bomberos
               </span>
             </div>
-            <p>Atenuado: ya decidido o sin noticias recientes.</p>
+            <p>Más tenue: ya decidido o sin noticias recientes.</p>
             <div className="space-y-1 border-t pt-2">
               <label className="flex cursor-pointer items-center gap-1.5">
                 <input type="checkbox" checked={lugares} onChange={(e) => setLugares(e.target.checked)} className="accent-foreground" />
@@ -368,10 +367,16 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
         )}
       </div>
 
-      {encima && (
-        <div className="pointer-events-none absolute bottom-2 left-2 z-10 rounded-sm border bg-card/95 px-2 py-1 text-xs font-medium">
-          {encima}
+      {zona && enZona ? (
+        <div className="pointer-events-none absolute bottom-2 left-2 z-10">
+          <TarjetaZona grupo={enZona} barrio={barrio(zona)?.nombre ?? null} seleccion={seleccion} />
         </div>
+      ) : (
+        encima && (
+          <div className="pointer-events-none absolute bottom-2 left-2 z-10 rounded-sm border bg-card/95 px-2 py-1 text-xs font-medium">
+            {encima}
+          </div>
+        )
       )}
       {sinUbicacion > 0 && (
         <div className="absolute right-2 bottom-10 z-10 rounded-sm border border-p2/40 bg-p2-surface px-2 py-1 text-[0.6875rem] text-p2">

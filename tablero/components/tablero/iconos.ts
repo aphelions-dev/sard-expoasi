@@ -1,14 +1,23 @@
-// Un icono por tipo de incidente del contrato. Se usan en el mapa y en la cola, siempre junto al
-// texto del tipo: el icono ayuda a reconocer, no reemplaza la palabra.
-import { BrickWall, CircleAlert, Flame, HeartPulse, TrafficCone, UserRoundSearch, type LucideIcon } from "lucide-react"
+// Un icono por tipo de incidente del contrato, de Tabler: tiene símbolos de emergencia que lucide no
+// (botiquín, vía cortada, salvavidas de rescate). Van siempre junto al texto del tipo: el icono
+// ayuda a reconocer, no reemplaza la palabra.
+import {
+  IconAlertCircle,
+  IconFirstAidKit,
+  IconFlame,
+  IconLifebuoy,
+  IconRoadOff,
+  IconUserSearch,
+  type Icon,
+} from "@tabler/icons-react"
 
 import type { Tipo } from "@/lib/api/tipos"
 
-export const ICONO_TIPO: Record<Tipo, LucideIcon> = {
-  ATRAP: BrickWall,
-  MEDIC: HeartPulse,
-  FUEGO: Flame,
-  VIA: TrafficCone,
-  DESAP: UserRoundSearch,
-  OTRO: CircleAlert,
+export const ICONO_TIPO: Record<Tipo, Icon> = {
+  ATRAP: IconLifebuoy,
+  MEDIC: IconFirstAidKit,
+  FUEGO: IconFlame,
+  VIA: IconRoadOff,
+  DESAP: IconUserSearch,
+  OTRO: IconAlertCircle,
 }

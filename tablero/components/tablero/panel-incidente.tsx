@@ -1,15 +1,25 @@
 "use client"
 
-import { ChevronRight, Clock, MapPin, TriangleAlert, Users } from "lucide-react"
+import {
+  ChevronRight,
+  CircleHelp,
+  Clock,
+  MapPin,
+  MessageCircleQuestion,
+  ShieldCheck,
+  TriangleAlert,
+  Users,
+} from "lucide-react"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
 import type { Nodo } from "@/lib/api/central"
-import type { Evidencia, Incidente } from "@/lib/api/tipos"
+import type { Corroboracion, Evidencia, Incidente } from "@/lib/api/tipos"
 import {
   CORROBORACION,
-  FUENTE,
+  fuenteLegible,
   TIPO,
   coordenadas,
+  precision,
   haceCuanto,
   horaLocal,
   lugarLegible,
@@ -17,7 +27,7 @@ import {
 import { cercanos, type Barrio, type Geo } from "@/lib/geo"
 import { cn } from "@/lib/utils"
 
-import { ORIGEN_LEGIBLE, enPalabras, senalLegible } from "@/lib/lenguaje"
+import { ORIGEN_LEGIBLE, citaLegible, enPalabras, senalLegible } from "@/lib/lenguaje"
 
 import { BarraDecision, Propuesta } from "./decision"
 import { ICONO_TIPO } from "./iconos"
@@ -129,7 +139,7 @@ export function PanelIncidente({
 
   // Todo lo que pide cautela, junto y en lenguaje llano.
   const atencion = [
-    ...u.motivos.map((m) => enPalabras(legible(m))),
+    ...u.motivos.map((m) => enPalabras(legible(m), inc.evidencia.map((e) => e.texto))),
     ...(u.sin_analisis_ia
       ? ["Sin análisis automático: se clasificó solo con las palabras de alerta."]
       : []),
@@ -183,7 +193,7 @@ export function PanelIncidente({
                 }
               >
                 {inc.geohash ? (
-                  (barrio?.nombre ?? "Sin barrio")
+                  (barrio?.nombre ?? "Fuera de los barrios del mapa")
                 ) : (
                   <span className="text-p2">Sin ubicación</span>
                 )}
@@ -221,18 +231,11 @@ export function PanelIncidente({
 
         <div className="space-y-2 p-2">
           <Tarjeta n={1} titulo="Qué tan seguro es">
-            <p>
-              <strong className="font-medium">
-                {CORROBORACION[u.corroboracion]}
-              </strong>
-              <span className="text-muted-foreground">
-                {" "}
-                · {u.dispositivos} celular{u.dispositivos === 1 ? "" : "es"} distinto{u.dispositivos === 1 ? "" : "s"}{" "}
-                · {u.fuentes_directas} testigo
-                {u.fuentes_directas === 1 ? "" : "s"} directo
-                {u.fuentes_directas === 1 ? "" : "s"}
-              </span>
-            </p>
+            <Confianza
+              nivel={u.corroboracion}
+              celulares={u.dispositivos}
+              testigos={u.fuentes_directas}
+            />
             {atencion.length > 0 && (
               <div
                 className={cn(
@@ -298,7 +301,7 @@ export function PanelIncidente({
                 <>
                   <dt className="text-muted-foreground">Código de zona</dt>
                   <dd className="font-mono">
-                    {inc.geohash} · {coordenadas(inc.geohash)} · ±600 m
+                    {inc.geohash} · {coordenadas(inc.geohash)} · {precision(inc.geohash)}
                   </dd>
                 </>
               )}
@@ -354,6 +357,80 @@ export function PanelIncidente({
   )
 }
 
+const NIVEL: Record<
+  Corroboracion,
+  { n: number; Icono: typeof ShieldCheck; tono: string; dice: string }
+> = {
+  posible_rumor: {
+    n: 1,
+    Icono: MessageCircleQuestion,
+    tono: "text-p2",
+    dice: "Nadie dice haberlo visto en persona.",
+  },
+  sin_confirmar: {
+    n: 2,
+    Icono: CircleHelp,
+    tono: "text-foreground",
+    dice: "Falta otra persona que lo haya visto.",
+  },
+  corroborado: {
+    n: 3,
+    Icono: ShieldCheck,
+    tono: "text-ok",
+    dice: "Lo cuentan varias personas y al menos una lo vio.",
+  },
+}
+
+/** Qué tan seguro es, de un vistazo: tres escalones, del rumor a lo corroborado. */
+function Confianza({
+  nivel,
+  celulares,
+  testigos,
+}: {
+  nivel: Corroboracion
+  celulares: number
+  testigos: number
+}) {
+  const { n, Icono, tono, dice } = NIVEL[nivel]
+  return (
+    <div className="flex items-center gap-2.5">
+      <Icono aria-hidden="true" className={cn("size-5 shrink-0", tono)} />
+      <div className="min-w-0 flex-1">
+        <p className="flex items-center gap-2">
+          <strong className={cn("font-medium", tono)}>
+            {CORROBORACION[nivel]}
+          </strong>
+          <span
+            className="flex gap-0.5"
+            role="meter"
+            aria-valuemin={1}
+            aria-valuemax={3}
+            aria-valuenow={n}
+            aria-label={`Confianza ${n} de 3`}
+          >
+            {[1, 2, 3].map((k) => (
+              <span
+                key={k}
+                className={cn(
+                  "h-1.5 w-5 rounded-full",
+                  k <= n ? "bg-current" : "bg-muted",
+                  tono
+                )}
+              />
+            ))}
+          </span>
+        </p>
+        <p className="text-muted-foreground">
+          {dice} {celulares} celular{celulares === 1 ? "" : "es"} ·{" "}
+          {testigos === 0
+            ? "nadie lo vio en persona"
+            : `${testigos} lo ${testigos === 1 ? "vio" : "vieron"} en persona`}
+        </p>
+      </div>
+    </div>
+  )
+}
+
 /** El texto de la persona primero y grande; quién, cuándo y las señales del triaje, debajo y a un clic. */
 function ItemEvidencia({
   ev,
@@ -373,7 +450,7 @@ function ItemEvidencia({
             Reporte {n}
           </span>
           <Prioridad p={ev.prioridad} />
-          <span>{ev.fuente ? FUENTE[ev.fuente] : "Fuente sin dato"}</span>·
+          <span>{fuenteLegible(ev.fuente)}</span>·
           <span>{haceCuanto(ev.hora_unix, ahora)}</span>·
           <span>
             {ev.personas} persona{ev.personas === 1 ? "" : "s"}
@@ -390,7 +467,7 @@ function ItemEvidencia({
               aria-hidden="true"
               className="size-3 transition-transform group-open:rotate-90"
             />
-            Por qué esta prioridad ({ev.senales.length} razón{ev.senales.length === 1 ? "" : "es"})
+            Por qué esta prioridad ({ev.senales.length} {ev.senales.length === 1 ? "razón" : "razones"})
           </summary>
           <ul className="space-y-1 px-2 pb-2" aria-label="Señales del triaje">
             {ev.senales.map((s, i) => (
@@ -408,7 +485,7 @@ function ItemEvidencia({
                 >
                   {ORIGEN_LEGIBLE[s.origen]}
                 </span>
-                <span>{senalLegible(s.senal)}</span>
+                <span>{senalLegible(s.senal, ev.texto)}</span>
                 <Prioridad p={s.prioridad} />
                 {s.probabilidad !== null && (
                   <span className="font-mono text-[0.6875rem]">
@@ -416,7 +493,7 @@ function ItemEvidencia({
                   </span>
                 )}
                 {s.cita && (
-                  <q className="text-muted-foreground italic">{s.cita}</q>
+                  <q className="text-muted-foreground italic">{citaLegible(s.cita, ev.texto)}</q>
                 )}
               </li>
             ))}

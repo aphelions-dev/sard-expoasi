@@ -18,10 +18,13 @@ export const CORROBORACION: Record<Corroboracion, string> = {
 };
 
 export const FUENTE: Record<Fuente, string> = {
-  directa: "Testigo directo",
-  de_oidas: "De oídas",
-  incierta: "Fuente incierta",
+  directa: "Lo vio en persona",
+  de_oidas: "Lo supo por otros",
+  incierta: "No está claro si lo vio",
 };
+
+/** Quién cuenta lo que pasó, también cuando el análisis automático no pudo saberlo. */
+export const fuenteLegible = (f: Fuente | null) => (f ? FUENTE[f] : "No se sabe si lo vio");
 
 export const ESTADO: Record<Estado, string> = {
   sin_propuesta: "Sin sugerencia",
@@ -44,16 +47,23 @@ export function horaLocal(horaUnix: number): string {
   return new Date(horaUnix * 1000).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
 }
 
-/** Centro aproximado de un geohash de 6 caracteres (±0,6 km). */
+/** Cuánto se puede alejar el sitio real del centro de la zona, según el largo del geohash
+ *  (protocolo, «Ubicación»): de 6 caracteres (~1,2 × 0,6 km) a 9 (~5 m). */
+export function precision(gh: string): string {
+  return ({ 6: "±600 m", 7: "±75 m", 8: "±20 m" } as Record<number, string>)[gh.length] ?? "±3 m";
+}
+
+/** Centro de la zona de un geohash. */
 export function coordenadas(gh: string): string {
   const { latitude, longitude } = geohash.decode(gh);
   return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
 }
 
 /** La central nombra los lugares por su geohash ("en la zona d2fkcd"), que al coordinador no le dice
- *  nada: se cambia por el barrio. Sin barrio (fuera de Manizales, o mapas sin cargar) el texto queda
- *  como vino: el geohash es la única ubicación y no se borra. */
+ *  nada: se cambia por el barrio. Sin barrio (fuera de Manizales, o mapas sin cargar) se remite al
+ *  mapa, que sí muestra la zona; el código queda en el detalle técnico. */
 export function lugarLegible(texto: string, gh: string | null, barrio: string | null): string {
-  if (!gh || !barrio) return texto
-  return texto.replaceAll(`la zona ${gh}`, barrio).replaceAll(gh, barrio)
+  if (!gh) return texto
+  const nombre = barrio ?? "la zona marcada en el mapa"
+  return texto.replaceAll(`la zona ${gh}`, nombre).replaceAll(gh, nombre)
 }

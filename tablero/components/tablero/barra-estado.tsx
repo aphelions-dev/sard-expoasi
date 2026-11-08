@@ -7,7 +7,6 @@ import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import type { Nodo } from "@/lib/api/central"
 import type { Incidente, Salud } from "@/lib/api/tipos"
 import { cn } from "@/lib/utils"
@@ -25,30 +24,61 @@ interface Props {
 
 type EstadoPunto = "ok" | "caido" | "aviso" | "espera"
 
-/** Un servicio del sistema: punto de color, nombre y, al pasar el cursor, qué significa. */
-function Servicio({ nombre, estado, detalle, activa }: { nombre: string; estado: EstadoPunto; detalle: string; activa?: boolean }) {
+interface Parte {
+  nombre: string
+  estado: EstadoPunto
+  detalle: string
+}
+
+/** El sistema en una sola frase: quien coordina solo necesita saber si puede confiar en lo que ve.
+ *  El detalle de cada parte se abre con un clic. */
+function Sistema({ partes, resumen, estado }: { partes: Parte[]; resumen: string; estado: EstadoPunto }) {
   return (
-    <Tooltip>
-      <TooltipTrigger
+    <Popover>
+      <PopoverTrigger
         render={
-          <span
+          <button
+            type="button"
             className={cn(
-              "flex h-6 cursor-default items-center gap-1.5 rounded-sm px-2",
-              activa && "bg-accent",
-              estado === "caido" && "bg-p1-surface text-p1",
-              estado === "aviso" && "bg-p2-surface text-p2",
+              "flex h-7 items-center gap-1.5 rounded-sm px-2 font-medium hover:bg-accent",
+              estado === "caido" && "bg-p1-surface text-p1 hover:bg-p1-surface",
+              estado === "aviso" && "bg-p2-surface text-p2 hover:bg-p2-surface",
             )}
           />
         }
       >
         <Punto estado={estado} />
-        <span className="font-medium">{nombre}</span>
-        {estado === "caido" && <span>caída</span>}
-        {estado === "aviso" && <span>limitado</span>}
-      </TooltipTrigger>
-      <TooltipContent>{detalle}</TooltipContent>
-    </Tooltip>
+        {resumen}
+        <ChevronDown aria-hidden="true" className="size-3.5 opacity-60" />
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-80 gap-2.5">
+        <p className="text-sm font-medium">Estado del sistema</p>
+        <ul className="space-y-2">
+          {partes.map((p) => (
+            <li key={p.nombre} className="flex gap-2">
+              <span className="pt-1">
+                <Punto estado={p.estado} />
+              </span>
+              <span>
+                <span className="font-medium">{p.nombre}</span>
+                <span className="block text-muted-foreground">{p.detalle}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </PopoverContent>
+    </Popover>
   )
+}
+
+/** La frase del indicador: lo más grave manda. */
+function resumirSistema(a: EstadoPunto, b: EstadoPunto, analisis: EstadoPunto): { resumen: string; estado: EstadoPunto } {
+  if (a === "espera" && b === "espera") return { resumen: "Conectando…", estado: "espera" }
+  if (a === "caido" && b === "caido") return { resumen: "Sin conexión", estado: "caido" }
+  if (a === "caido") return { resumen: "Funcionando con respaldo", estado: "aviso" }
+  if (analisis === "aviso") return { resumen: "Clasificación básica", estado: "aviso" }
+  if (b === "caido") return { resumen: "Sin respaldo", estado: "aviso" }
+  return { resumen: "Todo en línea", estado: "ok" }
 }
 
 /** Un número de la cola con su etiqueta; se colorea solo si pide atención. */
@@ -157,39 +187,39 @@ export function BarraEstado({ saludes, activa, incidentes, pendientes, coordinad
         </div>
       </div>
 
-      <div className="flex items-center gap-0.5 border-l pl-3 md:pl-5" role="status" aria-live="polite" aria-label="Estado del sistema">
-        <Servicio
-          nombre="Principal"
-          estado={nodo("A")}
-          activa={activa === "A"}
-          detalle={
-            nodo("A") === "caido"
-              ? "El sistema principal no responde. Lo que decidas queda guardado en el de respaldo."
-              : "Sistema principal en línea: aquí llegan los reportes y quedan tus decisiones."
-          }
-        />
-        <Servicio
-          nombre="Respaldo"
-          estado={nodo("B")}
-          activa={activa === "B"}
-          detalle={
-            nodo("B") === "caido"
-              ? "La central B no responde."
-              : activa === "B"
-                ? "Estás trabajando con el sistema de respaldo porque el principal no responde. Puedes seguir decidiendo."
-                : "Sistema de respaldo en línea, al día con el principal. Entra solo si el principal falla."
-          }
-        />
-        <Servicio
-          nombre="Análisis automático"
-          estado={jev}
-          detalle={
-            jev === "aviso"
-              ? "El análisis automático no responde: los reportes se clasifican solo con las palabras de alerta. Revisa con más cuidado."
-              : jev === "ok"
-                ? "Lee cada mensaje para encontrar señales de peligro. Puede subir una prioridad, nunca bajarla."
-                : "Sin dato todavía."
-          }
+      <div className="flex items-center border-l pl-3 md:pl-5" role="status" aria-live="polite" aria-label="Estado del sistema">
+        <Sistema
+          {...resumirSistema(nodo("A"), nodo("B"), jev)}
+          partes={[
+            {
+              nombre: "Sistema principal",
+              estado: nodo("A"),
+              detalle:
+                nodo("A") === "caido"
+                  ? "No responde. Lo que decidas queda guardado en el de respaldo."
+                  : "En línea: aquí llegan los reportes y quedan tus decisiones.",
+            },
+            {
+              nombre: "Sistema de respaldo",
+              estado: nodo("B"),
+              detalle:
+                nodo("B") === "caido"
+                  ? "No responde. Si el principal también falla, el tablero se queda con lo último que leyó."
+                  : activa === "B"
+                    ? "Estás trabajando con el respaldo porque el principal no responde. Puedes seguir decidiendo."
+                    : "En línea y al día con el principal. Entra solo si el principal falla.",
+            },
+            {
+              nombre: "Análisis automático",
+              estado: jev,
+              detalle:
+                jev === "aviso"
+                  ? "No responde: los reportes se clasifican solo con las palabras de alerta. Revisa con más cuidado."
+                  : jev === "ok"
+                    ? "Lee cada mensaje para encontrar señales de peligro. Puede subir una prioridad, nunca bajarla."
+                    : "Sin dato todavía.",
+            },
+          ]}
         />
       </div>
 

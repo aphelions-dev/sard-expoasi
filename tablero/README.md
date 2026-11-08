@@ -53,10 +53,12 @@ Las URLs de las centrales salen de `NEXT_PUBLIC_CENTRAL_A_URL` y `NEXT_PUBLIC_CE
   una capa opcional que se apaga.
 - **Cerca del incidente**: hospitales/clínicas y estaciones de bomberos más cercanos en línea recta.
 - **Recursos** (pestaña): los recursos del contrato (equipo de rescate, máquina de bomberos,
-  ambulancia, equipo de búsqueda, cuadrilla) con libres, comprometidos y cuántos incidentes
-  pendientes los piden, con aviso si faltan. El coordinador declara las unidades libres
-  (`POST /recursos`); declarar reemplaza lo anterior. Un recurso sin declarar se marca: la
-  coordinación propone sin saber si hay.
+  ambulancia, equipo de búsqueda, cuadrilla) unidad por unidad, como en el SCI-211: cuántas
+  están disponibles, asignadas o fuera de servicio, y las solicitudes sin unidad, con aviso si
+  faltan. Quien representa a la entidad registra cada unidad con su matrícula
+  (`POST /recursos/unidades`) y reporta sus cambios: asignarla a un incidente, liberarla o
+  marcarla no disponible con una nota. Aprobar un incidente solo solicita el recurso. Un recurso
+  sin unidades se marca: la coordinación propone sin saber si hay.
 - **Rechazados** (pestaña, con el número sin recuperar): los mensajes mal formados o cortados, en el
   orden de la central, con sus motivos y solo los campos que llegaron (`GET /rechazados`). Marca
   "Recuperado" si después llegó una versión válida.

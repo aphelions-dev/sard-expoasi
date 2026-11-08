@@ -41,8 +41,20 @@ export function Propuesta({ inc, lugar }: { inc: Incidente; lugar: (texto: strin
               {a.recurso}
               {r && (
                 <span className={cn("font-mono", r.disponibles === 0 ? "text-p1" : r.disponibles === null ? "text-p2" : "text-muted-foreground")}>
-                  {r.disponibles === null ? "sin declarar" : `${r.disponibles} disponibles`}
+                  {r.disponibles === null ? "sin unidades registradas" : `${r.disponibles} disponible${r.disponibles === 1 ? "" : "s"}`}
                 </span>
+              )}
+            </dd>
+          </>
+        )}
+        {r && (r.solicitado || r.asignadas.length > 0) && (
+          <>
+            <dt className="text-muted-foreground">Unidad</dt>
+            <dd>
+              {r.asignadas.length > 0 ? (
+                <span className="font-mono">{r.asignadas.join(", ")}</span>
+              ) : (
+                <span className="text-p2">Solicitada; {r.entidad} todavía no asigna una unidad</span>
               )}
             </dd>
           </>
@@ -51,12 +63,12 @@ export function Propuesta({ inc, lugar }: { inc: Incidente; lugar: (texto: strin
         <dd className="font-mono">{a.personas_estimadas}</dd>
       </dl>
 
-      {r && r.compiten.length > 0 && !vigente && (
+      {r && r.compiten.length > 0 && r.asignadas.length === 0 && (
         <p className="flex gap-1.5 rounded-sm border border-p2/40 bg-p2-surface p-2 text-p2" title={r.compiten.join(", ")}>
           <TriangleAlert className="mt-px size-3.5 shrink-0" aria-hidden="true" />
           <span>
-            Compite por {r.recurso} con <strong>{r.compiten.length}</strong> incidente{r.compiten.length > 1 ? "s" : ""} pendiente
-            {r.compiten.length > 1 ? "s" : ""} de igual o mayor prioridad.
+            Compite por {r.recurso} con <strong>{r.compiten.length}</strong> incidente{r.compiten.length > 1 ? "s" : ""} sin unidad
+            asignada de igual o mayor prioridad.
           </span>
         </p>
       )}

@@ -157,6 +157,14 @@ def pendientes(
     return [_a_evento(f) for f in filas]
 
 
+def recibido(conn: sqlite3.Connection, reporte_id: str) -> Evento | None:
+    """El evento `reporte_recibido` de un reporte (hay uno solo por id)."""
+    fila = conn.execute(
+        "SELECT * FROM eventos WHERE tipo = 'reporte_recibido' AND reporte_id = ?", (reporte_id,)
+    ).fetchone()
+    return _a_evento(fila) if fila else None
+
+
 def ultimo(conn: sqlite3.Connection, tipo: str) -> Evento | None:
     fila = conn.execute(
         "SELECT * FROM eventos WHERE tipo = ? ORDER BY seq DESC LIMIT 1", (tipo,)

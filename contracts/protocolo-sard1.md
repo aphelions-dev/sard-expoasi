@@ -26,9 +26,28 @@ SARD1|a3f9-0042|P1|ATRAP|3|101|d2fkcd|1762481000|edificio colapsado calle 23
 | 3 | tipo | `ATRAP` `MEDIC` `FUEGO` `VIA` `DESAP` `OTRO` | sí | Tipo de emergencia. |
 | 4 | personas | entero ≥ 0 | sí | Personas afectadas estimadas. |
 | 5 | banderas | 3 dígitos `0`/`1` | sí | Posición 1: atrapados. 2: heridos. 3: niños o adultos mayores. |
-| 6 | geohash | 6 caracteres o vacío | no | Vacío si no hay GPS (`\|\|` seguidos). |
+| 6 | geohash | 6 a 9 caracteres, o vacío | no | Zona del reportante. El largo dice la precisión (ver «Ubicación»). Vacío si no hay GPS (`\|\|` seguidos). |
 | 7 | hora_unix | entero (segundos) | sí | Hora de creación en el celular. |
 | 8 | texto | texto libre | no | Opcional y recortado. Puede contener `\|`: todo lo que sigue al separador del campo 7 es texto. Longitud máxima: **por definir**. |
+
+## Ubicación
+
+El geohash es tan largo como lo permite la precisión del GPS, para que el mensaje nunca aparente
+saber más de lo que sabe. Es la idea de AML (ETSI TS 103 625), que manda latitud, longitud y un
+radio de incertidumbre; aquí el largo del geohash cumple el papel del radio, sin agregar un campo.
+
+La app toma el radio de `Location.getAccuracy()` de Android (metros, 68 % de confianza) y elige:
+
+| Radio de precisión | Caracteres | Zona que ve el coordinador |
+|--------------------|------------|----------------------------|
+| hasta 5 m | 9 | ~5 × 5 m |
+| hasta 20 m | 8 | ~38 × 19 m |
+| hasta 75 m | 7 | ~150 × 150 m |
+| más de 75 m | 6 | ~1,2 × 0,6 km |
+
+Con 6 caracteres un mensaje es igual que antes de esta regla. La central acepta de 6 a 9 y el
+tablero dibuja la zona del tamaño que llegó: lo preciso casi como un punto, lo impreciso como un
+área.
 
 ## Acuse
 
@@ -67,5 +86,6 @@ y ningún modelo baja esa prioridad (ADR 0005).
 ## Por definir
 
 - Longitud máxima de `texto` y del mensaje completo (límite de la malla, P1; se mide en #1).
+- Qué tan vieja puede ser la posición del GPS para usarla en un reporte (P1).
 - Cómo detecta la app un vecino nuevo para reactivar un reporte vencido (regla 5; se confirma en
   #1 con bitchat-android).

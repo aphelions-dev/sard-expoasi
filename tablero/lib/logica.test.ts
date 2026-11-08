@@ -3,6 +3,7 @@ import { ErrorApi, elegirActiva, mensajeDecision } from "./api/central";
 import type { Incidente, Prioridad, Salud } from "./api/tipos";
 import { conteos, filtrar, porDecidir } from "./cola";
 import { haceCuanto, lugarLegible } from "./formato";
+import { enPalabras, senalLegible } from "./lenguaje";
 
 const ok = (central: "A" | "B"): Salud => ({ estado: "ok", central, jev: "ok" });
 
@@ -54,4 +55,21 @@ describe("lugarLegible", () => {
   it("sin barrio, deja el geohash: es la única ubicación", () =>
     expect(lugarLegible("Bomberos en la zona d2fkcd", "d2fkcd", null)).toBe("Bomberos en la zona d2fkcd"))
   it("sin geohash, deja el texto igual", () => expect(lugarLegible("ubicación sin confirmar", null, null)).toBe("ubicación sin confirmar"))
+})
+
+describe("enPalabras", () => {
+  it("no nombra a Jev", () =>
+    expect(enPalabras("Reporte 1: Jev subió la prioridad de P2 a P1")).toBe(
+      "Reporte 1: el análisis automático subió la prioridad de P2 a P1: confirma que es así",
+    ))
+  it("traduce el riesgo dudoso sin números", () =>
+    expect(enPalabras("riesgo vital dudoso (0.34)")).toBe("No está claro si hay riesgo para la vida"))
+  it("dice qué no coincide con palabras", () =>
+    expect(enPalabras("el celular dice MEDIC, Jev ve FUEGO")).toBe(
+      "Quien reportó marcó «atención médica», pero el mensaje parece «incendio»",
+    ))
+  it("las señales salen en palabras", () => {
+    expect(senalLegible("riesgo_vital")).toBe("riesgo para la vida")
+    expect(senalLegible("palabra crítica «llamas»")).toBe("palabra de alerta «llamas»")
+  })
 })

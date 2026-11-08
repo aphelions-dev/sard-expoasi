@@ -44,7 +44,7 @@ function Servicio({ nombre, estado, detalle, activa }: { nombre: string; estado:
         <Punto estado={estado} />
         <span className="font-medium">{nombre}</span>
         {estado === "caido" && <span>caída</span>}
-        {estado === "aviso" && <span>solo reglas</span>}
+        {estado === "aviso" && <span>limitado</span>}
       </TooltipTrigger>
       <TooltipContent>{detalle}</TooltipContent>
     </Tooltip>
@@ -159,31 +159,35 @@ export function BarraEstado({ saludes, activa, incidentes, pendientes, coordinad
 
       <div className="flex items-center gap-0.5 border-l pl-3 md:pl-5" role="status" aria-live="polite" aria-label="Estado del sistema">
         <Servicio
-          nombre="Central A"
+          nombre="Principal"
           estado={nodo("A")}
           activa={activa === "A"}
-          detalle={nodo("A") === "caido" ? "La central A no responde." : activa === "A" ? "En línea. El tablero lee y decide aquí." : "En línea."}
+          detalle={
+            nodo("A") === "caido"
+              ? "El sistema principal no responde. Lo que decidas queda guardado en el de respaldo."
+              : "Sistema principal en línea: aquí llegan los reportes y quedan tus decisiones."
+          }
         />
         <Servicio
-          nombre="Central B"
+          nombre="Respaldo"
           estado={nodo("B")}
           activa={activa === "B"}
           detalle={
             nodo("B") === "caido"
               ? "La central B no responde."
               : activa === "B"
-                ? "En línea. La A no responde: el tablero lee y decide aquí."
-                : "En línea, de respaldo."
+                ? "Estás trabajando con el sistema de respaldo porque el principal no responde. Puedes seguir decidiendo."
+                : "Sistema de respaldo en línea, al día con el principal. Entra solo si el principal falla."
           }
         />
         <Servicio
-          nombre="Jev"
+          nombre="Análisis automático"
           estado={jev}
           detalle={
             jev === "aviso"
-              ? "La IA no responde: el triaje sigue solo con reglas."
+              ? "El análisis automático no responde: los reportes se clasifican solo con las palabras de alerta. Revisa con más cuidado."
               : jev === "ok"
-                ? "IA en línea: ayuda al triaje y nunca baja una prioridad."
+                ? "Lee cada mensaje para encontrar señales de peligro. Puede subir una prioridad, nunca bajarla."
                 : "Sin dato todavía."
           }
         />

@@ -18,7 +18,7 @@ const vigenteDe = (inc: Incidente) =>
 export function Propuesta({ inc, lugar }: { inc: Incidente; lugar: (texto: string) => string }) {
   const a = inc.accion_propuesta
   if (!a) {
-    return <p className="text-xs text-muted-foreground">La coordinación todavía no propone una acción para este incidente.</p>
+    return <p className="text-xs text-muted-foreground">El sistema todavía no sugiere una acción para este incidente.</p>
   }
   const vigente = vigenteDe(inc)
   const anterior = inc.decision && !vigente ? inc.decision : null
@@ -89,7 +89,7 @@ export function Propuesta({ inc, lugar }: { inc: Incidente; lugar: (texto: strin
       {anterior && (
         <p className="text-muted-foreground">
           Llegó información nueva después de la decisión anterior ({anterior.decision === "aprobar" ? "aprobada" : "rechazada"} por{" "}
-          {anterior.coordinador}): esta es una propuesta nueva.
+          {anterior.coordinador}): esta es una sugerencia nueva.
         </p>
       )}
     </div>

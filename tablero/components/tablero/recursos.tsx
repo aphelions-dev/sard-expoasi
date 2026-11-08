@@ -106,7 +106,7 @@ function Fila({ f, incidentes, ...comun }: Comun & { f: FilaRecurso; incidentes:
           {r.asignadas} asignada{r.asignadas === 1 ? "" : "s"} · {r.no_disponibles} no disponible{r.no_disponibles === 1 ? "" : "s"}
         </p>
       ) : (
-        <p className="text-p2">Sin unidades registradas: la coordinación propone sin saber si hay.</p>
+        <p className="text-p2">Sin unidades registradas: el sistema sugiere sin saber si hay.</p>
       )}
       {abiertas.length > 0 && (
         <p className={cn("flex items-start gap-1", f.faltan > 0 ? "text-p1" : "text-muted-foreground")} title={abiertas.join(", ")}>

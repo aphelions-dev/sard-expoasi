@@ -72,7 +72,14 @@ export interface Incidente {
   impacto: { personas: number; vulnerables: boolean };
   vigencia: { ultimo_reporte_unix: number; minutos_sin_noticias: number; sin_noticias_recientes: boolean };
   motivo_orden: string;
-  recurso: { recurso: string; entidad: string; disponibles: number | null; compiten: string[] } | null;
+  recurso: {
+    recurso: string;
+    entidad: string;
+    disponibles: number | null;
+    compiten: string[];
+    solicitado: boolean;
+    asignadas: string[];
+  } | null;
   estado: Estado;
   accion_propuesta: AccionPropuesta | null;
   decision: Decision | null;
@@ -84,14 +91,25 @@ export interface Salud {
   jev: "ok" | "caido";
 }
 
+export type EstadoUnidad = "disponible" | "asignada" | "no_disponible";
+
+export interface Unidad {
+  matricula: string;
+  estado: EstadoUnidad;
+  incidente_id: string | null;
+  reportado_por: string;
+  reportado_en: number;
+  nota: string;
+}
+
 export interface Recurso {
   entidad: string;
   recurso: string;
-  declarados: number;
-  comprometidos: number;
   disponibles: number;
-  coordinador: string;
-  declarado_en: number;
+  asignadas: number;
+  no_disponibles: number;
+  solicitudes_abiertas: string[];
+  unidades: Unidad[];
 }
 
 export interface Rechazado {

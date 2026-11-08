@@ -219,10 +219,13 @@ def main(seguido: bool = False, env_file: str | None = None, pausa_s: float = 8.
         webbrowser.open(f"http://localhost:{PUERTO}")
         centrales.levantar("A")
         centrales.levantar("B")
-        for entidad, recurso, n in [("Bomberos", "equipo de rescate", 1), ("Bomberos", "máquina de bomberos", 1),
-                                    ("Cruz Roja", "ambulancia", 2)]:
-            pedir(f"{URLS['A']}/recursos", {"entidad": entidad, "recurso": recurso, "disponibles": n,
-                                            "coordinador": "sala de crisis"})
+        for entidad, recurso, matricula in [("Bomberos", "equipo de rescate", "BM-R1"),
+                                            ("Bomberos", "máquina de bomberos", "BM-M3"),
+                                            ("Cruz Roja", "ambulancia", "CR-114"),
+                                            ("Cruz Roja", "ambulancia", "CR-207")]:
+            pedir(f"{URLS['A']}/recursos/unidades", {"entidad": entidad, "recurso": recurso,
+                                                     "matricula": matricula,
+                                                     "reportado_por": f"registrador {entidad}"})
         hilo.start()
 
         # 1 · Reporte

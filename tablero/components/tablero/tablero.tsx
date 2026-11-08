@@ -175,12 +175,12 @@ export function Tablero() {
       </TabsContent>
       <TabsContent value="recursos" className="min-h-0">
         <Recursos
-          declarados={recs.datos}
+          recursos={recs.datos}
           incidentes={incs}
           nodo={activa}
-          coordinador={coordinador}
+          quien={coordinador}
           ahora={ahora}
-          onDeclarado={() => {
+          onCambio={() => {
             recs.refrescar()
             refrescar()
           }}
@@ -270,7 +270,7 @@ export function Tablero() {
         </>
       )}
 
-      <FranjaRecursos declarados={recs.datos} incidentes={incs} onAbrir={abrirRecursos} />
+      <FranjaRecursos recursos={recs.datos} onAbrir={abrirRecursos} />
     </div>
   )
 }

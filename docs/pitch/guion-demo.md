@@ -20,7 +20,7 @@ cd simulador && PYTHONUTF8=1 uv run python -m simulador recorrido  # terminal 2:
   perdió nada.
 - Se avanza con **Enter** en la terminal o con **«Siguiente paso»** en el visor. `--seguido` avanza solo
   (para ensayar o grabar el video, #23); `--env-file ../.env` usa Jev.
-- El script levanta A y B con bases nuevas, declara 1 equipo de rescate, 1 máquina de bomberos y 2
+- El script levanta A y B con bases nuevas, registra como unidades 1 equipo de rescate, 1 máquina de bomberos y 2
   ambulancias, y en el paso 7 apaga la A entera (API y agentes) con aviso «3… 2… 1…».
 - Puertos libres: 8001, 8002, 8090 y 5173.
 

@@ -1,14 +1,14 @@
 # Ficha: agente de comunicación y sincronización
 
-**Dueño:** P1 · cola de reenvío de la app (`app/`) · Fuente de los límites: Bases, Tabla 3 (`docs/referencias/HackathonExpoASI2026.pdf`)
+**Dueño:** P1 · cola de reenvío de la app (`app/`) · Fuente de los límites: Bases, Tabla 3 (`docs/referencias/HackathonExpoASI2026.pdf`) · Valores: `contracts/protocolo-sard1.md` (reglas 1, 2, 5 y 6)
 
 | Campo | Contenido |
 |-------|-----------|
 | Objetivo | Decidir qué mensajes transmitir primero según urgencia, antigüedad, tamaño y vencimiento; administrar la cola, los reintentos con espera creciente y las confirmaciones (`SACK`). Servicio transversal, no un agente con LLM. |
-| Entradas | Reportes guardados en el celular y `SACK` recibidos. |
-| Salidas | Cola de transmisión ordenada y estado de entrega de cada reporte (pendiente, entregado, no entregado). |
-| Herramientas | Por definir. |
-| Memoria | Registro de eventos (solo agrega). Estado adicional: por definir. |
-| Límites de autonomía | La priorización no puede hacer desaparecer los casos P3/P4. Nunca borra un reporte; los vencidos se marcan "no entregado". |
-| Manejo de errores | Por definir. Nunca borra eventos; registra el error como evento. |
-| Criterio de terminación | Por definir. |
+| Entradas | Reportes creados en el celular (reportante) o recibidos de un vecino (relevo); `SACK` que llegan por la malla; aviso de que apareció un vecino nuevo (cómo lo da bitchat-android: se confirma en #1). En la pasarela, además, la respuesta de `GET /salud` y de `POST /reportes`. |
+| Salidas | Mensajes SARD1 a los vecinos, en orden de cola. Estado de entrega de cada reporte: pendiente, entregado (llegó su `SACK`) o no entregado (vencido). En la pasarela, los SARD1 subidos con `POST /reportes` y los `SACK` reenviados a la malla. |
+| Herramientas | Código, sin IA, dentro del fork de bitchat-android. **Orden:** por prioridad (P1 a P4) y, dentro de cada una, por `hora_unix` más antigua; P3/P4 esperan su turno, nunca se descartan. **Espera entre reintentos:** 2, 4, 8, 16, 32 s y luego 60 s fijo, con ±20 % al azar. **Vencimiento:** a los 600 s de la `hora_unix` (unos 14 intentos). **Pasarela:** sube todo lo pendiente en un `POST /reportes`; antes consulta `GET /salud` de la A y, si no responde, sube a la B. Cuántos mensajes emite el celular por segundo: por definir (#1). |
+| Memoria | Almacenamiento local del celular, que sobrevive a un reinicio: cada reporte con su estado, intentos y próximo intento, y el conjunto de ids ya confirmados. Con qué se guarda: por definir (#6). |
+| Límites de autonomía | No cambia la prioridad de un reporte: la fijan las reglas del reportante. La priorización no puede hacer desaparecer los casos P3/P4. Nunca borra un reporte; los vencidos se marcan "no entregado". Solo la pasarela usa internet. |
+| Manejo de errores | **Sin `SACK`:** reintenta con la espera creciente. **Vencido:** queda "no entregado" y deja de reintentar; se reactiva con una ronda nueva (la espera vuelve a 2 s) cuando aparece un vecino nuevo. **Llega un reporte ya confirmado:** el relevo no lo encola y repite el `SACK` al que se lo mandó, que no sabía. **Ninguna central responde:** la pasarela conserva los reportes y sigue con la misma espera. **Central rechaza un mensaje por mal formado (regla 6):** la pasarela deja de reintentarlo; sin `SACK`, en el reportante vence. |
+| Criterio de terminación | Por reporte, en cada celular: termina al recibir su `SACK` (entregado) o al vencer (no entregado, en espera de un vecino nuevo). La cola como servicio es continua mientras el celular esté encendido. |

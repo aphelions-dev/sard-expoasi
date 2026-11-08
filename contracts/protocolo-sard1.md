@@ -38,10 +38,14 @@ pasarela y la malla hasta el reportante.
 ## Reglas
 
 1. Reenviar primero P1/P2, sin descartar nunca P3/P4.
-2. Reintentar con espera creciente hasta recibir `SACK`.
+2. Reintentar con espera creciente hasta recibir `SACK`: 2, 4, 8, 16, 32 s y luego 60 s fijo, con
+   ±20 % al azar para que los celulares no reintenten todos a la vez.
 3. La central acepta cada `id` una sola vez; un duplicado recibe `SACK` pero no crea otro reporte.
 4. Ordenar por `hora_unix` del campo, no por la hora de llegada.
-5. Un reporte vencido queda marcado como "no entregado"; nunca se borra.
+5. Un reporte vence a los 600 s (10 min) de su `hora_unix`, en el reportante y en cada relevo
+   (unos 14 intentos). Vencido, queda marcado como "no entregado" y se deja de reintentar, pero nunca
+   se borra. Se reactiva con una ronda nueva de reintentos (la espera vuelve a 2 s) cuando el
+   celular ve un vecino nuevo en la malla.
 6. Un mensaje mal formado no recibe `SACK`: la central lo rechaza con sus motivos y lo registra como
    `reporte_rechazado`. El emisor no debe reintentarlo sin corregirlo.
 
@@ -62,6 +66,6 @@ y ningún modelo baja esa prioridad (ADR 0005).
 
 ## Por definir
 
-- Longitud máxima de `texto` y del mensaje completo (límite de la malla, P1).
-- Cuándo vence un reporte (P1).
-- Tiempos de la espera creciente entre reintentos (P1).
+- Longitud máxima de `texto` y del mensaje completo (límite de la malla, P1; se mide en #1).
+- Cómo detecta la app un vecino nuevo para reactivar un reporte vencido (regla 5; se confirma en
+  #1 con bitchat-android).

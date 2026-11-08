@@ -50,3 +50,10 @@ def test_campos_invalidos_da_todos_los_motivos():
 def test_barra_en_el_texto_queda_en_el_texto():
     r = sard1.leer("SARD1|a1-1|P3|OTRO|0|000||1762481000|uno | dos")
     assert r.texto == "uno | dos"
+
+
+@pytest.mark.parametrize("gh,valido", [("d2fkcd", True), ("d2fkcdq", True), ("d2fkcdqr", True),
+                                        ("d2fkcdqrs", True), ("d2fkc", False), ("d2fkcdqrst", False)])
+def test_geohash_de_6_a_9_caracteres(gh, valido):
+    linea = f"SARD1|a3f9-0042|P1|ATRAP|3|101|{gh}|1762481000|edificio colapsado"
+    assert isinstance(sard1.leer(linea), sard1.Reporte) == valido

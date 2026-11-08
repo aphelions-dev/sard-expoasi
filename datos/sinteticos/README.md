@@ -36,24 +36,30 @@ correlación, no el triaje. Un rumor sin detalle concreto es P4.
 
 | P1 | P2 | P3 | P4 | Dudosos | Sobretriaje esperado |
 |----|----|----|----|---------|----------------------|
-| 30 | 25 | 25 | 20 | 41 | 6 |
+| 30 | 25 | 25 | 20 | 42 | 4 |
 
 Los **dudosos** son los casos que hacen notar el umbral de Jev: «creo que», «no sé si respira»,
 textos con faltas o cortados, de oídas, y P1 que no contienen ninguna palabra crítica (por ejemplo
-«quedó debajo de la placa» o «se está ahogando»). Con solo reglas, 13 de los 30 P1 se quedan en
-P4: es lo que Jev tiene que rescatar.
+«quedó debajo de la placa»). Con las palabras críticas del 7 de noviembre, 13 de los 30 P1 se
+quedaban en P4 solo con reglas; con la lista corregida en #69 (variantes como «atrap», «ahog»,
+«aplastad», «escombros»), quedan **4 de 30** (`r002`, `r013`, `r019`, `r026`): es lo que Jev o el
+coordinador tienen que rescatar.
 
 Los de **sobretriaje esperado** son casos donde las reglas suben la prioridad de más y así debe
 quedar registrado (ADR 0005: las reglas ganan):
 
-- `r050` «sangre» en un herido leve, `r075` «fuego» ya apagado, `r096` rumor con «gas».
-- `r056` negación: «no hay carros atrapados».
+- `r050` «sangre» en un herido leve, `r075` «fuego» ya apagado.
+- `r056` negación: «no hay carros atrapados» (desde #70 la central lo marca como posible negación,
+  sin bajar la prioridad).
 - `r062` bandera de heridos en raspones ya curados.
-- `r100` falso positivo: «gas» dentro de «lle**gas**te».
+
+Dos que lo eran dejaron de serlo con #69: `r100` («gas» dentro de «lle**gas**te») y `r096` (un
+rumor con «gas»), porque «gas» solo cuenta ahora en frases como «fuga de gas».
 
 ## Cómo se revisó
 
 Cada fila se pasó por las reglas reales del triaje (`central/agentes/triaje/reglas.py`) con la
-prioridad del celular en P4, igual que la calibración. Solo con reglas: 42 exactas, 52 por debajo
-de su prioridad real y 6 por encima, todas las de arriba. Los P3 aparecen «por debajo» solo porque
+prioridad del celular en P4, igual que la calibración. Solo con reglas y la lista de #69: 53
+exactas, 43 por debajo de su prioridad real y 4 por encima, todas las de arriba (con la lista del
+7 de noviembre eran 42, 52 y 6). Los P3 aparecen «por debajo» solo porque
 la calibración entra con P4 y las reglas no tienen nada que suba a P3.

@@ -76,7 +76,7 @@ def test_traza_y_reporte_a_pedido_para_el_recorrido():
 
 def test_palabras_criticas_del_contrato():
     from simulador.recorrido import palabras_criticas
-    assert palabras_criticas("Hay tres personas ATRAPADAS") == ["atrapad"]
+    assert palabras_criticas("Hay tres personas ATRAPADAS") == ["atrap"]  # contracts/palabras-criticas.txt (#69)
     assert palabras_criticas("todo bien") == []
 
 

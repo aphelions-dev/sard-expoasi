@@ -2,33 +2,33 @@ id,texto,tipo_real,prioridad_real,atrapados,heridos,notas
 r001,"Se cayó el edificio de la calle 23, hay tres personas atrapadas en el segundo piso",ATRAP,P1,1,0,claro
 r002,"mi mamá quedó debajo de la placa del techo, la escucho pero no la puedo sacar",ATRAP,P1,0,0,dudoso: sin palabra crítica ni bandera; solo Jev puede subirlo
 r003,"el niño no respira, ayuda por favor",MEDIC,P1,0,0,claro
-r004,"mi papá se desplomó, está morado y no se mueve",MEDIC,P1,0,0,dudoso: sin palabra crítica
+r004,"mi papá se desplomó, está morado y no se mueve",MEDIC,P1,0,0,dudoso: antes sin palabra crítica; desde #69 la detectan «desplom» y «no se mueve»
 r005,se está quemando el segundo piso y hay gente adentro,FUEGO,P1,0,0,claro
 r006,huele mucho a gas en todo el edificio y hay niños adentro,FUEGO,P1,0,0,claro: fuga de gas con personas
 r007,"creo que mi vecino está atrapado, no contesta desde el temblor",ATRAP,P1,0,0,dudoso: «creo que»; la palabra crítica lo sube igual
 r008,señora mayor convulsionando en la tienda de la esquina,MEDIC,P1,0,0,claro
 r009,"un hombre sangra mucho de la pierna, se cortó con un vidrio",MEDIC,P1,0,1,claro
 r010,hay un muchacho que no reacciona en el parque,MEDIC,P1,0,0,claro
-r011,"no sé si respira mi abuela, está muy pálida y fría",MEDIC,P1,0,0,dudoso: «no sé si respira» no coincide con «no respira»
+r011,"no sé si respira mi abuela, está muy pálida y fría",MEDIC,P1,0,0,dudoso: «no sé si respira»; desde #69 la detecta «si respira»
 r012,"quedamos encerrados en el ascensor del centro comercial, somos 5 y uno es asmático",ATRAP,P1,1,0,claro
 r013,colapsó el puente peatonal y hay gente abajo,ATRAP,P1,0,0,dudoso: sin palabra crítica
-r014,se escucha a alguien pidiendo auxilio entre los escombros del colegio,ATRAP,P1,0,0,dudoso: «entre los escombros» no coincide con «bajo escombros»
-r015,mi hijo de 3 años se tragó algo y se está ahogando,MEDIC,P1,0,0,dudoso: «ahogando» no está en la lista
+r014,se escucha a alguien pidiendo auxilio entre los escombros del colegio,ATRAP,P1,0,0,dudoso: «entre los escombros»; desde #69 la detectan «escombros» y «auxilio»
+r015,mi hijo de 3 años se tragó algo y se está ahogando,MEDIC,P1,0,0,dudoso: «ahogando»; desde #69 la detecta «ahog»
 r016,"explosión en la estación de servicio de la avenida, hay heridos",FUEGO,P1,0,1,claro
 r017,estamos atrapados en el sótano y está entrando agua,ATRAP,P1,1,0,claro
-r018,"mi esposa está embarazada, empezó a sangrar mucho y está mareada",MEDIC,P1,0,0,dudoso: «sangrar mucho» no coincide con «sangra mucho»
+r018,"mi esposa está embarazada, empezó a sangrar mucho y está mareada",MEDIC,P1,0,0,dudoso: «sangrar mucho»; desde #69 está en la lista
 r019,"la casa se derrumbó con la familia adentro, son 4 con dos niños",ATRAP,P1,0,0,dudoso: sin palabra crítica ni bandera
 r020,"humo negro saliendo del hospital, están evacuando pacientes",FUEGO,P1,0,0,claro
 r021,"un señor inconsciente en la vía, lo atropelló una moto",MEDIC,P1,0,1,claro
 r022,"ayuda no puedo salir, la puerta quedó trabada y el techo se está cediendo",ATRAP,P1,1,0,claro
 r023,"llamas en la cocina del restaurante, el cocinero se quemó los brazos",FUEGO,P1,0,1,claro
-r024,persona aplastada por una pared en la carrera 5,ATRAP,P1,0,0,dudoso: «aplastada» no está en la lista
-r025,mi bebé no se despierta y tiene fiebre muy alta,MEDIC,P1,0,0,dudoso: sin palabra crítica
+r024,persona aplastada por una pared en la carrera 5,ATRAP,P1,0,0,dudoso: «aplastada»; desde #69 la detecta «aplastad»
+r025,mi bebé no se despierta y tiene fiebre muy alta,MEDIC,P1,0,0,dudoso: antes sin palabra crítica; desde #69 la detecta «no se despierta»
 r026,"hay alguien colgado del balcón del cuarto piso, se va a caer",OTRO,P1,0,0,dudoso: riesgo vital sin palabra crítica
 r027,se desmayó mi tía diabética y no despierta,MEDIC,P1,0,0,claro
-r028,edif caido gnt atrapda cll 10 ayu,ATRAP,P1,0,0,dudoso: escrito con prisa; «atrapda» no coincide con «atrapad»
+r028,edif caido gnt atrapda cll 10 ayu,ATRAP,P1,0,0,dudoso: escrito con prisa («atrapda»); desde #69 la detecta «atrap»
 r029,dicen que en el colegio hay niños atrapados,ATRAP,P1,0,0,"dudoso: de oídas; riesgo vital no se baja por rumor, la confianza la mide la correlación"
-r030,la bodega de pinturas está ardiendo al lado del jardín infantil,FUEGO,P1,0,0,dudoso: «ardiendo» no está en la lista
+r030,la bodega de pinturas está ardiendo al lado del jardín infantil,FUEGO,P1,0,0,dudoso: «ardiendo»; desde #69 está en la lista
 r031,"me fracturé el brazo cuando salía de la casa, estoy consciente pero duele mucho",MEDIC,P2,0,1,claro
 r032,señor de 80 años sin sus pastillas del corazón desde ayer,MEDIC,P2,0,0,dudoso: vulnerable sin bandera
 r033,"niña de 7 años perdida desde el temblor, la buscamos en el barrio San José",DESAP,P2,0,0,claro: niño desaparecido
@@ -94,8 +94,8 @@ r092,"se agrietó una pared de mi cuarto, es pequeña",OTRO,P4,0,0,claro
 r093,ayu,OTRO,P4,0,0,"dudoso: truncado; sin información, decide el formulario"
 r094,,OTRO,P4,0,0,dudoso: sin texto; decide el formulario
 r095,"se escucha una sirena por el norte, ¿alguien sabe qué pasa?",OTRO,P4,0,0,dudoso: sin dato concreto
-r096,"en el WhatsApp dicen que hay gas tóxico en el aire, no salgan",OTRO,P4,0,0,sobretriaje esperado: rumor con «gas» sube a P1
+r096,"en el WhatsApp dicen que hay gas tóxico en el aire, no salgan",OTRO,P4,0,0,"dudoso: rumor; desde #69 «gas» solo cuenta en frases como «fuga de gas», así que ya no sube a P1"
 r097,hay fila larga en la única droguería abierta,OTRO,P4,0,0,claro
 r098,¿los buses intermunicipales están saliendo?,OTRO,P4,0,0,claro: pregunta
 r099,ofrezco mi casa para 3 personas en Chipre,OTRO,P4,0,0,claro
-r100,"Mamá, ¿llegaste bien a la casa? Avísame",OTRO,P4,0,0,"sobretriaje esperado: falso positivo, «gas» dentro de «llegaste»"
+r100,"Mamá, ¿llegaste bien a la casa? Avísame",OTRO,P4,0,0,"claro: era un falso positivo («gas» dentro de «llegaste»), corregido en #69"

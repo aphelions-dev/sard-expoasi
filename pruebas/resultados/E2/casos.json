@@ -5,6 +5,7 @@
    "nodos": 15,
    "pasarelas": 1,
    "lado_m": 250.0,
+   "focos": 1,
    "alcance_m": 30.0,
    "perdida": 0.1,
    "reportes": 40,
@@ -122,7 +123,7 @@
     "emitidos": {
      "reportes": 689,
      "sacks": 0,
-     "bytes": 68530
+     "bytes": 69547
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -173,7 +174,7 @@
     "emitidos": {
      "reportes": 588,
      "sacks": 8,
-     "bytes": 59139
+     "bytes": 59863
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -224,7 +225,7 @@
     "emitidos": {
      "reportes": 892,
      "sacks": 0,
-     "bytes": 89853
+     "bytes": 91177
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -275,7 +276,7 @@
     "emitidos": {
      "reportes": 777,
      "sacks": 12,
-     "bytes": 82650
+     "bytes": 83863
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -326,7 +327,7 @@
     "emitidos": {
      "reportes": 748,
      "sacks": 0,
-     "bytes": 75203
+     "bytes": 76326
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -377,7 +378,7 @@
     "emitidos": {
      "reportes": 1398,
      "sacks": 4,
-     "bytes": 139172
+     "bytes": 141595
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -428,7 +429,7 @@
     "emitidos": {
      "reportes": 1158,
      "sacks": 0,
-     "bytes": 120565
+     "bytes": 121937
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -479,7 +480,7 @@
     "emitidos": {
      "reportes": 663,
      "sacks": 0,
-     "bytes": 65351
+     "bytes": 66232
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -530,7 +531,7 @@
     "emitidos": {
      "reportes": 1554,
      "sacks": 0,
-     "bytes": 153681
+     "bytes": 155990
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -581,7 +582,7 @@
     "emitidos": {
      "reportes": 822,
      "sacks": 17,
-     "bytes": 76424
+     "bytes": 77543
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -597,6 +598,7 @@
    "nodos": 15,
    "pasarelas": 1,
    "lado_m": 250.0,
+   "focos": 1,
    "alcance_m": 50.0,
    "perdida": 0.1,
    "reportes": 40,
@@ -714,7 +716,7 @@
     "emitidos": {
      "reportes": 1363,
      "sacks": 24,
-     "bytes": 129474
+     "bytes": 131267
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 1,
@@ -765,7 +767,7 @@
     "emitidos": {
      "reportes": 1178,
      "sacks": 71,
-     "bytes": 114034
+     "bytes": 115400
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 2,
@@ -816,7 +818,7 @@
     "emitidos": {
      "reportes": 1025,
      "sacks": 13,
-     "bytes": 104912
+     "bytes": 106190
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -867,7 +869,7 @@
     "emitidos": {
      "reportes": 1444,
      "sacks": 18,
-     "bytes": 139289
+     "bytes": 141206
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -918,7 +920,7 @@
     "emitidos": {
      "reportes": 1515,
      "sacks": 8,
-     "bytes": 152689
+     "bytes": 154883
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 1,
@@ -969,7 +971,7 @@
     "emitidos": {
      "reportes": 2207,
      "sacks": 16,
-     "bytes": 215323
+     "bytes": 218748
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -1020,7 +1022,7 @@
     "emitidos": {
      "reportes": 1244,
      "sacks": 42,
-     "bytes": 119392
+     "bytes": 121398
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 1,
@@ -1071,7 +1073,7 @@
     "emitidos": {
      "reportes": 754,
      "sacks": 14,
-     "bytes": 70336
+     "bytes": 71291
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -1122,7 +1124,7 @@
     "emitidos": {
      "reportes": 3287,
      "sacks": 0,
-     "bytes": 331918
+     "bytes": 336841
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 2,
@@ -1173,7 +1175,7 @@
     "emitidos": {
      "reportes": 1990,
      "sacks": 13,
-     "bytes": 191142
+     "bytes": 194050
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -1189,6 +1191,7 @@
    "nodos": 15,
    "pasarelas": 1,
    "lado_m": 250.0,
+   "focos": 1,
    "alcance_m": 100.0,
    "perdida": 0.1,
    "reportes": 40,
@@ -1306,7 +1309,7 @@
     "emitidos": {
      "reportes": 531,
      "sacks": 599,
-     "bytes": 60790
+     "bytes": 61534
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -1357,7 +1360,7 @@
     "emitidos": {
      "reportes": 628,
      "sacks": 605,
-     "bytes": 65592
+     "bytes": 66242
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -1408,7 +1411,7 @@
     "emitidos": {
      "reportes": 312,
      "sacks": 494,
-     "bytes": 36463
+     "bytes": 36817
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -1459,7 +1462,7 @@
     "emitidos": {
      "reportes": 658,
      "sacks": 592,
-     "bytes": 72695
+     "bytes": 73722
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -1510,7 +1513,7 @@
     "emitidos": {
      "reportes": 304,
      "sacks": 577,
-     "bytes": 35014
+     "bytes": 35426
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -1561,7 +1564,7 @@
     "emitidos": {
      "reportes": 552,
      "sacks": 599,
-     "bytes": 61617
+     "bytes": 62394
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -1612,7 +1615,7 @@
     "emitidos": {
      "reportes": 342,
      "sacks": 597,
-     "bytes": 38525
+     "bytes": 38980
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -1663,7 +1666,7 @@
     "emitidos": {
      "reportes": 587,
      "sacks": 612,
-     "bytes": 65208
+     "bytes": 66067
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -1714,7 +1717,7 @@
     "emitidos": {
      "reportes": 275,
      "sacks": 548,
-     "bytes": 31648
+     "bytes": 31995
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -1765,7 +1768,7 @@
     "emitidos": {
      "reportes": 343,
      "sacks": 391,
-     "bytes": 36322
+     "bytes": 36788
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -1781,6 +1784,7 @@
    "nodos": 30,
    "pasarelas": 1,
    "lado_m": 250.0,
+   "focos": 1,
    "alcance_m": 30.0,
    "perdida": 0.1,
    "reportes": 40,
@@ -1898,7 +1902,7 @@
     "emitidos": {
      "reportes": 1671,
      "sacks": 6,
-     "bytes": 162439
+     "bytes": 164890
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -1949,7 +1953,7 @@
     "emitidos": {
      "reportes": 1364,
      "sacks": 0,
-     "bytes": 140054
+     "bytes": 141619
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -2000,7 +2004,7 @@
     "emitidos": {
      "reportes": 1995,
      "sacks": 0,
-     "bytes": 211091
+     "bytes": 213882
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -2051,7 +2055,7 @@
     "emitidos": {
      "reportes": 1001,
      "sacks": 3,
-     "bytes": 100928
+     "bytes": 102381
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -2102,7 +2106,7 @@
     "emitidos": {
      "reportes": 1032,
      "sacks": 0,
-     "bytes": 104291
+     "bytes": 105467
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -2153,7 +2157,7 @@
     "emitidos": {
      "reportes": 3170,
      "sacks": 0,
-     "bytes": 327745
+     "bytes": 332987
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -2204,7 +2208,7 @@
     "emitidos": {
      "reportes": 1769,
      "sacks": 0,
-     "bytes": 178381
+     "bytes": 180796
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -2255,7 +2259,7 @@
     "emitidos": {
      "reportes": 1221,
      "sacks": 0,
-     "bytes": 121928
+     "bytes": 123662
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -2306,7 +2310,7 @@
     "emitidos": {
      "reportes": 2264,
      "sacks": 0,
-     "bytes": 224871
+     "bytes": 227895
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -2357,7 +2361,7 @@
     "emitidos": {
      "reportes": 1416,
      "sacks": 8,
-     "bytes": 134641
+     "bytes": 136489
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -2373,6 +2377,7 @@
    "nodos": 30,
    "pasarelas": 1,
    "lado_m": 250.0,
+   "focos": 1,
    "alcance_m": 50.0,
    "perdida": 0.1,
    "reportes": 40,
@@ -2490,7 +2495,7 @@
     "emitidos": {
      "reportes": 4946,
      "sacks": 61,
-     "bytes": 511101
+     "bytes": 517600
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 6,
@@ -2541,7 +2546,7 @@
     "emitidos": {
      "reportes": 8868,
      "sacks": 42,
-     "bytes": 876711
+     "bytes": 886792
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 9,
@@ -2592,7 +2597,7 @@
     "emitidos": {
      "reportes": 2316,
      "sacks": 229,
-     "bytes": 239247
+     "bytes": 242200
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -2643,7 +2648,7 @@
     "emitidos": {
      "reportes": 4874,
      "sacks": 24,
-     "bytes": 515336
+     "bytes": 521726
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 4,
@@ -2694,7 +2699,7 @@
     "emitidos": {
      "reportes": 2560,
      "sacks": 6,
-     "bytes": 255964
+     "bytes": 259008
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 1,
@@ -2745,7 +2750,7 @@
     "emitidos": {
      "reportes": 7719,
      "sacks": 4,
-     "bytes": 770391
+     "bytes": 781506
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 3,
@@ -2796,7 +2801,7 @@
     "emitidos": {
      "reportes": 3610,
      "sacks": 187,
-     "bytes": 350060
+     "bytes": 355500
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -2847,7 +2852,7 @@
     "emitidos": {
      "reportes": 8031,
      "sacks": 20,
-     "bytes": 831656
+     "bytes": 844695
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 10,
@@ -2898,7 +2903,7 @@
     "emitidos": {
      "reportes": 1436,
      "sacks": 135,
-     "bytes": 142232
+     "bytes": 144478
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -2949,7 +2954,7 @@
     "emitidos": {
      "reportes": 952,
      "sacks": 741,
-     "bytes": 101873
+     "bytes": 102880
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -2965,6 +2970,7 @@
    "nodos": 30,
    "pasarelas": 1,
    "lado_m": 250.0,
+   "focos": 1,
    "alcance_m": 100.0,
    "perdida": 0.1,
    "reportes": 40,
@@ -3082,7 +3088,7 @@
     "emitidos": {
      "reportes": 727,
      "sacks": 1181,
-     "bytes": 84745
+     "bytes": 85689
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -3133,7 +3139,7 @@
     "emitidos": {
      "reportes": 1230,
      "sacks": 1199,
-     "bytes": 133030
+     "bytes": 134856
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -3184,7 +3190,7 @@
     "emitidos": {
      "reportes": 619,
      "sacks": 1182,
-     "bytes": 72900
+     "bytes": 73759
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -3235,7 +3241,7 @@
     "emitidos": {
      "reportes": 1036,
      "sacks": 1195,
-     "bytes": 110848
+     "bytes": 112433
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -3286,7 +3292,7 @@
     "emitidos": {
      "reportes": 639,
      "sacks": 1204,
-     "bytes": 76824
+     "bytes": 77782
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -3337,7 +3343,7 @@
     "emitidos": {
      "reportes": 870,
      "sacks": 1197,
-     "bytes": 97943
+     "bytes": 99281
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -3388,7 +3394,7 @@
     "emitidos": {
      "reportes": 553,
      "sacks": 1178,
-     "bytes": 66079
+     "bytes": 67109
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -3439,7 +3445,7 @@
     "emitidos": {
      "reportes": 1087,
      "sacks": 1204,
-     "bytes": 116621
+     "bytes": 118501
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -3490,7 +3496,7 @@
     "emitidos": {
      "reportes": 398,
      "sacks": 1193,
-     "bytes": 50346
+     "bytes": 50926
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -3541,7 +3547,7 @@
     "emitidos": {
      "reportes": 370,
      "sacks": 1184,
-     "bytes": 48066
+     "bytes": 48518
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -3557,6 +3563,7 @@
    "nodos": 60,
    "pasarelas": 1,
    "lado_m": 250.0,
+   "focos": 1,
    "alcance_m": 30.0,
    "perdida": 0.1,
    "reportes": 40,
@@ -3674,7 +3681,7 @@
     "emitidos": {
      "reportes": 2158,
      "sacks": 427,
-     "bytes": 222442
+     "bytes": 225818
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -3725,7 +3732,7 @@
     "emitidos": {
      "reportes": 2541,
      "sacks": 0,
-     "bytes": 243475
+     "bytes": 247639
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -3776,7 +3783,7 @@
     "emitidos": {
      "reportes": 4903,
      "sacks": 0,
-     "bytes": 495802
+     "bytes": 502485
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -3827,7 +3834,7 @@
     "emitidos": {
      "reportes": 2378,
      "sacks": 33,
-     "bytes": 244523
+     "bytes": 248460
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -3878,7 +3885,7 @@
     "emitidos": {
      "reportes": 4249,
      "sacks": 0,
-     "bytes": 435843
+     "bytes": 442185
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 2,
@@ -3929,7 +3936,7 @@
     "emitidos": {
      "reportes": 6947,
      "sacks": 0,
-     "bytes": 681213
+     "bytes": 692092
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 4,
@@ -3980,7 +3987,7 @@
     "emitidos": {
      "reportes": 2202,
      "sacks": 675,
-     "bytes": 216114
+     "bytes": 219246
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -4031,7 +4038,7 @@
     "emitidos": {
      "reportes": 2076,
      "sacks": 0,
-     "bytes": 216817
+     "bytes": 219950
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -4082,7 +4089,7 @@
     "emitidos": {
      "reportes": 2530,
      "sacks": 136,
-     "bytes": 262389
+     "bytes": 265554
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -4133,7 +4140,7 @@
     "emitidos": {
      "reportes": 2782,
      "sacks": 176,
-     "bytes": 287035
+     "bytes": 291307
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -4149,6 +4156,7 @@
    "nodos": 60,
    "pasarelas": 1,
    "lado_m": 250.0,
+   "focos": 1,
    "alcance_m": 50.0,
    "perdida": 0.1,
    "reportes": 40,
@@ -4266,7 +4274,7 @@
     "emitidos": {
      "reportes": 2571,
      "sacks": 2329,
-     "bytes": 271416
+     "bytes": 274599
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -4317,7 +4325,7 @@
     "emitidos": {
      "reportes": 4218,
      "sacks": 2427,
-     "bytes": 465705
+     "bytes": 472053
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -4368,7 +4376,7 @@
     "emitidos": {
      "reportes": 1389,
      "sacks": 2364,
-     "bytes": 158275
+     "bytes": 160092
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -4419,7 +4427,7 @@
     "emitidos": {
      "reportes": 3594,
      "sacks": 2404,
-     "bytes": 402587
+     "bytes": 407783
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -4470,7 +4478,7 @@
     "emitidos": {
      "reportes": 1262,
      "sacks": 1912,
-     "bytes": 137809
+     "bytes": 139560
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -4521,7 +4529,7 @@
     "emitidos": {
      "reportes": 4131,
      "sacks": 2279,
-     "bytes": 434313
+     "bytes": 440531
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -4572,7 +4580,7 @@
     "emitidos": {
      "reportes": 1876,
      "sacks": 2219,
-     "bytes": 212003
+     "bytes": 215383
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -4623,7 +4631,7 @@
     "emitidos": {
      "reportes": 4707,
      "sacks": 2254,
-     "bytes": 505976
+     "bytes": 513050
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -4674,7 +4682,7 @@
     "emitidos": {
      "reportes": 2689,
      "sacks": 2354,
-     "bytes": 290321
+     "bytes": 294389
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -4725,7 +4733,7 @@
     "emitidos": {
      "reportes": 1194,
      "sacks": 2273,
-     "bytes": 145300
+     "bytes": 146811
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -4741,6 +4749,7 @@
    "nodos": 60,
    "pasarelas": 1,
    "lado_m": 250.0,
+   "focos": 1,
    "alcance_m": 100.0,
    "perdida": 0.1,
    "reportes": 40,
@@ -4858,7 +4867,7 @@
     "emitidos": {
      "reportes": 1652,
      "sacks": 2383,
-     "bytes": 189869
+     "bytes": 191795
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -4909,7 +4918,7 @@
     "emitidos": {
      "reportes": 2117,
      "sacks": 2390,
-     "bytes": 222918
+     "bytes": 225948
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -4960,7 +4969,7 @@
     "emitidos": {
      "reportes": 937,
      "sacks": 2408,
-     "bytes": 116254
+     "bytes": 117659
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -5011,7 +5020,7 @@
     "emitidos": {
      "reportes": 1816,
      "sacks": 2350,
-     "bytes": 202701
+     "bytes": 205456
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -5062,7 +5071,7 @@
     "emitidos": {
      "reportes": 894,
      "sacks": 2364,
-     "bytes": 112580
+     "bytes": 113694
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -5113,7 +5122,7 @@
     "emitidos": {
      "reportes": 1440,
      "sacks": 2399,
-     "bytes": 168776
+     "bytes": 170988
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -5164,7 +5173,7 @@
     "emitidos": {
      "reportes": 1083,
      "sacks": 2351,
-     "bytes": 131906
+     "bytes": 133748
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -5215,7 +5224,7 @@
     "emitidos": {
      "reportes": 1549,
      "sacks": 2364,
-     "bytes": 179403
+     "bytes": 181799
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -5266,7 +5275,7 @@
     "emitidos": {
      "reportes": 763,
      "sacks": 2376,
-     "bytes": 99548
+     "bytes": 100673
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,
@@ -5317,7 +5326,7 @@
     "emitidos": {
      "reportes": 840,
      "sacks": 2408,
-     "bytes": 108126
+     "bytes": 109199
     },
     "subidas_fallidas": 0,
     "nodos_apagados": 0,

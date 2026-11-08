@@ -81,5 +81,18 @@ Uso responsable de la IA: `docs/uso-responsable-ia.md`. Riesgos y planes B: `doc
 ## Equipo
 
 Persona 1 **@samcastroca** (app y malla) · Persona 2 **@lufigir** (central y agentes) · Persona 3
-**@CrArenas** (tablero, simulador y pruebas). Cómo trabajamos (ramas, commits, issues):
-`docs/equipo.md`.
+**@CrArenas** (tablero, simulador y pruebas). Qué hace cada uno y cómo trabajamos (ramas, commits,
+issues): [`docs/equipo.md`](docs/equipo.md).
+
+## Documentación
+
+| Tema | Documentos |
+|------|------------|
+| Contrato | [Protocolo SARD1](contracts/protocolo-sard1.md) · [API de la central](contracts/api-central.md) · [Ejemplos](contracts/ejemplos/README.md) |
+| Arquitectura y decisiones | [Arquitectura](docs/arquitectura.md) · [ADR 0001](docs/decisiones/0001-usar-port-android-bitchat.md) · [0002](docs/decisiones/0002-solo-android.md) · [0003](docs/decisiones/0003-registro-eventos-solo-agregar.md) · [0004](docs/decisiones/0004-jev-solo-en-central.md) · [0005](docs/decisiones/0005-reglas-ganan-palabra-critica.md) |
+| Fichas de agentes | [Recepción](docs/fichas-agentes/recepcion.md) · [Triaje](docs/fichas-agentes/triaje.md) · [Correlación](docs/fichas-agentes/correlacion.md) · [Coordinación](docs/fichas-agentes/coordinacion.md) · [Resiliencia](docs/fichas-agentes/resiliencia.md) · [Comunicación](docs/fichas-agentes/comunicacion.md) · [Plantilla](docs/fichas-agentes/_plantilla.md) |
+| Pruebas | [Escenarios](pruebas/escenarios.md) · [Resultados](pruebas/resultados/README.md): [E1](pruebas/resultados/E1/resumen.md) · [E2](pruebas/resultados/E2/resumen.md) · [E3](pruebas/resultados/E3/resumen.md) · [E4](pruebas/resultados/E4/resumen.md) ([central](pruebas/resultados/E4/resumen-central.md)) · [E5](pruebas/resultados/E5/resumen-central.md) · [E7](pruebas/resultados/E7/resumen-central.md) · [Base S1](pruebas/resultados/base-s1/resumen.md) |
+| Proyecto | [Plan por hitos](docs/plan.md) · [Entregables](docs/entregables.md) · [Riesgos](docs/riesgos.md) · [Uso responsable de la IA](docs/uso-responsable-ia.md) · [Cómo trabajamos](docs/equipo.md) |
+| Demo y pitch | [Guion de la demo](docs/pitch/guion-demo.md) · [Pitch](docs/pitch/README.md) |
+| Por área | [App](app/README.md) · [Central](central/README.md) · [Tablero](tablero/README.md) · [Simulador](simulador/README.md) · [Datos sintéticos](datos/sinteticos/README.md) |
+| Referencias | [Bases de la hackathon (PDF)](docs/referencias/HackathonExpoASI2026.pdf) · [Investigación de la central](docs/referencias/investigacion-central.md) |

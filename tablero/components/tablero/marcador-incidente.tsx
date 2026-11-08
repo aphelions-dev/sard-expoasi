@@ -81,7 +81,7 @@ export function MarcadorIncidente({ grupo, centro, barrio, seleccion, onSeleccio
           <div className="flex items-baseline justify-between gap-2 border-b px-2.5 py-1.5">
             <span className="font-medium">{barrio ?? "Sin barrio conocido"}</span>
             <span className="text-muted-foreground">
-              {grupo.length} incidente{grupo.length > 1 ? "s" : ""} · ±600 m
+              {grupo.length} incidente{grupo.length > 1 ? "s" : ""} · zona aprox. 600 m
             </span>
           </div>
           <ul className="divide-y">
@@ -100,7 +100,7 @@ export function MarcadorIncidente({ grupo, centro, barrio, seleccion, onSeleccio
           </ul>
           {grupo.length > 5 && <p className="border-t px-2.5 py-1 text-muted-foreground">y {grupo.length - 5} más en la cola</p>}
           <p className="border-t px-2.5 py-1 text-[0.6875rem] text-muted-foreground">
-            {grupo.length > 1 ? "Clic: ver el siguiente de esta celda" : "Clic: ver el incidente"}
+            {grupo.length > 1 ? "Clic: ver el siguiente de esta zona" : "Clic: ver el incidente"}
           </p>
         </div>
       </MarkerTooltip>

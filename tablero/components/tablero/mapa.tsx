@@ -323,7 +323,7 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
                 >
                   3
                 </span>
-                en la celda
+                en la misma zona
               </span>
             </div>
             <div className="grid grid-cols-2 gap-x-3 gap-y-1">
@@ -340,7 +340,7 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span className="flex items-center gap-1">
                 <span aria-hidden="true" className="size-3 border border-dashed border-foreground/60" />
-                ubicación ±600 m
+                zona aproximada (~600 m)
               </span>
               <span className="flex items-center gap-1">
                 <span aria-hidden="true" className="grid size-3.5 place-items-center rounded-full border border-lugar-salud text-[0.5rem] font-bold text-lugar-salud">
@@ -361,7 +361,7 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
               </label>
               <label className="flex cursor-pointer items-center gap-1.5">
                 <input type="checkbox" checked={calles} onChange={(e) => setCalles(e.target.checked)} className="accent-foreground" />
-                Calles de OpenStreetMap (requiere internet)
+                Mapa de calles (requiere internet)
               </label>
             </div>
           </div>

@@ -8,7 +8,6 @@ import type { Evidencia, Incidente } from "@/lib/api/tipos"
 import {
   CORROBORACION,
   FUENTE,
-  ORIGEN,
   TIPO,
   coordenadas,
   haceCuanto,
@@ -17,6 +16,8 @@ import {
 } from "@/lib/formato"
 import { cercanos, type Barrio, type Geo } from "@/lib/geo"
 import { cn } from "@/lib/utils"
+
+import { ORIGEN_LEGIBLE, enPalabras, senalLegible } from "@/lib/lenguaje"
 
 import { BarraDecision, Propuesta } from "./decision"
 import { ICONO_TIPO } from "./iconos"
@@ -128,9 +129,9 @@ export function PanelIncidente({
 
   // Todo lo que pide cautela, junto y en lenguaje llano.
   const atencion = [
-    ...u.motivos.map(legible),
+    ...u.motivos.map((m) => enPalabras(legible(m))),
     ...(u.sin_analisis_ia
-      ? ["Sin análisis de IA: priorizado solo con reglas."]
+      ? ["Sin análisis automático: se clasificó solo con las palabras de alerta."]
       : []),
     ...(u.sin_ubicacion ? ["Sin ubicación: el reporte no trajo GPS."] : []),
     ...(u.contradicciones.length
@@ -226,7 +227,7 @@ export function PanelIncidente({
               </strong>
               <span className="text-muted-foreground">
                 {" "}
-                · {u.dispositivos} dispositivo{u.dispositivos === 1 ? "" : "s"}{" "}
+                · {u.dispositivos} celular{u.dispositivos === 1 ? "" : "es"} distinto{u.dispositivos === 1 ? "" : "s"}{" "}
                 · {u.fuentes_directas} testigo
                 {u.fuentes_directas === 1 ? "" : "s"} directo
                 {u.fuentes_directas === 1 ? "" : "s"}
@@ -276,7 +277,7 @@ export function PanelIncidente({
             </ol>
           </Tarjeta>
 
-          <Tarjeta n={3} titulo="Acción propuesta">
+          <Tarjeta n={3} titulo="Acción sugerida">
             <Propuesta inc={inc} lugar={lugar} />
           </Tarjeta>
 
@@ -295,7 +296,7 @@ export function PanelIncidente({
               <dd className="font-mono">{inc.id}</dd>
               {inc.geohash && (
                 <>
-                  <dt className="text-muted-foreground">Geohash</dt>
+                  <dt className="text-muted-foreground">Código de zona</dt>
                   <dd className="font-mono">
                     {inc.geohash} · {coordenadas(inc.geohash)} · ±600 m
                   </dd>
@@ -389,8 +390,7 @@ function ItemEvidencia({
               aria-hidden="true"
               className="size-3 transition-transform group-open:rotate-90"
             />
-            Por qué esta prioridad ({ev.senales.length} señal
-            {ev.senales.length === 1 ? "" : "es"})
+            Por qué esta prioridad ({ev.senales.length} razón{ev.senales.length === 1 ? "" : "es"})
           </summary>
           <ul className="space-y-1 px-2 pb-2" aria-label="Señales del triaje">
             {ev.senales.map((s, i) => (
@@ -406,9 +406,9 @@ function ItemEvidencia({
                       : "bg-muted text-muted-foreground"
                   )}
                 >
-                  {ORIGEN[s.origen]}
+                  {ORIGEN_LEGIBLE[s.origen]}
                 </span>
-                <span>{s.senal.replaceAll("_", " ")}</span>
+                <span>{senalLegible(s.senal)}</span>
                 <Prioridad p={s.prioridad} />
                 {s.probabilidad !== null && (
                   <span className="font-mono text-[0.6875rem]">
@@ -460,7 +460,7 @@ function Cerca({ geo, gh }: { geo: Geo; gh: string }) {
         </div>
       ))}
       <p className="text-[0.6875rem] text-muted-foreground">
-        En línea recta desde el centro de la celda. Fuente: OpenStreetMap.
+        En línea recta desde el centro de la zona. Fuente: OpenStreetMap.
       </p>
     </div>
   )

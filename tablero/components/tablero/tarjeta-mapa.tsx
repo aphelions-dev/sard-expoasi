@@ -53,7 +53,7 @@ export function TarjetaMapa({ inc, barrio, ahora, onAbrir, onCerrar }: Props) {
         </p>
       )}
       <div className="mt-2 flex items-center justify-between gap-2 border-t px-3 py-2">
-        <span className="truncate text-muted-foreground">{inc.accion_propuesta ? lugarLegible(inc.accion_propuesta.accion, inc.geohash, barrio?.nombre ?? null) : "Sin acción propuesta todavía"}</span>
+        <span className="truncate text-muted-foreground">{inc.accion_propuesta ? lugarLegible(inc.accion_propuesta.accion, inc.geohash, barrio?.nombre ?? null) : "Sin acción sugerida todavía"}</span>
         <Button size="sm" onClick={onAbrir}>
           Ver y decidir
           <ArrowRight data-icon="inline-end" />

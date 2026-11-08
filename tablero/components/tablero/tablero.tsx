@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import dynamic from "next/dynamic"
 
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
@@ -8,8 +8,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { elegirActiva, incidentes, rechazados, recursos, salud, type Nodo } from "@/lib/api/central"
 import type { Incidente, Rechazado, Recurso, Salud } from "@/lib/api/tipos"
 import { filtrar, porDecidir, type Filtro } from "@/lib/cola"
-import { barrioDe, cargarGeo, type Barrio, type Geo } from "@/lib/geo"
+import { buscadorDeBarrio, cargarGeo, type Barrio, type Geo } from "@/lib/geo"
 import { ESCRITORIO, useMedia } from "@/lib/use-media"
+import { useNovedades } from "@/lib/use-novedades"
+import { enZona, zonasConConteo, type Zona as ZonaFiltro } from "@/lib/zonas"
 import { usePreferencia, useSondeo } from "@/lib/use-sondeo"
 import { cn } from "@/lib/utils"
 
@@ -40,6 +42,7 @@ type Zona = "cola" | "mapa" | "panel" // en pantallas angostas se ve una a la ve
 export function Tablero() {
   const [coordinador, setCoordinador] = usePreferencia("sard.coordinador", "")
   const [filtro, setFiltro] = useState<Filtro>("todos")
+  const [zonaFiltro, setZonaFiltro] = useState<ZonaFiltro | null>(null)
   const [seleccion, setSeleccion] = useState<string | null>(null)
   const [vista, setVista] = useState<Vista>("incidente")
   const [zona, setZona] = useState<Zona>("cola")
@@ -66,7 +69,7 @@ export function Tablero() {
     return () => window.removeEventListener("keydown", tecla)
   }, [mapaCompleto])
 
-  const barrio = useCallback((gh: string | null): Barrio | null => (geo && gh ? barrioDe(geo.barrios, gh) : null), [geo])
+  const barrio = useMemo(() => (geo ? buscadorDeBarrio(geo.barrios) : (): Barrio | null => null), [geo])
 
   const saludes = useSondeo(leerSaludes, CADA_MS)
   const activa = saludes.datos ? elegirActiva(saludes.datos) : null
@@ -82,17 +85,32 @@ export function Tablero() {
   }, [activa, refrescar])
 
   const incs = lista.datos ?? []
+  const novedades = useNovedades(lista.datos)
+  // La zona elegida filtra la cola y sus conteos; el mapa muestra todo y apaga lo de afuera.
+  const enLaZona = zonaFiltro ? incs.filter((i) => enZona(barrio(i.geohash), zonaFiltro)) : incs
   // Sin selección, el primero de lo que deja ver el filtro. Si el elegido desaparece de la cola, no
   // se reemplaza en silencio por otro: el panel lo dice y el coordinador elige de nuevo.
-  const elegido = seleccion ? (incs.find((i) => i.id === seleccion) ?? null) : (filtrar(incs, filtro)[0] ?? null)
+  const elegido = seleccion ? (incs.find((i) => i.id === seleccion) ?? null) : (filtrar(enLaZona, filtro)[0] ?? null)
   const perdido = seleccion !== null && elegido === null && lista.datos !== null
   const sinRecuperar = rech.datos?.filter((r) => !r.recuperado).length ?? 0
 
   function elegir(id: string) {
+    novedades.visto(id)
     setSeleccion(id)
     setVista("incidente")
     setTarjeta(true)
     if (!escritorio && !mapaCompleto) setZona("panel")
+  }
+
+  /** Al primero de lo nuevo, en el orden de la central, sin filtros que lo escondan. */
+  function verNuevos() {
+    const primero = incs.find((i) => novedades.nuevos.includes(i.id))
+    novedades.todosVistos()
+    if (!primero) return
+    setFiltro("todos")
+    setZonaFiltro(null)
+    elegir(primero.id)
+    document.querySelector(`[data-id="${CSS.escape(primero.id)}"]`)?.scrollIntoView({ block: "nearest" })
   }
 
   function abrirDetalle() {
@@ -109,7 +127,7 @@ export function Tablero() {
 
   const cola = (
     <Cola
-      incidentes={incs}
+      incidentes={enLaZona}
       cargando={lista.datos === null && !lista.error}
       filtro={filtro}
       onFiltro={setFiltro}
@@ -117,17 +135,26 @@ export function Tablero() {
       onSeleccion={elegir}
       ahora={ahora}
       barrio={barrio}
+      zona={zonaFiltro}
+      onZona={setZonaFiltro}
+      zonas={zonasConConteo(incs, barrio)}
+      recientes={novedades.recientes}
+      nuevos={novedades.nuevos}
+      onVerNuevos={verNuevos}
     />
   )
 
   const mapa = geo ? (
-    // El mapa muestra lo mismo que deja ver el filtro de la cola.
+    // El mapa muestra lo que deja ver el filtro de la cola en todas las zonas: la elegida se
+    // encuadra y el resto se apaga, para no perder de vista lo que pasa al lado.
     <Mapa
       geo={geo}
       incidentes={filtrar(incs, filtro)}
       seleccion={elegido?.id ?? null}
       onSeleccion={elegir}
       barrio={barrio}
+      zona={zonaFiltro}
+      onZona={setZonaFiltro}
       completo={mapaCompleto}
       onCompleto={setMapaCompleto}
     />

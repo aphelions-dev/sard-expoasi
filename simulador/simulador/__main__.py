@@ -83,8 +83,8 @@ def main() -> None:
     valores = {**base, **{f.name: getattr(a, f.name) for f in fields(Parametros) if getattr(a, f.name) is not None}}
     central = None
     if a.central:
-        central = CentralHttp({"A": os.environ.get("CENTRAL_A_URL") or "http://localhost:8001",
-                               "B": os.environ.get("CENTRAL_B_URL") or "http://localhost:8002"})
+        central = CentralHttp({"A": os.environ.get("CENTRAL_A_URL") or "http://127.0.0.1:8001",
+                               "B": os.environ.get("CENTRAL_B_URL") or "http://127.0.0.1:8002"})
         # La central acepta cada id una vez: cada corrida real lleva su propio prefijo y su hora.
         valores.setdefault("prefijo", f"s{int(time.time()) % 100000}n")
         valores.setdefault("hora_base", int(time.time()))

@@ -78,3 +78,32 @@ def test_palabras_criticas_del_contrato():
     from simulador.recorrido import palabras_criticas
     assert palabras_criticas("Hay tres personas ATRAPADAS") == ["atrapad"]
     assert palabras_criticas("todo bien") == []
+
+
+def test_focos_son_mallas_separadas_con_su_pasarela():
+    from dataclasses import replace
+
+    from simulador.geo import a_latlon, geohash
+
+    p = replace(Parametros(), semilla=3, nodos=24, focos=6, reportes=30)
+    sim = Simulacion(p)
+    por_foco = [sim.nodos[k::6] for k in range(6)]
+    assert all(any(n.pasarela for n in grupo) for grupo in por_foco)
+    # Nadie oye a un celular de otro foco: están a kilómetros.
+    foco = {n.id: i % 6 for i, n in enumerate(sim.nodos)}
+    assert all(foco[v.id] == foco[a] for a, vs in sim.vecinos.items() for v in vs)
+    assert len({geohash(*a_latlon(n.x, n.y)) for n in sim.nodos}) >= 6
+    assert Simulacion(replace(p, focos=1)).nodos[0].x < p.lado_m  # un foco: lo de siempre
+
+
+def test_largo_del_geohash_segun_precision_del_gps():
+    import random
+    from collections import Counter
+
+    from simulador.generador import Generador
+    from simulador.geo import caracteres
+
+    assert [caracteres(r) for r in (3, 5, 6, 20, 21, 75, 76)] == [9, 9, 8, 8, 7, 7, 6]
+    gen = Generador(random.Random(1), sin_gps=0)
+    largos = Counter(len(gen.nuevo(f"n{i}", 10, 10, 0).geohash) for i in range(400))
+    assert set(largos) == {6, 7, 8, 9} and largos[8] > largos[6]

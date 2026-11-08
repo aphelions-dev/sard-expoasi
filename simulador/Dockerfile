@@ -8,4 +8,4 @@ COPY datos /repo/datos
 COPY simulador/simulador /repo/simulador/simulador
 RUN mkdir -p /repo/pruebas/resultados
 ENTRYPOINT ["python", "-m", "simulador"]
-CMD ["correr", "--central", "--velocidad", "20"]
+CMD ["correr", "--central", "--velocidad", "20", "--focos", "6", "--nodos", "150", "--pasarelas", "2", "--reportes", "60"]

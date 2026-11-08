@@ -4,7 +4,7 @@
 
 ## Alcance
 
-Proponer acciones por incidente para el coordinador humano, con el recurso que usarían (ambulancia, equipo de rescate…), y marcarlas como ejecutadas solo tras `POST /incidentes/{id}/aprobacion`. Cuántas unidades quedan lo calcula la vista con lo que declara el coordinador en `POST /recursos`.
+Proponer acciones por incidente para el coordinador humano, con el recurso que usarían (ambulancia, equipo de rescate…), y marcarlas como ejecutadas solo tras `POST /incidentes/{id}/aprobacion`. Cuántas unidades hay disponibles lo calcula la vista con lo que registra y reporta cada entidad en `POST /recursos/unidades`; aprobar solo solicita el recurso.
 
 ## No le toca
 

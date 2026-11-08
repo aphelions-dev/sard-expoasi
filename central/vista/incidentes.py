@@ -49,9 +49,7 @@ def construir(evs: list[Evento]) -> dict[str, Incidente]:
     vinculos: dict[str, dict] = {}
     propuestas: dict[str, Evento] = {}
     decisiones: dict[str, Evento] = {}
-    propuestas_por_id: dict[str, Evento] = {}
-    declaraciones: dict[tuple[str, str], Evento] = {}
-    aprobaciones: list[Evento] = []
+    unidad_evs: list[Evento] = []
 
     for ev in sorted(evs, key=lambda e: e.creado_en):
         d, rid = ev.datos, ev.reporte_id
@@ -66,13 +64,10 @@ def construir(evs: list[Evento]) -> dict[str, Incidente]:
             vinculos.setdefault(rid, d)  # si A y B correlacionaron, gana el primero
         elif ev.tipo == "accion_propuesta":
             propuestas[d["incidente_id"]] = ev
-            propuestas_por_id[ev.id] = ev
         elif ev.tipo == "decision_humana":
             decisiones[d["incidente_id"]] = ev
-            if d["decision"] == "aprobar":
-                aprobaciones.append(ev)
-        elif ev.tipo == "recurso_declarado":
-            declaraciones[(d["entidad"], d["recurso"])] = ev
+        elif ev.tipo in ("unidad_registrada", "unidad_estado"):
+            unidad_evs.append(ev)
 
     miembros: dict[str, list[str]] = defaultdict(list)
     for rid, v in vinculos.items():
@@ -84,41 +79,56 @@ def construir(evs: list[Evento]) -> dict[str, Incidente]:
         rids.sort(key=lambda r: recibidos[r]["hora_unix"])
         out[inc_id] = _incidente(inc_id, rids, recibidos, priorizados, rutas, vinculos,
                                  propuestas.get(inc_id), decisiones.get(inc_id))
-    _asignar_recursos(out, estado_recursos(declaraciones, aprobaciones, propuestas_por_id))
+    _asignar_recursos(out, unidades(unidad_evs))
     return out
 
 
-def estado_recursos(declaraciones, aprobaciones, propuestas_por_id) -> dict[tuple, dict]:
-    """Unidades por recurso: lo declarado menos lo aprobado después de la última declaración."""
-    out = {}
-    for clave, dec in declaraciones.items():
-        usados = set()
-        for ap in aprobaciones:
-            prop = propuestas_por_id.get(ap.datos["accion_id"])
-            if (prop and ap.creado_en > dec.creado_en
-                    and (prop.datos["entidad"], prop.datos.get("recurso")) == clave):
-                usados.add(ap.datos["incidente_id"])  # un incidente compromete una unidad
-        n = dec.datos["disponibles"]
-        out[clave] = {"entidad": clave[0], "recurso": clave[1], "declarados": n,
-                      "comprometidos": len(usados), "disponibles": max(0, n - len(usados)),
-                      "coordinador": dec.datos["coordinador"], "declarado_en": dec.creado_en}
+def unidades(evs: list[Evento]) -> dict[str, dict[str, Any]]:
+    """Estado vigente de cada unidad (SCI-211): el último cambio que reportó su entidad."""
+    out: dict[str, dict[str, Any]] = {}
+    for ev in sorted(evs, key=lambda e: e.creado_en):
+        d = ev.datos
+        if ev.tipo == "unidad_registrada":
+            if d["matricula"] not in out:  # si A y B la registraron, vale la primera
+                out[d["matricula"]] = {
+                    "entidad": d["entidad"], "recurso": d["recurso"], "matricula": d["matricula"],
+                    "estado": "disponible", "incidente_id": None,
+                    "reportado_por": d["reportado_por"], "reportado_en": ev.creado_en, "nota": ""}
+        elif d["matricula"] in out:
+            out[d["matricula"]].update(
+                estado=d["estado"], incidente_id=d["incidente_id"],
+                reportado_por=d["reportado_por"], reportado_en=ev.creado_en, nota=d["nota"])
     return out
 
 
-def _asignar_recursos(incs: dict[str, "Incidente"], estado: dict[tuple, dict]) -> None:
+def _clave(inc: "Incidente") -> tuple[str, str] | None:
+    a = inc.accion_propuesta
+    return (a["entidad"], a["recurso"]) if a and a.get("recurso") else None
+
+
+def _asignar_recursos(incs: dict[str, "Incidente"], unids: dict[str, dict]) -> None:
+    asignadas: dict[str, list[str]] = defaultdict(list)
+    disponibles: Counter = Counter()
+    registrados = set()
+    for u in unids.values():
+        registrados.add((u["entidad"], u["recurso"]))
+        if u["estado"] == "asignada":
+            asignadas[u["incidente_id"]].append(u["matricula"])
+        elif u["estado"] == "disponible":
+            disponibles[(u["entidad"], u["recurso"])] += 1
+
     for inc in incs.values():
-        a = inc.accion_propuesta
-        if not a or not a.get("recurso"):
+        clave = _clave(inc)
+        if clave is None:
             continue
-        clave = (a["entidad"], a["recurso"])
         compiten = sorted(
             o.id for o in incs.values()
-            if o.id != inc.id and o.estado == "pendiente" and o.prioridad <= inc.prioridad
-            and o.accion_propuesta
-            and (o.accion_propuesta["entidad"], o.accion_propuesta.get("recurso")) == clave)
-        inc.recurso = {"recurso": a["recurso"], "entidad": a["entidad"],
-                       "disponibles": estado[clave]["disponibles"] if clave in estado else None,
-                       "compiten": compiten}
+            if o.id != inc.id and o.estado in ("pendiente", "aprobada")
+            and o.prioridad <= inc.prioridad and _clave(o) == clave and not asignadas[o.id])
+        inc.recurso = {"recurso": clave[1], "entidad": clave[0],
+                       "disponibles": disponibles[clave] if clave in registrados else None,
+                       "compiten": compiten, "solicitado": inc.estado == "aprobada",
+                       "asignadas": sorted(asignadas[inc.id])}
 
 
 def clave_orden(inc: "Incidente") -> tuple:
@@ -219,17 +229,25 @@ def todos(conn: sqlite3.Connection) -> dict[str, Incidente]:
 
 
 def recursos(conn: sqlite3.Connection) -> list[dict[str, Any]]:
-    evs = eventos.leer(conn, tipos=["recurso_declarado", "decision_humana", "accion_propuesta"])
-    declaraciones, aprobaciones, props = {}, [], {}
-    for ev in sorted(evs, key=lambda e: e.creado_en):
-        if ev.tipo == "recurso_declarado":
-            declaraciones[(ev.datos["entidad"], ev.datos["recurso"])] = ev
-        elif ev.tipo == "accion_propuesta":
-            props[ev.id] = ev
-        elif ev.datos["decision"] == "aprobar":
-            aprobaciones.append(ev)
-    return sorted(estado_recursos(declaraciones, aprobaciones, props).values(),
-                  key=lambda r: (r["entidad"], r["recurso"]))
+    """`GET /recursos`: una fila por recurso con al menos una unidad registrada."""
+    evs = eventos.leer(conn)
+    incs = sorted(construir(evs).values(), key=clave_orden)
+    unids = unidades([e for e in evs if e.tipo in ("unidad_registrada", "unidad_estado")])
+    filas: dict[tuple[str, str], dict[str, Any]] = {}
+    for u in sorted(unids.values(), key=lambda u: u["matricula"]):
+        clave = (u["entidad"], u["recurso"])
+        f = filas.setdefault(clave, {
+            "entidad": clave[0], "recurso": clave[1], "disponibles": 0, "asignadas": 0,
+            "no_disponibles": 0, "solicitudes_abiertas": [], "unidades": []})
+        f[{"disponible": "disponibles", "asignada": "asignadas",
+           "no_disponible": "no_disponibles"}[u["estado"]]] += 1
+        f["unidades"].append({k: u[k] for k in ("matricula", "estado", "incidente_id",
+                                                 "reportado_por", "reportado_en", "nota")})
+    for inc in incs:
+        clave = _clave(inc)
+        if clave in filas and inc.recurso["solicitado"] and not inc.recurso["asignadas"]:
+            filas[clave]["solicitudes_abiertas"].append(inc.id)
+    return [filas[c] for c in sorted(filas)]
 
 
 def uno(conn: sqlite3.Connection, incidente_id: str) -> Incidente | None:

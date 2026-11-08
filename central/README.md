@@ -76,7 +76,9 @@ dos veces el mismo reporte.
 | `decision_humana` | API (coordinador) | Aprobación o rechazo de la propuesta vigente |
 | `agente_error` | Cualquier agente | Un agente falló con un evento; se reintenta |
 | `par_caido`, `par_recuperado` | Resiliencia | La otra central dejó de responder o volvió |
-| `recurso_declarado` | API (coordinador) | Cuántas unidades hay de un recurso (`POST /recursos`); reemplaza la declaración anterior |
+| `recurso_solicitado` | API (coordinador) | Al aprobar una propuesta con recurso: queda pedido, sin unidad asignada |
+| `unidad_registrada` | API (entidad) | Una entidad registra una unidad con su matrícula (`POST /recursos/unidades`); entra disponible |
+| `unidad_estado` | API (entidad) | La entidad reporta que una unidad quedó disponible, asignada a un incidente o no disponible |
 
 ## Decisiones provisionales del contrato
 

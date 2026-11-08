@@ -101,8 +101,8 @@ def mostrar(incs: list[dict]) -> None:
             print(f"    propuesta: {a['accion']}")
             if i["recurso"]:
                 rc = i["recurso"]
-                quedan = "sin declarar" if rc["disponibles"] is None else rc["disponibles"]
-                print(f"    recurso: {rc['recurso']} ({rc['entidad']}), quedan {quedan}"
+                hay = "sin unidades registradas" if rc["disponibles"] is None else rc["disponibles"]
+                print(f"    recurso: {rc['recurso']} ({rc['entidad']}), disponibles {hay}"
                       + (f"; compite con {', '.join(rc['compiten'])}" if rc["compiten"] else ""))
             if a["falta_confirmar"]:
                 print(f"    falta confirmar: {', '.join(a['falta_confirmar'])}")
@@ -131,10 +131,17 @@ def main() -> None:
     print("  Lo que llegó incompleto (GET /rechazados), sin SACK para que el celular reintente:")
     for x in pedir(f"{CENTRALES[nodo]}/rechazados")[:2]:
         print(f"    {x['reporte_id']}: llegó {x['campos']}")
-    for entidad, recurso, n in [("Cruz Roja", "ambulancia", 1), ("Bomberos", "equipo de rescate", 2)]:
-        pedir(f"{CENTRALES[nodo]}/recursos", {"entidad": entidad, "recurso": recurso,
-                                              "disponibles": n, "coordinador": "sala de crisis"})
-    print("  La sala de crisis declara 1 ambulancia (Cruz Roja) y 2 equipos de rescate (Bomberos).")
+    for entidad, recurso, matricula in [("Cruz Roja", "ambulancia", "CR-114"),
+                                        ("Bomberos", "equipo de rescate", "BM-R1"),
+                                        ("Bomberos", "equipo de rescate", "BM-R2")]:
+        try:
+            pedir(f"{CENTRALES[nodo]}/recursos/unidades",
+                  {"entidad": entidad, "recurso": recurso, "matricula": matricula,
+                   "reportado_por": f"registrador {entidad}"})
+        except urllib.error.HTTPError as e:
+            if e.code != 409:  # 409: ya quedó registrada en un ensayo anterior
+                raise
+    print("  Cruz Roja registra 1 ambulancia (CR-114) y Bomberos 2 equipos de rescate (BM-R1, BM-R2).")
 
     paso("Paso 5 · Triaje (reglas + Jev) y correlación en incidentes")
     mostrar(esperar_incidentes(nodo, ids1))

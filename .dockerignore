@@ -1,0 +1,11 @@
+# Contexto de las imágenes que se construyen desde la raíz (central y simulador).
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/node_modules
+central/datos/*.sqlite*
+central/tests
+tablero
+app
+.git
+.env

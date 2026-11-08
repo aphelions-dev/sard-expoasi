@@ -12,7 +12,7 @@ type Geometria = { type: "Polygon"; coordinates: Anillo[] } | { type: "MultiPoly
 
 export interface ColeccionBarrios {
   type: "FeatureCollection";
-  features: { type: "Feature"; properties: { id: string; name: string; comuna: string }; geometry: Geometria }[];
+  features: { type: "Feature"; properties: { id: string; name: string; comuna: string; lon: number; lat: number }; geometry: Geometria }[];
 }
 
 export interface ColeccionLugares {
@@ -25,6 +25,7 @@ export interface ColeccionLugares {
 }
 
 export interface Barrio {
+  id: string;
   nombre: string;
   comuna: string;
 }
@@ -61,7 +62,17 @@ export function contiene(g: Geometria, lon: number, lat: number): boolean {
 export function barrioDe(barrios: ColeccionBarrios, gh: string): Barrio | null {
   const { latitude, longitude } = geohash.decode(gh);
   const f = barrios.features.find((b) => contiene(b.geometry, longitude, latitude));
-  return f ? { nombre: f.properties.name, comuna: f.properties.comuna } : null;
+  return f ? { id: f.properties.id, nombre: f.properties.name, comuna: f.properties.comuna } : null;
+}
+
+/** `barrioDe` con memoria: punto en polígono contra ~115 barrios, una vez por geohash. */
+export function buscadorDeBarrio(barrios: ColeccionBarrios): (gh: string | null) => Barrio | null {
+  const cache = new Map<string, Barrio | null>();
+  return (gh) => {
+    if (!gh) return null;
+    if (!cache.has(gh)) cache.set(gh, barrioDe(barrios, gh));
+    return cache.get(gh)!;
+  };
 }
 
 /** La celda del geohash como polígono: la ubicación real está en algún punto de ese rectángulo. */

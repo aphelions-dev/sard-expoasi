@@ -248,3 +248,32 @@
     z-index: 5;
   }
 }
+
+/* Lo que acaba de llegar o cambió de prioridad se avisa con un destello que se apaga solo. Con
+   movimiento reducido no se anima: queda el contador de nuevos. */
+@keyframes llegada {
+  from {
+    background-color: var(--revisar-surface);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+@keyframes latido {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in oklch, var(--foreground) 45%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+}
+@utility animate-llegada {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: llegada 2.4s ease-out 1;
+  }
+}
+@utility animate-latido {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: latido 1.2s ease-out 3;
+  }
+}

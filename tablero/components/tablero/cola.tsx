@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef } from "react"
-import { Clock, MapPinOff, TriangleAlert, Users } from "lucide-react"
+import { ArrowDown, Clock, MapPinOff, TriangleAlert, Users } from "lucide-react"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
 import type { Incidente } from "@/lib/api/tipos"
@@ -9,6 +9,9 @@ import { FILTROS, agrupar, conteos, filtrar, type Filtro } from "@/lib/cola"
 import { TIPO, haceCuanto } from "@/lib/formato"
 import type { Barrio } from "@/lib/geo"
 import { cn } from "@/lib/utils"
+import type { Zona } from "@/lib/zonas"
+
+import { FiltroZona } from "./filtro-zona"
 
 import { ICONO_TIPO } from "./iconos"
 import { BARRA_PRIORIDAD, EstadoInsignia, Prioridad } from "./insignias"
@@ -22,6 +25,14 @@ interface Props {
   onSeleccion: (id: string) => void
   ahora: number
   barrio: (gh: string | null) => Barrio | null
+  zona: Zona | null
+  onZona: (z: Zona | null) => void
+  zonas: { zona: Zona; total: number; pendientes: number }[]
+  /** Llegaron o cambiaron de prioridad hace unos segundos: destellan. */
+  recientes: Set<string>
+  /** Llegaron desde que el coordinador miró por última vez. */
+  nuevos: string[]
+  onVerNuevos: () => void
 }
 
 /** Cola en filas densas, en el orden que decide la central. Los filtros esconden, no reordenan. */
@@ -34,6 +45,12 @@ export function Cola({
   onSeleccion,
   ahora,
   barrio,
+  zona,
+  onZona,
+  zonas,
+  recientes,
+  nuevos,
+  onVerNuevos,
 }: Props) {
   const lista = filtrar(incidentes, filtro)
   const secciones = agrupar(lista)
@@ -83,13 +100,30 @@ export function Cola({
         ))}
       </div>
 
+      <div className="flex h-8 shrink-0 items-center gap-1 border-b px-1.5">
+        <FiltroZona zona={zona} onZona={onZona} zonas={zonas} />
+        {nuevos.length > 0 && (
+          <button
+            type="button"
+            onClick={onVerNuevos}
+            className="ml-auto flex h-6 shrink-0 animate-latido items-center gap-1 rounded-full bg-foreground px-2 text-[0.6875rem] font-medium text-background"
+            aria-live="polite"
+          >
+            <ArrowDown aria-hidden="true" className="size-3" />
+            {nuevos.length} nuevo{nuevos.length > 1 ? "s" : ""}
+          </button>
+        )}
+      </div>
+
       {lista.length === 0 ? (
         <p className="p-4 text-xs text-muted-foreground">
           {cargando
             ? "Cargando…"
             : incidentes.length
               ? "Ningún incidente con este filtro."
-              : "Todavía no hay incidentes."}
+              : zona
+                ? `Nada en ${zona.nombre}.`
+                : "Todavía no hay incidentes."}
         </p>
       ) : (
         <ScrollArea className="min-h-0 flex-1">
@@ -130,12 +164,14 @@ export function Cola({
                       tercera solo si hay algo fuera de lo normal. El resto, en el panel. */}
                         <button
                           data-fila
+                          data-id={inc.id}
                           aria-current={elegida}
                           onClick={() => onSeleccion(inc.id)}
                           onKeyDown={(e) => teclado(e, i)}
                           title={inc.motivo_orden}
                           className={cn(
                             "relative grid w-full gap-0.5 py-2 pr-2.5 pl-3.5 text-left text-xs transition-colors hover:bg-accent/60 focus-visible:bg-accent focus-visible:outline-none",
+                            recientes.has(inc.id) && "animate-llegada",
                             elegida && "bg-accent",
                             decidido && !elegida && "opacity-60"
                           )}

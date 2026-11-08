@@ -4,12 +4,14 @@
 // locales, así que sin internet se ve igual; las calles de OpenStreetMap son una capa opcional.
 //
 // Jerarquía visual (Du et al. 2021, diseño de mapas de crisis): el mapa base va lo menos saliente
-// posible; los incidentes, lo más. El reporte trae una zona aproximada, no un punto, así que cada
-// incidente es el área de esa zona con el color de su prioridad: un icono haría creer que se sabe
-// el sitio exacto. Hospitales y bomberos (círculos, simbología de la FGDC) van apagados por defecto.
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react"
+// posible; los incidentes, lo más. De lejos, la lectura es por barrio (`barrios-mapa.tsx`): cada
+// barrio con el color de la prioridad más alta que tiene pendiente y cuántos incidentes hay, como
+// agregan los tableros de emergencia por unidad administrativa. Al acercarse aparece la zona de
+// cada incidente (su celda de geohash), porque el reporte trae un área, no un punto: un icono haría
+// creer que se sabe el sitio exacto. Hospitales y bomberos (simbología FGDC) van apagados.
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react"
 import type { StyleSpecification } from "maplibre-gl"
-import { ChevronDown, FireExtinguisher, Maximize2, Minimize2, Scan } from "lucide-react"
+import { ChevronDown, FireExtinguisher, Maximize2, Minimize2, Play, Scan, Square } from "lucide-react"
 
 import "@/lib/maplibre-local" // antes que el mapa: worker local, sin internet
 import { Map, MapControls, MapGeoJSON, MapMarker, MarkerContent, MarkerTooltip, useMap } from "@/components/ui/map"
@@ -17,8 +19,13 @@ import type { Incidente } from "@/lib/api/tipos"
 import { token } from "@/lib/color"
 import { celda, type Barrio, type Geo } from "@/lib/geo"
 import { cn } from "@/lib/utils"
+import { enZona, resumenPorBarrio, type Zona } from "@/lib/zonas"
 
-import { MarcaZona, TarjetaZona, siguienteDeZona } from "./zona-incidentes"
+import { EncuadrarZona, EstadoBarrios, EtiquetasBarrios, Zoom, pinturaBarrios, useReproduccion } from "./barrios-mapa"
+import { MarcaZona, PRECISO, TarjetaZona, siguienteDeZona } from "./zona-incidentes"
+
+/** Desde este zoom se ven las celdas de cada incidente en vez del resumen por barrio. */
+const ZOOM_CELDAS = 14
 
 interface Props {
   geo: Geo
@@ -26,6 +33,8 @@ interface Props {
   seleccion: string | null
   onSeleccion: (id: string) => void
   barrio: (gh: string | null) => Barrio | null
+  zona: Zona | null
+  onZona: (z: Zona | null) => void
   completo: boolean
   onCompleto: (v: boolean) => void
 }
@@ -115,7 +124,7 @@ function centroDe(gh: string): [number, number] {
 /** Una celda por geohash, con la prioridad más alta de sus incidentes: varios incidentes en la
  *  misma celda no deben apilar rellenos hasta volverla opaca. Lo ya decidido o sin noticias
  *  recientes se apaga para que lo pendiente sobresalga. */
-function celdas(grupos: [string, Incidente[]][], seleccion: string | null): GeoJSON.FeatureCollection {
+function celdas(grupos: [string, Incidente[]][], seleccion: string | null, fuera: (gh: string) => boolean): GeoJSON.FeatureCollection {
   const orden = (p: string) => Number(p.slice(1))
   return {
     type: "FeatureCollection",
@@ -125,6 +134,7 @@ function celdas(grupos: [string, Incidente[]][], seleccion: string | null): GeoJ
         prioridad: grupo.map((i) => i.prioridad).sort((a, b) => orden(a) - orden(b))[0],
         sel: grupo.some((i) => i.id === seleccion),
         apagada:
+          fuera(gh) ||
           grupo.every((i) => i.estado === "aprobada" || i.estado === "rechazada") ||
           grupo.every((i) => i.vigencia.sin_noticias_recientes),
       }))
@@ -188,12 +198,22 @@ function Botones({ grupos, completo, onCompleto }: { grupos: [string, Incidente[
   )
 }
 
-export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo, onCompleto }: Props) {
+export function Mapa({ geo, incidentes: todos, seleccion, onSeleccion, barrio, zona, onZona, completo, onCompleto }: Props) {
   const [calles, setCalles] = useState(true)
   const [leyenda, setLeyenda] = useState(false)
   const [lugares, setLugares] = useState(false)
-  const [encima, setEncima] = useState<string | null>(null)
-  const [zona, setZona] = useState<string | null>(null)
+  const [encima, setEncima] = useState<{ id: string; nombre: string } | null>(null)
+  const [celdaEncima, setCeldaEncima] = useState<string | null>(null)
+  const [zoom, setZoom] = useState(12.6)
+  const [destellan, setDestellan] = useState<Set<string>>(() => new Set())
+  const repro = useReproduccion(todos.map((i) => i.hora_unix))
+  // Durante la reproducción, solo lo que ya había llegado a esa hora.
+  const incidentes = useMemo(() => (repro.t === null ? todos : todos.filter((i) => i.hora_unix <= repro.t!)), [todos, repro.t])
+  const resumen = useMemo(() => resumenPorBarrio(incidentes, barrio), [incidentes, barrio])
+  const alCambiar = useCallback((ids: string[]) => {
+    setDestellan(new Set(ids))
+    setTimeout(() => setDestellan(new Set()), 3600)
+  }, [])
 
   // Los tokens dependen de la clase de <html>, que next-themes cambia fuera de React.
   const clase = useSyncExternalStore(observarClase, () => document.documentElement.className, () => "")
@@ -201,15 +221,24 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
   // El tema sale de la misma clase que los colores, para que nunca vayan desfasados.
   const tema = clase.split(" ").includes("dark") ? "dark" : "light"
 
-  const grupos = useMemo(() => porCelda(incidentes), [incidentes])
-  const datos = useMemo(() => celdas(grupos, seleccion), [grupos, seleccion])
+  // De cerca (o con un barrio elegido) se ven todas las celdas; de lejos, solo las que no caen en
+  // ningún barrio (Villamaría, afueras) y los puntos precisos, que el resumen por barrio no muestra.
+  const cerca = zoom >= ZOOM_CELDAS || zona?.tipo === "barrio"
+  const grupos = useMemo(
+    () => porCelda(incidentes).filter(([gh]) => cerca || gh.length >= PRECISO || !barrio(gh)),
+    [incidentes, cerca, barrio],
+  )
+  // Con una zona elegida, las celdas de afuera se apagan como lo ya decidido.
+  const datos = useMemo(() => celdas(grupos, seleccion, (gh) => !enZona(barrio(gh), zona)), [grupos, seleccion, barrio, zona])
   const sinUbicacion = incidentes.filter((i) => !i.geohash).length
   const grupoDe = (gh: string) => grupos.find(([g]) => g === gh)?.[1] ?? null
-  const enZona = zona ? grupoDe(zona) : null
+  const enCelda = celdaEncima ? grupoDe(celdaEncima) : null
+  const enBarrio = encima ? incidentes.filter((i) => barrio(i.geohash)?.id === encima.id) : []
 
   if (!colores) return <div className="h-full bg-mapa-fondo" />
 
   const porPrioridad = ["match", ["get", "prioridad"], "P1", colores.p.P1, "P2", colores.p.P2, "P3", colores.p.P3, colores.p.P4]
+  const pintura = pinturaBarrios(colores)
 
   return (
     <div className="relative h-full bg-mapa-fondo" role="region" aria-label="Mapa de incidentes">
@@ -221,17 +250,29 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
         attributionControl={{ compact: true }}
       >
         <PinturaBase tema={tema} fondo={colores.fondo} calles={calles} />
-        {/* Mapa base: lo menos saliente posible. */}
+        {/* Barrios: fondo apagado, y del color de su prioridad los que tienen incidentes. Clic en un
+            barrio: filtrar por él (otra vez: quitar el filtro). */}
         <MapGeoJSON
           id="barrios"
           data={geo.barrios as GeoJSON.FeatureCollection}
           promoteId="id"
           interactive
-          fillPaint={{ "fill-color": colores.barrio, "fill-opacity": 0.3 }}
-          fillHoverPaint={{ "fill-opacity": 0.55 }}
-          linePaint={{ "line-color": colores.borde, "line-width": 0.6 }}
-          onHover={(e) => setEncima((e?.feature.properties?.name as string | undefined) ?? null)}
+          fillPaint={pintura.fill}
+          fillHoverPaint={pintura.hover}
+          linePaint={pintura.line}
+          onHover={(e) => {
+            const p = e?.feature.properties as { id?: string; name?: string } | undefined
+            setEncima(p?.id && p.name ? { id: p.id, nombre: p.name } : null)
+          }}
+          onClick={(e) => {
+            // Un clic sobre una celda es para elegir el incidente, no el barrio de abajo.
+            const m = e.originalEvent.target
+            if (m.getLayer("geojson-fill-celdas") && m.queryRenderedFeatures(e.originalEvent.point, { layers: ["geojson-fill-celdas"] }).length) return
+            const p = e.feature.properties as { id: string; name: string }
+            onZona(zona?.tipo === "barrio" && zona.id === p.id ? null : { tipo: "barrio", id: p.id, nombre: p.name })
+          }}
         />
+        <EstadoBarrios barrios={geo.barrios} resumen={resumen} zona={zona} onCambio={alCambiar} />
         {/* El incidente es su zona: relleno del color de la prioridad y borde punteado, porque el
             sitio exacto no se sabe; la elegida, con el borde marcado. */}
         <MapGeoJSON
@@ -249,7 +290,7 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
             "line-width": ["case", ["get", "sel"], 2.5, 1.25] as never,
             "line-dasharray": [2, 1.5],
           }}
-          onHover={(e) => setZona((e?.feature.properties?.gh as string | undefined) ?? null)}
+          onHover={(e) => setCeldaEncima((e?.feature.properties?.gh as string | undefined) ?? null)}
           onClick={(e) => {
             const g = grupoDe(e.feature.properties?.gh as string)
             if (g) onSeleccion(siguienteDeZona(g, seleccion))
@@ -287,13 +328,16 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
             </MapMarker>
           )
         })}
-        {/* Cuántos hay en cada zona y si alguno pide revisión, encima de todo. */}
+        {/* De lejos, el nombre y el número de cada barrio; de cerca, cuántos hay en cada celda. */}
+        {!cerca && <EtiquetasBarrios barrios={geo.barrios} resumen={resumen} zona={zona} destellan={destellan} onZona={onZona} />}
         {grupos.map(([gh, grupo]) => (
           <MarcaZona key={gh} gh={gh} grupo={grupo} centro={centroDe(gh)} seleccion={seleccion} onSeleccion={onSeleccion} />
         ))}
         <MapControls position="top-right" />
         <Botones grupos={grupos} completo={completo} onCompleto={onCompleto} />
         <Enfocar incidentes={incidentes} seleccion={seleccion} />
+        <EncuadrarZona barrios={geo.barrios} zona={zona} resumen={resumen} />
+        <Zoom onZoom={setZoom} />
       </Map>
 
       <div className="absolute top-2 left-2 z-10 mr-14 max-w-80 rounded-sm border bg-card/95 text-[0.6875rem] text-muted-foreground shadow-sm">
@@ -307,7 +351,8 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
         </button>
         {leyenda && (
           <div className="space-y-2 border-t px-2.5 py-2">
-            <p>Cada incidente es la zona donde ocurrió, tan grande como la incertidumbre del GPS. Si el GPS fue preciso (~20 m), es un punto con el icono del tipo.</p>
+            <p>De lejos, cada barrio toma el color de lo más grave que tiene por decidir, más intenso cuantos más incidentes tiene. Clic en un barrio: ver solo ese barrio en la cola.</p>
+            <p>De cerca, cada incidente es la zona donde ocurrió, tan grande como la incertidumbre del GPS. Si el GPS fue preciso (~20 m), es un punto con el icono del tipo.</p>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               {(["P1", "P2", "P3", "P4"] as const).map((p) => (
                 <span key={p} className="flex items-center gap-1 font-mono">
@@ -367,16 +412,49 @@ export function Mapa({ geo, incidentes, seleccion, onSeleccion, barrio, completo
         )}
       </div>
 
-      {zona && enZona ? (
-        <div className="pointer-events-none absolute bottom-2 left-2 z-10">
-          <TarjetaZona grupo={enZona} barrio={barrio(zona)?.nombre ?? null} seleccion={seleccion} />
+      {celdaEncima && enCelda ? (
+        <div className="pointer-events-none absolute bottom-12 left-2 z-10">
+          <TarjetaZona grupo={enCelda} barrio={barrio(celdaEncima)?.nombre ?? null} seleccion={seleccion} />
+        </div>
+      ) : encima && enBarrio.length > 0 ? (
+        <div className="pointer-events-none absolute bottom-12 left-2 z-10">
+          <TarjetaZona
+            grupo={enBarrio}
+            barrio={encima.nombre}
+            seleccion={seleccion}
+            pie={zona?.tipo === "barrio" && zona.id === encima.id ? "Clic: ver todas las zonas." : "Clic: ver solo este barrio en la cola."}
+          />
         </div>
       ) : (
         encima && (
-          <div className="pointer-events-none absolute bottom-2 left-2 z-10 rounded-sm border bg-card/95 px-2 py-1 text-xs font-medium">
-            {encima}
+          <div className="pointer-events-none absolute bottom-12 left-2 z-10 rounded-sm border bg-card/95 px-2 py-1 text-xs font-medium">
+            {encima.nombre} <span className="font-normal text-muted-foreground">· sin incidentes</span>
           </div>
         )
+      )}
+
+      {/* Reproducir cómo fueron llegando: la sala ve en segundos cómo creció la emergencia. */}
+      {repro.puede && (
+        <div className="absolute bottom-2 left-2 z-10 flex items-center gap-2 rounded-md border bg-card/95 py-1 pr-2.5 pl-1 text-[0.6875rem] shadow-sm">
+          <button
+            type="button"
+            onClick={repro.t === null ? repro.empezar : repro.parar}
+            className="flex h-6 items-center gap-1 rounded-sm px-2 font-medium hover:bg-accent"
+          >
+            {repro.t === null ? <Play aria-hidden="true" className="size-3" /> : <Square aria-hidden="true" className="size-3" />}
+            {repro.t === null ? "Reproducir llegadas" : "Detener"}
+          </button>
+          {repro.t !== null && (
+            <>
+              <span className="h-1 w-24 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                <span className="block h-full bg-foreground" style={{ width: `${repro.progreso * 100}%` }} />
+              </span>
+              <span className="font-mono tabular-nums">
+                {new Date(repro.t * 1000).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })} · {incidentes.length}
+              </span>
+            </>
+          )}
+        </div>
       )}
       {sinUbicacion > 0 && (
         <div className="absolute right-2 bottom-10 z-10 rounded-sm border border-p2/40 bg-p2-surface px-2 py-1 text-[0.6875rem] text-p2">

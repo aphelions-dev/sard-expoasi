@@ -8,7 +8,7 @@ const lugares = leer<ColeccionLugares>("lugares.geojson");
 
 describe("barrioDe", () => {
   it("nombra el barrio oficial de la celda", () => {
-    expect(barrioDe(barrios, "d2fkcd")).toEqual({ nombre: "Centro", comuna: "03" });
+    expect(barrioDe(barrios, "d2fkcd")).toEqual({ id: "CENTRO", nombre: "Centro", comuna: "03" });
     expect(barrioDe(barrios, "d2fkc7")?.nombre).toBe("Chipre");
   });
 

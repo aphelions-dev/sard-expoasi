@@ -4,6 +4,18 @@ Integrantes: Persona 1 = **@samcastroca** (app y malla), Persona 2 = **@lufigir*
 Persona 3 = **@CrArenas** (tablero, simulador y pruebas). Dueños por carpeta en
 `.github/CODEOWNERS`; reglas para Claude Code en `CLAUDE.md`.
 
+## Qué hace cada uno
+
+| Integrante | Qué hace | Empieza por | Tareas |
+|------------|----------|-------------|--------|
+| **@samcastroca** (P1) · rama `p1/app-malla` | App Android sobre el fork de bitchat: formulario sin internet, prioridad por reglas, almacenamiento local, cola de reenvío con `SACK` y pasarela con failover A/B | [`app/README.md`](../app/README.md) · [ficha de comunicación](fichas-agentes/comunicacion.md) | [Issues abiertos](https://github.com/aphelions-dev/sard-expoasi/issues?q=is%3Aissue%20is%3Aopen%20assignee%3Asamcastroca) |
+| **@lufigir** (P2) · rama `p2/central-agentes` | Central (API, registro de eventos solo-agregar, central B) y agentes de recepción, triaje, correlación, coordinación y resiliencia | [`central/README.md`](../central/README.md) · [arquitectura](arquitectura.md) | [Issues abiertos](https://github.com/aphelions-dev/sard-expoasi/issues?q=is%3Aissue%20is%3Aopen%20assignee%3Alufigir) |
+| **@CrArenas** (P3) · rama `p3/tablero-pruebas` | Tablero del coordinador, simulador de la malla (plan B de la demo), reportes sintéticos, pruebas con métricas, README y pitch | [`tablero/README.md`](../tablero/README.md) · [`simulador/README.md`](../simulador/README.md) · [resultados](../pruebas/resultados/README.md) | [Issues abiertos](https://github.com/aphelions-dev/sard-expoasi/issues?q=is%3Aissue%20is%3Aopen%20assignee%3ACrArenas) |
+
+Las tareas compartidas (recorrido integrado, ensayos de la demo, revisión del contrato) aparecen en
+el filtro de cada uno. Tareas por hito: [`plan.md`](plan.md). Índice de todos los documentos: la
+sección «Documentación» del [`README.md`](../README.md#documentación).
+
 ## Cómo empezar
 
 1. Leer el `README.md`, `CLAUDE.md` y `contracts/protocolo-sard1.md`.

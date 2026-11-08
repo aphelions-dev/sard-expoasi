@@ -78,21 +78,11 @@ Uso responsable de la IA: `docs/uso-responsable-ia.md`. Riesgos y planes B: `doc
 - Si la central A cae justo después de confirmar un reporte, la B lo recibe cuando la A vuelve (#49).
 - Todos los datos son sintéticos.
 
-## Equipo: qué hace cada uno
+## Equipo
 
-Antes de tocar nada, cada uno lee [`CLAUDE.md`](CLAUDE.md),
-[`contracts/protocolo-sard1.md`](contracts/protocolo-sard1.md) y el README y el `CLAUDE.md` de su
-carpeta. Comandos para clonar, cambiarse de rama y abrir Claude Code, más ramas, commits e issues:
-[`docs/equipo.md`](docs/equipo.md). Hitos y tareas: [`docs/plan.md`](docs/plan.md).
-
-| Integrante | Qué hace | Empieza por | Tareas |
-|------------|----------|-------------|--------|
-| **@samcastroca** (P1) · rama `p1/app-malla` | App Android sobre el fork de bitchat: formulario sin internet, prioridad por reglas, almacenamiento local, cola de reenvío con `SACK` y pasarela con failover A/B | [`app/README.md`](app/README.md) · [ficha de comunicación](docs/fichas-agentes/comunicacion.md) | [Issues abiertos](https://github.com/aphelions-dev/sard-expoasi/issues?q=is%3Aissue%20is%3Aopen%20assignee%3Asamcastroca) |
-| **@lufigir** (P2) · rama `p2/central-agentes` | Central (API, registro de eventos solo-agregar, central B) y agentes de recepción, triaje, correlación, coordinación y resiliencia | [`central/README.md`](central/README.md) · [arquitectura](docs/arquitectura.md) | [Issues abiertos](https://github.com/aphelions-dev/sard-expoasi/issues?q=is%3Aissue%20is%3Aopen%20assignee%3Alufigir) |
-| **@CrArenas** (P3) · rama `p3/tablero-pruebas` | Tablero del coordinador, simulador de la malla (plan B de la demo), reportes sintéticos, pruebas con métricas, README y pitch | [`tablero/README.md`](tablero/README.md) · [`simulador/README.md`](simulador/README.md) · [resultados](pruebas/resultados/README.md) | [Issues abiertos](https://github.com/aphelions-dev/sard-expoasi/issues?q=is%3Aissue%20is%3Aopen%20assignee%3ACrArenas) |
-
-Las tareas compartidas (recorrido integrado, ensayos de la demo, revisión del contrato) aparecen en
-el filtro de cada uno.
+Persona 1 **@samcastroca** (app y malla) · Persona 2 **@lufigir** (central y agentes) · Persona 3
+**@CrArenas** (tablero, simulador y pruebas). Qué hace cada uno y cómo trabajamos (ramas, commits,
+issues): [`docs/equipo.md`](docs/equipo.md).
 
 ## Documentación
 

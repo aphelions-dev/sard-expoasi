@@ -111,7 +111,7 @@ function Fila({ f, nodo, coordinador, ahora, onDeclarado }: { f: FilaRecurso; no
           </p>
         </>
       ) : (
-        <p className="text-p2">Sin declarar: la coordinación propone sin saber si hay.</p>
+        <p className="text-p2">Sin declarar: el sistema sugiere sin saber si hay.</p>
       )}
       <p className={cn("flex items-center gap-1", faltan > 0 ? "text-p1" : "text-muted-foreground")}>
         {faltan > 0 && <TriangleAlert className="size-3" aria-hidden="true" />}

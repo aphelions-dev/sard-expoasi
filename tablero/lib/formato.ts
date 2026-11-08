@@ -24,16 +24,10 @@ export const FUENTE: Record<Fuente, string> = {
 };
 
 export const ESTADO: Record<Estado, string> = {
-  sin_propuesta: "Sin propuesta",
+  sin_propuesta: "Sin sugerencia",
   pendiente: "Pendiente",
   aprobada: "Aprobada",
   rechazada: "Rechazada",
-};
-
-export const ORIGEN: Record<"formulario" | "texto" | "jev", string> = {
-  formulario: "Formulario",
-  texto: "Texto",
-  jev: "Jev (IA)",
 };
 
 /** "hace 5 min", "hace 2 h 10 min". `ahora` en segundos unix. */

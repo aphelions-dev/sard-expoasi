@@ -5,9 +5,9 @@ export type Filtro = "todos" | "urgentes" | "revisar" | "resto";
 
 export const FILTROS: { id: Filtro; etiqueta: string }[] = [
   { id: "todos", etiqueta: "Todos" },
-  { id: "urgentes", etiqueta: "P1–P2" },
+  { id: "urgentes", etiqueta: "Urgentes" },
   { id: "revisar", etiqueta: "Revisar" },
-  { id: "resto", etiqueta: "P3–P4" },
+  { id: "resto", etiqueta: "Menos urgentes" },
 ];
 
 const CUMPLE: Record<Filtro, (i: Incidente) => boolean> = {

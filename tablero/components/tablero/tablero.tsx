@@ -141,9 +141,9 @@ export function Tablero() {
         <TabsTrigger value="incidente" className="flex-none px-2">Incidente</TabsTrigger>
         <TabsTrigger value="recursos" className="flex-none px-2">Recursos</TabsTrigger>
         <TabsTrigger value="rechazados" className="flex-none px-2">
-          Rechazados
+          Incompletos
           {sinRecuperar > 0 && (
-            <span className="rounded-sm bg-revisar-surface px-1 font-mono text-[0.625rem] text-revisar" aria-label={`${sinRecuperar} sin recuperar`}>
+            <span className="rounded-sm bg-revisar-surface px-1 font-mono text-[0.625rem] text-revisar" aria-label={`${sinRecuperar} pendientes`}>
               {sinRecuperar}
             </span>
           )}
@@ -166,7 +166,7 @@ export function Tablero() {
         ) : (
           <p className="p-4 text-xs text-muted-foreground">
             {perdido
-              ? "El incidente que tenías abierto ya no está en la cola (la central pudo unirlo con otro). Elige uno de la cola."
+              ? "El incidente que tenías abierto ya no está en la cola (pudo unirse con otro que habla de lo mismo). Elige uno de la cola."
               : lista.datos === null && !lista.error
                 ? "Cargando…"
                 : "Elige un incidente de la cola."}
@@ -205,12 +205,12 @@ export function Tablero() {
 
       {saludes.datos && !activa && (
         <p role="alert" className="shrink-0 border-b border-p1/40 bg-p1-surface px-3 py-1.5 text-xs text-p1">
-          Ninguna central responde. Lo último que se mostró puede estar desactualizado.
+          No hay conexión con el sistema. Lo que ves es lo último que llegó y puede estar desactualizado.
         </p>
       )}
       {activa === "B" && (
         <p role="status" className="shrink-0 border-b border-p2/40 bg-p2-surface px-3 py-1.5 text-xs text-p2">
-          La central A no responde: leyendo y decidiendo en la central B.
+          El sistema principal no responde: estás trabajando con el de respaldo. Puedes seguir decidiendo.
         </p>
       )}
 
@@ -250,7 +250,7 @@ export function Tablero() {
               [
                 ["cola", "Cola"],
                 ["mapa", "Mapa"],
-                ["panel", vista === "incidente" ? "Incidente" : vista === "recursos" ? "Recursos" : "Rechazados"],
+                ["panel", vista === "incidente" ? "Incidente" : vista === "recursos" ? "Recursos" : "Incompletos"],
               ] as const
             ).map(([z, etiqueta]) => (
               <button

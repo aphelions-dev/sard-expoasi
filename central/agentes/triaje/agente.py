@@ -33,7 +33,8 @@ def senales_jev(nouls: dict[str, float], si: float = jev_mod.SI) -> list[reglas.
 def triar(reporte: dict[str, Any], cliente: jev_mod.Jev) -> dict[str, Any]:
     senales = reglas.senales(reporte)
     p_reglas = mas_alta(*(s.prioridad for s in senales))
-    revision: list[str] = []
+    revision = [f"posible negación de «{w}»: la prioridad no baja, confirmar si aplica"
+                for w in reglas.posibles_negaciones(reporte["texto"])]
     datos: dict[str, Any] = {"prioridad_reglas": p_reglas, "prioridad_jev": None}
 
     if not reporte["texto"].strip():

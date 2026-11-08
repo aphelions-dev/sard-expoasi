@@ -129,3 +129,20 @@ def test_error_se_registra_y_se_reintenta(conn):
     errores = eventos.leer(conn, tipos=["agente_error"])
     assert len(errores) == 1  # se registra una vez, no en cada intento
     assert correr_triaje(conn, JevFalso()) == 1  # cuando el agente funciona, lo retoma
+
+
+def test_posible_negacion_avisa_sin_bajar_la_prioridad():
+    r = reporte("SARD1|a-1|P3|VIA|0|000||1|la vía está bloqueada por un derrumbe, no hay carros atrapados")
+    out = agente.triar(r, JevFalso(falla=True))
+    assert out["prioridad"] == "P1" and out["revisar"]
+    assert any("posible negación" in m for m in out["motivos_revision"])
+
+
+def test_negacion_solo_en_la_misma_frase_y_cerca():
+    neg = reglas.posibles_negaciones
+    assert neg("ya apagamos el fuego de la cocina")
+    assert neg("no hay nadie que ayude, están atrapados") == []
+    assert neg("no hay luz y hay dos personas atrapadas") == []
+    # «ya no respira» es la negación que hace grave el reporte: no se avisa.
+    assert neg("mi papá ya no respira") == []
+    assert neg("se cayó la casa con gente atrapada") == []

@@ -1,7 +1,7 @@
 # Resultados de las pruebas (#16)
 
 Corridas del 7 de noviembre de 2026. E1–E4 con el simulador y la central simulada, 10 semillas por
-caso (reproducibles). E4 (parte central), E5 y E7 contra las centrales A y B reales, levantadas con
+caso (reproducibles), con los tiempos de reintento y el vencimiento a 600 s del contrato (#58). E4 (parte central), E5 y E7 contra las centrales A y B reales, levantadas con
 bases nuevas y sin Jev.
 
 ```bash
@@ -26,9 +26,11 @@ PYTHONUTF8=1 uv run python -m simulador escenarios-central --env-file ../.env   
 1. **La densidad manda más que la pérdida.** Con 50 % de pérdida los reintentos igual entregan todo
    (E1), pero un celular sin camino a una pasarela no entrega nunca (E2). La métrica "celulares con
    camino a una pasarela" lo explica: en 30 celulares a 50 m, solo 8,9 de 30 lo tienen.
-2. **Los celulares aislados se quedan sin batería reintentando.** En E2 (30 celulares a 50 m), 9,9 de
-   30 se apagan: reenvían cada 60 s un reporte que nunca recibirá `SACK`. Para P1: un tope de
-   reintentos o el vencimiento (hoy "por definir") ahorrarían batería sin borrar nada.
+2. **Los celulares aislados se quedaban sin batería reintentando.** Sin vencimiento, en E2 (30
+   celulares a 50 m) 9,9 de 30 se apagaban reenviando cada 60 s un reporte que nunca recibiría
+   `SACK`. **Resuelto en el contrato** (#58, regla 5: el reporte vence a los 600 s sin borrarse):
+   con el vencimiento, los apagados bajan a 3,3 de 30 y los mensajes emitidos un 35 % (7.183 →
+   4.676); con 60 celulares a 30 m, de 4,0 a 0,6. Ninguna entrega cambia en E1–E4.
 3. **La prioridad tiene un costo en P4.** En E3, P4 espera más y en ese tiempo algunos celulares que
    lo guardaban se apagan: llega el 94 % de P4 con prioridad contra el 97,6 % en orden de llegada.
    Ninguno se descarta por la cola; se pierden con la batería.
@@ -44,7 +46,7 @@ PYTHONUTF8=1 uv run python -m simulador escenarios-central --env-file ../.env   
 
 | Prueba | Carga | Resultado |
 |--------|-------|-----------|
-| E3, cola llena | 200 reportes en 60 s, 1 mensaje/s por celular, 10 semillas | Entrega 98,4 % (peor 95 %); mediana P1 6,3 s, P4 77 s; ningún reporte descartado por la cola, los perdidos se fueron con celulares sin batería (7,2 de 30) |
+| E3, cola llena | 200 reportes en 60 s, 1 mensaje/s por celular, 10 semillas | Entrega 98,4 % (peor 95 %); mediana P1 6,3 s, P4 77 s; ningún reporte descartado por la cola, los perdidos se fueron con celulares sin batería (6,7 de 30) |
 | E1, pérdida extrema | 50 % de pérdida por salto | Entrega 99,8 %; el p95 de P1 en el peor caso sube a 63 s |
 | E5, caída en carga | 60 reportes en 300 s con la central A apagada en el segundo 120 | 60/60 entregados, 0 perdidos |
 | Recorrido de la demo | Ráfaga de 20 reportes y la central A apagada en plena carga (`python -m simulador recorrido`) | 23/23 entregados y confirmados en dos ensayos; A y B coinciden al volver la A |
@@ -59,7 +61,7 @@ Lo que las pruebas encontraron en el sistema, con su issue:
 | «gas» se busca como fragmento: «¿lle**gas**te bien?» sale P1 | Reglas de triaje y palabras críticas | #43 |
 | Las reglas no entienden negaciones («no hay carros atrapados» sale P1) ni variantes («sangrar mucho», «atrapda», «aplastada», «ahogando») | Reglas de triaje | #43 |
 | La central da `SACK` antes de que la otra central copie el reporte: 1 o 2 reportes quedan solo en la A si cae en ese segundo | Central, sincronización | #49 |
-| Un celular sin camino a la pasarela reintenta para siempre y se apaga por batería | Cola de la app (tiempos por definir) | #50 |
+| Un celular sin camino a la pasarela reintentaba para siempre y se apagaba por batería | Cola de la app | #50; resuelto en el contrato (#58, vencimiento a 600 s) |
 | Sin Jev, la correlación junta reportes distintos con el mismo geohash y tipo (un ascensor y un colegio) | Correlación | Anotado en #44 |
 | Los geohash de los ejemplos del contrato caen en Cali | Contrato | #46 |
 | `evidencia[].rutas` llega como número; el contrato lo describe como la lista de pasarelas | API de la central | Anotado en #44 |
@@ -80,6 +82,8 @@ corrida base (área demasiado grande, la pasarela aislada).
 
 - El simulador es un modelo: alcance fijo, pérdida independiente por mensaje, celulares quietos y un
   consumo de batería supuesto (`simulador/README.md`). No reemplaza la prueba con celulares.
+- La reactivación de un reporte vencido al aparecer un vecino nuevo (contrato, regla 5) no se mide:
+  con los celulares quietos, un celular aislado nunca gana camino. Se confirma con la app en #1.
 - E4 (parte central), E5 y E7 dependen del reloj real y no son reproducibles al 100 %: el tamaño de la
   ventana del hallazgo 4 cambia entre corridas.
 - E7 usa la central sin Jev; E6 queda pendiente de la clave.

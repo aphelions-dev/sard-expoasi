@@ -35,7 +35,7 @@ class Parametros:
     espera_base_s: float = 2.0     # espera creciente: 2, 4, 8… s
     espera_tope_s: float = 60.0
     variacion: float = 0.2         # ±20 % al azar para que no reintenten todos a la vez
-    vence_s: int | None = None     # por definir (P1): None = nunca vence
+    vence_s: int | None = 600      # contrato, regla 5: vence a los 600 s de su hora_unix; None = nunca
     sin_gps: float = 0.1
     hora_base: int = 1786338000    # 10 de agosto de 2026 (el sismo de las bases)
     caida: tuple[int, int] | None = None  # (desde, hasta) s: la central no responde

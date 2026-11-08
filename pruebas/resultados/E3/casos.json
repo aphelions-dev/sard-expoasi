@@ -18,7 +18,7 @@
    "espera_base_s": 2.0,
    "espera_tope_s": 60.0,
    "variacion": 0.2,
-   "vence_s": null,
+   "vence_s": 600,
    "sin_gps": 0.1,
    "hora_base": 1786338000,
    "caida": null,
@@ -74,9 +74,9 @@
    "saltos_prom": 2.84,
    "llegadas_duplicadas_prom": 0,
    "un_reporte_por_id": true,
-   "nodos_apagados_prom": 7.2,
+   "nodos_apagados_prom": 6.7,
    "conectados_a_pasarela_prom": 29.9,
-   "emitidos_prom": 9246.1
+   "emitidos_prom": 9235.9
   },
   "por_semilla": [
    {
@@ -543,7 +543,7 @@
     "entregados_central": 194,
     "tasa_entrega": 0.97,
     "confirmados_reportante": 194,
-    "vencidos": 0,
+    "vencidos": 6,
     "latencia_por_prioridad": {
      "P1": {
       "creados": 52,
@@ -579,15 +579,15 @@
     "max_llegadas_por_id": 1,
     "reportes_creados_en_central_por_id": 1,
     "emitidos": {
-     "reportes": 1840,
+     "reportes": 1738,
      "sacks": 5643,
-     "bytes": 241810
+     "bytes": 232690
     },
     "subidas_fallidas": 0,
-    "nodos_apagados": 7,
+    "nodos_apagados": 2,
     "nodos_sin_vecinos": 1,
     "nodos_con_camino_a_pasarela": 29,
-    "segundos_simulados": 1800
+    "segundos_simulados": 655
    }
   ]
  },
@@ -610,7 +610,7 @@
    "espera_base_s": 2.0,
    "espera_tope_s": 60.0,
    "variacion": 0.2,
-   "vence_s": null,
+   "vence_s": 600,
    "sin_gps": 0.1,
    "hora_base": 1786338000,
    "caida": null,
@@ -666,9 +666,9 @@
    "saltos_prom": 2.81,
    "llegadas_duplicadas_prom": 0,
    "un_reporte_por_id": true,
-   "nodos_apagados_prom": 6.8,
+   "nodos_apagados_prom": 6.3,
    "conectados_a_pasarela_prom": 29.9,
-   "emitidos_prom": 9199.1
+   "emitidos_prom": 9189.4
   },
   "por_semilla": [
    {
@@ -1135,7 +1135,7 @@
     "entregados_central": 192,
     "tasa_entrega": 0.96,
     "confirmados_reportante": 192,
-    "vencidos": 0,
+    "vencidos": 8,
     "latencia_por_prioridad": {
      "P1": {
       "creados": 54,
@@ -1171,15 +1171,15 @@
     "max_llegadas_por_id": 1,
     "reportes_creados_en_central_por_id": 1,
     "emitidos": {
-     "reportes": 1732,
+     "reportes": 1635,
      "sacks": 5602,
-     "bytes": 225589
+     "bytes": 215401
     },
     "subidas_fallidas": 0,
-    "nodos_apagados": 7,
+    "nodos_apagados": 2,
     "nodos_sin_vecinos": 1,
     "nodos_con_camino_a_pasarela": 29,
-    "segundos_simulados": 1800
+    "segundos_simulados": 659
    }
   ]
  }

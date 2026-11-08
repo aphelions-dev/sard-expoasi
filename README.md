@@ -38,7 +38,7 @@ y recuperación. Sin `JEV_API_KEY` el triaje corre solo con reglas; con ella, co
 | 2 | Código fuente | Este repo; cómo instalar y correr cada parte en `central/README.md`, `tablero/README.md` y `simulador/README.md` | Listo |
 | 3 | Documento de arquitectura | `docs/arquitectura.md`, decisiones en `docs/decisiones/` | Listo |
 | 4 | Fichas de agentes | `docs/fichas-agentes/` | Listo; la de comunicación (app) tiene campos por definir |
-| 5 | Protocolo de comunicación | `contracts/protocolo-sard1.md`, `contracts/api-central.md`, ejemplos en `contracts/ejemplos/` | Listo; por definir con la app: largo máximo del texto, vencimiento y tiempos de reintento |
+| 5 | Protocolo de comunicación | `contracts/protocolo-sard1.md`, `contracts/api-central.md`, ejemplos en `contracts/ejemplos/` | Listo; por definir con la app: largo máximo del texto y cómo detecta un vecino nuevo |
 | 6 | Resultados de pruebas | `pruebas/resultados/README.md` | E1–E5 y E7 con métricas, estrés, errores observados y limitaciones. E6 (triaje con Jev) pendiente de la clave |
 | 7 | Pitch y demostración | `docs/pitch/` | Presentación v1 (el PDF se agrega al aprobarla) y recorrido de 8 pasos ensayado con una condición adversa. Video de respaldo pendiente |
 

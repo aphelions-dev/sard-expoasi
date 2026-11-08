@@ -1,0 +1,1778 @@
+[
+ {
+  "caso": "1 pasarela",
+  "parametros": {
+   "nodos": 30,
+   "pasarelas": 1,
+   "lado_m": 150.0,
+   "alcance_m": 50.0,
+   "perdida": 0.1,
+   "reportes": 40,
+   "ventana_s": 600,
+   "duracion_s": 1800,
+   "capacidad": 4,
+   "bateria_min": 5.0,
+   "bateria_max": 20.0,
+   "gasto_reposo": 0.002,
+   "gasto_envio": 0.02,
+   "espera_base_s": 2.0,
+   "espera_tope_s": 60.0,
+   "variacion": 0.2,
+   "vence_s": 600,
+   "sin_gps": 0.1,
+   "hora_base": 1786338000,
+   "caida": null,
+   "velocidad": 0.0,
+   "prefijo": "n",
+   "por_prioridad": true
+  },
+  "semillas": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10
+  ],
+  "agregado": {
+   "tasa_entrega": {
+    "prom": 0.9975,
+    "peor": 0.975,
+    "mejor": 1.0
+   },
+   "confirmados_reportante": 0.9975,
+   "latencia": {
+    "P1": {
+     "creados": 118,
+     "entregados": 118,
+     "p50_prom_s": 2.8,
+     "p95_peor_s": 7
+    },
+    "P2": {
+     "creados": 109,
+     "entregados": 108,
+     "p50_prom_s": 2.4,
+     "p95_peor_s": 6
+    },
+    "P3": {
+     "creados": 93,
+     "entregados": 93,
+     "p50_prom_s": 3,
+     "p95_peor_s": 8
+    },
+    "P4": {
+     "creados": 80,
+     "entregados": 80,
+     "p50_prom_s": 2.7,
+     "p95_peor_s": 7
+    }
+   },
+   "saltos_prom": 2.79,
+   "llegadas_duplicadas_prom": 0,
+   "un_reporte_por_id": true,
+   "nodos_apagados_prom": 0,
+   "conectados_a_pasarela_prom": 29.9,
+   "emitidos_prom": 2182.3
+  },
+  "por_semilla": [
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 13,
+      "entregados": 13,
+      "p50_s": 2,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P2": {
+      "creados": 11,
+      "entregados": 11,
+      "p50_s": 2,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P3": {
+      "creados": 8,
+      "entregados": 8,
+      "p50_s": 3,
+      "p95_s": 5,
+      "max_s": 5
+     },
+     "P4": {
+      "creados": 8,
+      "entregados": 8,
+      "p50_s": 3,
+      "p95_s": 5,
+      "max_s": 5
+     }
+    },
+    "saltos_promedio": 2.77,
+    "llegadas_duplicadas": 0,
+    "max_llegadas_por_id": 1,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 1008,
+     "sacks": 1192,
+     "bytes": 113392
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 600
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 15,
+      "entregados": 15,
+      "p50_s": 4,
+      "p95_s": 5,
+      "max_s": 5
+     },
+     "P2": {
+      "creados": 8,
+      "entregados": 8,
+      "p50_s": 4,
+      "p95_s": 6,
+      "max_s": 6
+     },
+     "P3": {
+      "creados": 8,
+      "entregados": 8,
+      "p50_s": 3,
+      "p95_s": 5,
+      "max_s": 5
+     },
+     "P4": {
+      "creados": 9,
+      "entregados": 9,
+      "p50_s": 3,
+      "p95_s": 5,
+      "max_s": 5
+     }
+    },
+    "saltos_promedio": 3.4,
+    "llegadas_duplicadas": 0,
+    "max_llegadas_por_id": 1,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 1413,
+     "sacks": 1194,
+     "bytes": 152951
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 540
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 9,
+      "entregados": 9,
+      "p50_s": 3,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P2": {
+      "creados": 14,
+      "entregados": 14,
+      "p50_s": 2,
+      "p95_s": 6,
+      "max_s": 6
+     },
+     "P3": {
+      "creados": 9,
+      "entregados": 9,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P4": {
+      "creados": 8,
+      "entregados": 8,
+      "p50_s": 2,
+      "p95_s": 4,
+      "max_s": 4
+     }
+    },
+    "saltos_promedio": 2.33,
+    "llegadas_duplicadas": 0,
+    "max_llegadas_por_id": 1,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 651,
+     "sacks": 1191,
+     "bytes": 77585
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 594
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 20,
+      "entregados": 20,
+      "p50_s": 4,
+      "p95_s": 5,
+      "max_s": 5
+     },
+     "P2": {
+      "creados": 10,
+      "entregados": 10,
+      "p50_s": 3,
+      "p95_s": 5,
+      "max_s": 5
+     },
+     "P3": {
+      "creados": 3,
+      "entregados": 3,
+      "p50_s": 5,
+      "p95_s": 6,
+      "max_s": 6
+     },
+     "P4": {
+      "creados": 7,
+      "entregados": 7,
+      "p50_s": 4,
+      "p95_s": 5,
+      "max_s": 5
+     }
+    },
+    "saltos_promedio": 3.83,
+    "llegadas_duplicadas": 0,
+    "max_llegadas_por_id": 1,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 1659,
+     "sacks": 1200,
+     "bytes": 174525
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 604
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 12,
+      "entregados": 12,
+      "p50_s": 2,
+      "p95_s": 7,
+      "max_s": 7
+     },
+     "P2": {
+      "creados": 14,
+      "entregados": 14,
+      "p50_s": 3,
+      "p95_s": 6,
+      "max_s": 6
+     },
+     "P3": {
+      "creados": 10,
+      "entregados": 10,
+      "p50_s": 3,
+      "p95_s": 5,
+      "max_s": 5
+     },
+     "P4": {
+      "creados": 4,
+      "entregados": 4,
+      "p50_s": 3,
+      "p95_s": 6,
+      "max_s": 6
+     }
+    },
+    "saltos_promedio": 3.02,
+    "llegadas_duplicadas": 0,
+    "max_llegadas_por_id": 1,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 931,
+     "sacks": 1199,
+     "bytes": 108190
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 581
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 9,
+      "entregados": 9,
+      "p50_s": 2,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P2": {
+      "creados": 10,
+      "entregados": 10,
+      "p50_s": 2,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P3": {
+      "creados": 7,
+      "entregados": 7,
+      "p50_s": 4,
+      "p95_s": 6,
+      "max_s": 6
+     },
+     "P4": {
+      "creados": 14,
+      "entregados": 14,
+      "p50_s": 3,
+      "p95_s": 5,
+      "max_s": 5
+     }
+    },
+    "saltos_promedio": 2.85,
+    "llegadas_duplicadas": 0,
+    "max_llegadas_por_id": 1,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 900,
+     "sacks": 1205,
+     "bytes": 101595
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 579
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 9,
+      "entregados": 9,
+      "p50_s": 3,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P2": {
+      "creados": 12,
+      "entregados": 12,
+      "p50_s": 2,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P3": {
+      "creados": 12,
+      "entregados": 12,
+      "p50_s": 3,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P4": {
+      "creados": 7,
+      "entregados": 7,
+      "p50_s": 2,
+      "p95_s": 4,
+      "max_s": 4
+     }
+    },
+    "saltos_promedio": 2.4,
+    "llegadas_duplicadas": 0,
+    "max_llegadas_por_id": 1,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 894,
+     "sacks": 1190,
+     "bytes": 101301
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 581
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 11,
+      "entregados": 11,
+      "p50_s": 4,
+      "p95_s": 7,
+      "max_s": 7
+     },
+     "P2": {
+      "creados": 10,
+      "entregados": 10,
+      "p50_s": 3,
+      "p95_s": 5,
+      "max_s": 5
+     },
+     "P3": {
+      "creados": 12,
+      "entregados": 12,
+      "p50_s": 4,
+      "p95_s": 8,
+      "max_s": 8
+     },
+     "P4": {
+      "creados": 7,
+      "entregados": 7,
+      "p50_s": 3,
+      "p95_s": 7,
+      "max_s": 7
+     }
+    },
+    "saltos_promedio": 3.73,
+    "llegadas_duplicadas": 0,
+    "max_llegadas_por_id": 1,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 1529,
+     "sacks": 1209,
+     "bytes": 164530
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 600
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 11,
+      "entregados": 11,
+      "p50_s": 2,
+      "p95_s": 6,
+      "max_s": 6
+     },
+     "P2": {
+      "creados": 11,
+      "entregados": 11,
+      "p50_s": 2,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P3": {
+      "creados": 12,
+      "entregados": 12,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P4": {
+      "creados": 6,
+      "entregados": 6,
+      "p50_s": 2,
+      "p95_s": 4,
+      "max_s": 4
+     }
+    },
+    "saltos_promedio": 2.02,
+    "llegadas_duplicadas": 0,
+    "max_llegadas_por_id": 1,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 513,
+     "sacks": 1195,
+     "bytes": 62786
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 581
+   },
+   {
+    "creados": 40,
+    "entregados_central": 39,
+    "tasa_entrega": 0.975,
+    "confirmados_reportante": 39,
+    "vencidos": 1,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 9,
+      "entregados": 9,
+      "p50_s": 2,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P2": {
+      "creados": 9,
+      "entregados": 8,
+      "p50_s": 1,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P3": {
+      "creados": 12,
+      "entregados": 12,
+      "p50_s": 1,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P4": {
+      "creados": 10,
+      "entregados": 10,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     }
+    },
+    "saltos_promedio": 1.59,
+    "llegadas_duplicadas": 0,
+    "max_llegadas_por_id": 1,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 416,
+     "sacks": 1134,
+     "bytes": 51938
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 1,
+    "nodos_con_camino_a_pasarela": 29,
+    "segundos_simulados": 1173
+   }
+  ]
+ },
+ {
+  "caso": "2 pasarelas",
+  "parametros": {
+   "nodos": 30,
+   "pasarelas": 2,
+   "lado_m": 150.0,
+   "alcance_m": 50.0,
+   "perdida": 0.1,
+   "reportes": 40,
+   "ventana_s": 600,
+   "duracion_s": 1800,
+   "capacidad": 4,
+   "bateria_min": 5.0,
+   "bateria_max": 20.0,
+   "gasto_reposo": 0.002,
+   "gasto_envio": 0.02,
+   "espera_base_s": 2.0,
+   "espera_tope_s": 60.0,
+   "variacion": 0.2,
+   "vence_s": 600,
+   "sin_gps": 0.1,
+   "hora_base": 1786338000,
+   "caida": null,
+   "velocidad": 0.0,
+   "prefijo": "n",
+   "por_prioridad": true
+  },
+  "semillas": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10
+  ],
+  "agregado": {
+   "tasa_entrega": {
+    "prom": 0.995,
+    "peor": 0.95,
+    "mejor": 1.0
+   },
+   "confirmados_reportante": 0.995,
+   "latencia": {
+    "P1": {
+     "creados": 124,
+     "entregados": 123,
+     "p50_prom_s": 2.3,
+     "p95_peor_s": 6
+    },
+    "P2": {
+     "creados": 106,
+     "entregados": 106,
+     "p50_prom_s": 2,
+     "p95_peor_s": 5
+    },
+    "P3": {
+     "creados": 99,
+     "entregados": 98,
+     "p50_prom_s": 1.9,
+     "p95_peor_s": 8
+    },
+    "P4": {
+     "creados": 71,
+     "entregados": 71,
+     "p50_prom_s": 1.7,
+     "p95_peor_s": 5
+    }
+   },
+   "saltos_prom": 2.1,
+   "llegadas_duplicadas_prom": 8.4,
+   "un_reporte_por_id": true,
+   "nodos_apagados_prom": 0,
+   "conectados_a_pasarela_prom": 29.9,
+   "emitidos_prom": 1853
+  },
+  "por_semilla": [
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 16,
+      "entregados": 16,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P2": {
+      "creados": 12,
+      "entregados": 12,
+      "p50_s": 1,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P3": {
+      "creados": 8,
+      "entregados": 8,
+      "p50_s": 2,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P4": {
+      "creados": 4,
+      "entregados": 4,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     }
+    },
+    "saltos_promedio": 1.7,
+    "llegadas_duplicadas": 12,
+    "max_llegadas_por_id": 2,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 491,
+     "sacks": 1195,
+     "bytes": 62087
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 599
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 14,
+      "entregados": 14,
+      "p50_s": 2,
+      "p95_s": 5,
+      "max_s": 5
+     },
+     "P2": {
+      "creados": 10,
+      "entregados": 10,
+      "p50_s": 1,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P3": {
+      "creados": 13,
+      "entregados": 13,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P4": {
+      "creados": 3,
+      "entregados": 3,
+      "p50_s": 1,
+      "p95_s": 2,
+      "max_s": 2
+     }
+    },
+    "saltos_promedio": 1.8,
+    "llegadas_duplicadas": 13,
+    "max_llegadas_por_id": 2,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 651,
+     "sacks": 1208,
+     "bytes": 78753
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 540
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 12,
+      "entregados": 12,
+      "p50_s": 1,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P2": {
+      "creados": 7,
+      "entregados": 7,
+      "p50_s": 2,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P3": {
+      "creados": 11,
+      "entregados": 11,
+      "p50_s": 2,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P4": {
+      "creados": 10,
+      "entregados": 10,
+      "p50_s": 1,
+      "p95_s": 3,
+      "max_s": 3
+     }
+    },
+    "saltos_promedio": 1.6,
+    "llegadas_duplicadas": 5,
+    "max_llegadas_por_id": 2,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 322,
+     "sacks": 1181,
+     "bytes": 42601
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 594
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 15,
+      "entregados": 15,
+      "p50_s": 4,
+      "p95_s": 6,
+      "max_s": 6
+     },
+     "P2": {
+      "creados": 9,
+      "entregados": 9,
+      "p50_s": 4,
+      "p95_s": 5,
+      "max_s": 5
+     },
+     "P3": {
+      "creados": 12,
+      "entregados": 12,
+      "p50_s": 3,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P4": {
+      "creados": 4,
+      "entregados": 4,
+      "p50_s": 4,
+      "p95_s": 5,
+      "max_s": 5
+     }
+    },
+    "saltos_promedio": 3.77,
+    "llegadas_duplicadas": 0,
+    "max_llegadas_por_id": 1,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 1604,
+     "sacks": 1203,
+     "bytes": 168783
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 603
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 9,
+      "entregados": 9,
+      "p50_s": 4,
+      "p95_s": 5,
+      "max_s": 5
+     },
+     "P2": {
+      "creados": 12,
+      "entregados": 12,
+      "p50_s": 2,
+      "p95_s": 5,
+      "max_s": 5
+     },
+     "P3": {
+      "creados": 10,
+      "entregados": 10,
+      "p50_s": 2,
+      "p95_s": 8,
+      "max_s": 8
+     },
+     "P4": {
+      "creados": 9,
+      "entregados": 9,
+      "p50_s": 2,
+      "p95_s": 4,
+      "max_s": 4
+     }
+    },
+    "saltos_promedio": 2.65,
+    "llegadas_duplicadas": 0,
+    "max_llegadas_por_id": 1,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 931,
+     "sacks": 1193,
+     "bytes": 107410
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 580
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 12,
+      "entregados": 12,
+      "p50_s": 2,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P2": {
+      "creados": 9,
+      "entregados": 9,
+      "p50_s": 2,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P3": {
+      "creados": 11,
+      "entregados": 11,
+      "p50_s": 2,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P4": {
+      "creados": 8,
+      "entregados": 8,
+      "p50_s": 2,
+      "p95_s": 2,
+      "max_s": 2
+     }
+    },
+    "saltos_promedio": 1.73,
+    "llegadas_duplicadas": 12,
+    "max_llegadas_por_id": 2,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 536,
+     "sacks": 1180,
+     "bytes": 64817
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 575
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 15,
+      "entregados": 15,
+      "p50_s": 3,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P2": {
+      "creados": 10,
+      "entregados": 10,
+      "p50_s": 3,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P3": {
+      "creados": 8,
+      "entregados": 8,
+      "p50_s": 1,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P4": {
+      "creados": 7,
+      "entregados": 7,
+      "p50_s": 1,
+      "p95_s": 3,
+      "max_s": 3
+     }
+    },
+    "saltos_promedio": 2.2,
+    "llegadas_duplicadas": 17,
+    "max_llegadas_por_id": 2,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 702,
+     "sacks": 1191,
+     "bytes": 82498
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 581
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 9,
+      "entregados": 9,
+      "p50_s": 2,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P2": {
+      "creados": 13,
+      "entregados": 13,
+      "p50_s": 2,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P3": {
+      "creados": 10,
+      "entregados": 10,
+      "p50_s": 2,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P4": {
+      "creados": 8,
+      "entregados": 8,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     }
+    },
+    "saltos_promedio": 2.17,
+    "llegadas_duplicadas": 15,
+    "max_llegadas_por_id": 2,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 630,
+     "sacks": 1209,
+     "bytes": 77374
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 598
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 10,
+      "entregados": 10,
+      "p50_s": 1,
+      "p95_s": 5,
+      "max_s": 5
+     },
+     "P2": {
+      "creados": 11,
+      "entregados": 11,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P3": {
+      "creados": 8,
+      "entregados": 8,
+      "p50_s": 1,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P4": {
+      "creados": 11,
+      "entregados": 11,
+      "p50_s": 1,
+      "p95_s": 4,
+      "max_s": 4
+     }
+    },
+    "saltos_promedio": 1.65,
+    "llegadas_duplicadas": 4,
+    "max_llegadas_por_id": 2,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 383,
+     "sacks": 1183,
+     "bytes": 49241
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 580
+   },
+   {
+    "creados": 40,
+    "entregados_central": 38,
+    "tasa_entrega": 0.95,
+    "confirmados_reportante": 38,
+    "vencidos": 2,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 12,
+      "entregados": 11,
+      "p50_s": 2,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P2": {
+      "creados": 13,
+      "entregados": 13,
+      "p50_s": 1,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P3": {
+      "creados": 8,
+      "entregados": 7,
+      "p50_s": 2,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P4": {
+      "creados": 7,
+      "entregados": 7,
+      "p50_s": 1,
+      "p95_s": 2,
+      "max_s": 2
+     }
+    },
+    "saltos_promedio": 1.74,
+    "llegadas_duplicadas": 6,
+    "max_llegadas_por_id": 2,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 431,
+     "sacks": 1106,
+     "bytes": 54762
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 1,
+    "nodos_con_camino_a_pasarela": 29,
+    "segundos_simulados": 998
+   }
+  ]
+ },
+ {
+  "caso": "3 pasarelas",
+  "parametros": {
+   "nodos": 30,
+   "pasarelas": 3,
+   "lado_m": 150.0,
+   "alcance_m": 50.0,
+   "perdida": 0.1,
+   "reportes": 40,
+   "ventana_s": 600,
+   "duracion_s": 1800,
+   "capacidad": 4,
+   "bateria_min": 5.0,
+   "bateria_max": 20.0,
+   "gasto_reposo": 0.002,
+   "gasto_envio": 0.02,
+   "espera_base_s": 2.0,
+   "espera_tope_s": 60.0,
+   "variacion": 0.2,
+   "vence_s": 600,
+   "sin_gps": 0.1,
+   "hora_base": 1786338000,
+   "caida": null,
+   "velocidad": 0.0,
+   "prefijo": "n",
+   "por_prioridad": true
+  },
+  "semillas": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10
+  ],
+  "agregado": {
+   "tasa_entrega": {
+    "prom": 0.9975,
+    "peor": 0.975,
+    "mejor": 1.0
+   },
+   "confirmados_reportante": 0.9975,
+   "latencia": {
+    "P1": {
+     "creados": 119,
+     "entregados": 119,
+     "p50_prom_s": 1.5,
+     "p95_peor_s": 5
+    },
+    "P2": {
+     "creados": 116,
+     "entregados": 116,
+     "p50_prom_s": 1.6,
+     "p95_peor_s": 5
+    },
+    "P3": {
+     "creados": 80,
+     "entregados": 80,
+     "p50_prom_s": 1.7,
+     "p95_peor_s": 4
+    },
+    "P4": {
+     "creados": 85,
+     "entregados": 84,
+     "p50_prom_s": 1.7,
+     "p95_peor_s": 4
+    }
+   },
+   "saltos_prom": 1.64,
+   "llegadas_duplicadas_prom": 11.4,
+   "un_reporte_por_id": true,
+   "nodos_apagados_prom": 0,
+   "conectados_a_pasarela_prom": 29.9,
+   "emitidos_prom": 1583.9
+  },
+  "por_semilla": [
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 13,
+      "entregados": 13,
+      "p50_s": 1,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P2": {
+      "creados": 12,
+      "entregados": 12,
+      "p50_s": 1,
+      "p95_s": 5,
+      "max_s": 5
+     },
+     "P3": {
+      "creados": 6,
+      "entregados": 6,
+      "p50_s": 1,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P4": {
+      "creados": 9,
+      "entregados": 9,
+      "p50_s": 1,
+      "p95_s": 3,
+      "max_s": 3
+     }
+    },
+    "saltos_promedio": 1.3,
+    "llegadas_duplicadas": 10,
+    "max_llegadas_por_id": 2,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 321,
+     "sacks": 1187,
+     "bytes": 43160
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 599
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 13,
+      "entregados": 13,
+      "p50_s": 1,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P2": {
+      "creados": 9,
+      "entregados": 9,
+      "p50_s": 1,
+      "p95_s": 1,
+      "max_s": 1
+     },
+     "P3": {
+      "creados": 7,
+      "entregados": 7,
+      "p50_s": 1,
+      "p95_s": 1,
+      "max_s": 1
+     },
+     "P4": {
+      "creados": 11,
+      "entregados": 11,
+      "p50_s": 1,
+      "p95_s": 2,
+      "max_s": 2
+     }
+    },
+    "saltos_promedio": 1.07,
+    "llegadas_duplicadas": 9,
+    "max_llegadas_por_id": 2,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 276,
+     "sacks": 1183,
+     "bytes": 39809
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 536
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 16,
+      "entregados": 16,
+      "p50_s": 1,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P2": {
+      "creados": 7,
+      "entregados": 7,
+      "p50_s": 2,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P3": {
+      "creados": 11,
+      "entregados": 11,
+      "p50_s": 2,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P4": {
+      "creados": 6,
+      "entregados": 6,
+      "p50_s": 1,
+      "p95_s": 2,
+      "max_s": 2
+     }
+    },
+    "saltos_promedio": 1.45,
+    "llegadas_duplicadas": 8,
+    "max_llegadas_por_id": 2,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 254,
+     "sacks": 1186,
+     "bytes": 38171
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 594
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 11,
+      "entregados": 11,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P2": {
+      "creados": 11,
+      "entregados": 11,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P3": {
+      "creados": 7,
+      "entregados": 7,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P4": {
+      "creados": 11,
+      "entregados": 11,
+      "p50_s": 3,
+      "p95_s": 4,
+      "max_s": 4
+     }
+    },
+    "saltos_promedio": 2.02,
+    "llegadas_duplicadas": 22,
+    "max_llegadas_por_id": 2,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 616,
+     "sacks": 1187,
+     "bytes": 71230
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 597
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 9,
+      "entregados": 9,
+      "p50_s": 1,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P2": {
+      "creados": 16,
+      "entregados": 16,
+      "p50_s": 1,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P3": {
+      "creados": 8,
+      "entregados": 8,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P4": {
+      "creados": 7,
+      "entregados": 7,
+      "p50_s": 1,
+      "p95_s": 3,
+      "max_s": 3
+     }
+    },
+    "saltos_promedio": 1.62,
+    "llegadas_duplicadas": 11,
+    "max_llegadas_por_id": 2,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 358,
+     "sacks": 1177,
+     "bytes": 48255
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 578
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 13,
+      "entregados": 13,
+      "p50_s": 2,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P2": {
+      "creados": 10,
+      "entregados": 10,
+      "p50_s": 2,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P3": {
+      "creados": 12,
+      "entregados": 12,
+      "p50_s": 2,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P4": {
+      "creados": 5,
+      "entregados": 5,
+      "p50_s": 1,
+      "p95_s": 2,
+      "max_s": 2
+     }
+    },
+    "saltos_promedio": 1.57,
+    "llegadas_duplicadas": 12,
+    "max_llegadas_por_id": 2,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 377,
+     "sacks": 1172,
+     "bytes": 50042
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 575
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 11,
+      "entregados": 11,
+      "p50_s": 3,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P2": {
+      "creados": 17,
+      "entregados": 17,
+      "p50_s": 2,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P3": {
+      "creados": 7,
+      "entregados": 7,
+      "p50_s": 3,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P4": {
+      "creados": 5,
+      "entregados": 5,
+      "p50_s": 3,
+      "p95_s": 3,
+      "max_s": 3
+     }
+    },
+    "saltos_promedio": 2.3,
+    "llegadas_duplicadas": 14,
+    "max_llegadas_por_id": 3,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 651,
+     "sacks": 1195,
+     "bytes": 76883
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 580
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 8,
+      "entregados": 8,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P2": {
+      "creados": 7,
+      "entregados": 7,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P3": {
+      "creados": 9,
+      "entregados": 9,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P4": {
+      "creados": 16,
+      "entregados": 16,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     }
+    },
+    "saltos_promedio": 1.8,
+    "llegadas_duplicadas": 12,
+    "max_llegadas_por_id": 2,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 541,
+     "sacks": 1194,
+     "bytes": 60550
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 595
+   },
+   {
+    "creados": 40,
+    "entregados_central": 40,
+    "tasa_entrega": 1.0,
+    "confirmados_reportante": 40,
+    "vencidos": 0,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 14,
+      "entregados": 14,
+      "p50_s": 1,
+      "p95_s": 5,
+      "max_s": 5
+     },
+     "P2": {
+      "creados": 16,
+      "entregados": 16,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     },
+     "P3": {
+      "creados": 7,
+      "entregados": 7,
+      "p50_s": 1,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P4": {
+      "creados": 3,
+      "entregados": 3,
+      "p50_s": 2,
+      "p95_s": 2,
+      "max_s": 2
+     }
+    },
+    "saltos_promedio": 1.6,
+    "llegadas_duplicadas": 9,
+    "max_llegadas_por_id": 2,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 304,
+     "sacks": 1184,
+     "bytes": 42726
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 0,
+    "nodos_con_camino_a_pasarela": 30,
+    "segundos_simulados": 580
+   },
+   {
+    "creados": 40,
+    "entregados_central": 39,
+    "tasa_entrega": 0.975,
+    "confirmados_reportante": 39,
+    "vencidos": 1,
+    "latencia_por_prioridad": {
+     "P1": {
+      "creados": 11,
+      "entregados": 11,
+      "p50_s": 1,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P2": {
+      "creados": 11,
+      "entregados": 11,
+      "p50_s": 1,
+      "p95_s": 4,
+      "max_s": 4
+     },
+     "P3": {
+      "creados": 6,
+      "entregados": 6,
+      "p50_s": 1,
+      "p95_s": 2,
+      "max_s": 2
+     },
+     "P4": {
+      "creados": 12,
+      "entregados": 11,
+      "p50_s": 2,
+      "p95_s": 3,
+      "max_s": 3
+     }
+    },
+    "saltos_promedio": 1.62,
+    "llegadas_duplicadas": 7,
+    "max_llegadas_por_id": 2,
+    "reportes_creados_en_central_por_id": 1,
+    "emitidos": {
+     "reportes": 339,
+     "sacks": 1137,
+     "bytes": 44148
+    },
+    "subidas_fallidas": 0,
+    "nodos_apagados": 0,
+    "nodos_sin_vecinos": 1,
+    "nodos_con_camino_a_pasarela": 29,
+    "segundos_simulados": 866
+   }
+  ]
+ }
+]

@@ -8,4 +8,4 @@
 En general, Jev puede subir una prioridad, nunca bajarla.
 
 **Consecuencias:** más falsos positivos, ningún P1 degradado por el modelo. Lista de palabras
-críticas: por definir (compartida entre la app y la central).
+críticas: `contracts/palabras-criticas.txt`, compartida entre la app y la central.

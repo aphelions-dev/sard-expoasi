@@ -4,11 +4,11 @@
 
 | Campo | Contenido |
 |-------|-----------|
-| Objetivo | Preparar una recomendación por incidente relacionándolo con los recursos declarados disponibles, las restricciones operativas y la incertidumbre. |
-| Entradas | Eventos `incidente_actualizado` y decisiones del coordinador (`POST /incidentes/{id}/aprobacion`). |
-| Salidas | Evento `accion_propuesta` (acción sugerida, justificación, requisitos pendientes, solicitud de aprobación); `accion_aprobada` o `accion_rechazada`. |
-| Herramientas | Por definir. |
-| Memoria | Registro de eventos (solo agrega). Estado adicional: por definir. |
-| Límites de autonomía | No despacha unidades ni asigna recursos sin aprobación humana explícita. |
-| Manejo de errores | Por definir. Nunca borra eventos; registra el error como evento. |
-| Criterio de terminación | Por definir. |
+| Objetivo | Preparar una recomendación por incidente con la entidad responsable, el recurso que usaría, la justificación y lo que falta confirmar, para que el coordinador la apruebe o la rechace. |
+| Entradas | Eventos `incidente_actualizado` y el incidente completo, calculado del registro (`central/vista/incidentes.py`). Recursos declarados por el coordinador (`POST /recursos`, evento `recurso_declarado`). |
+| Salidas | Evento `accion_propuesta`: entidad, recurso, acción, prioridad, personas estimadas, justificación, `falta_confirmar` y `requiere_aprobacion`. La decisión del coordinador (`POST /incidentes/{id}/aprobacion`) queda como evento `decision_humana` ligado a esa propuesta. |
+| Herramientas | Código, sin IA. Matriz de responsabilidades según lo que contó el comandante de Bomberos de Manizales: atrapados e incendios a Bomberos (búsqueda, rescate, evacuación), heridos y desaparecidos a Cruz Roja, vías a Defensa Civil, lo demás a la sala de crisis. La justificación es una plantilla con los datos del incidente. Cada tipo usa un recurso (ambulancia, equipo de rescate, máquina, cuadrilla, equipo de búsqueda); la vista del incidente dice cuántas unidades quedan según la última declaración y las aprobaciones posteriores, y qué otros incidentes pendientes compiten por él. |
+| Memoria | Registro de eventos (solo agrega). Sin estado propio. |
+| Límites de autonomía | No despacha unidades ni asigna recursos; no inventa disponibilidad (si nadie declaró un recurso, `disponibles` es `null`). Cuando dos incidentes compiten por la última unidad lo muestra y decide el coordinador: toda propuesta sale con `requiere_aprobacion` y queda pendiente hasta la decisión humana. Si el incidente cambia (llega otro reporte), se propone de nuevo y la decisión anterior no se aplica a la nueva propuesta. |
+| Manejo de errores | Si el incidente todavía no tiene todos sus eventos, registra `agente_error` y lo reintenta. Aprobar un incidente marcado para revisión exige una nota del coordinador (`422` si falta). Si falta la ubicación, una segunda fuente directa o el número de personas, lo dice en `falta_confirmar` en lugar de suponerlo. |
+| Criterio de terminación | Cada `incidente_actualizado` tiene una `accion_propuesta`; el ciclo de un incidente termina con una `decision_humana` sobre su propuesta vigente. |

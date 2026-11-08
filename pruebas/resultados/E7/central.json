@@ -1,0 +1,44 @@
+{
+ "jev": "caido",
+ "modos": {
+  "formulario_neutro": {
+   "enviados": 100,
+   "priorizados": 100,
+   "disponibilidad": 1.0,
+   "segundos_hasta_priorizar_todos": 4.2,
+   "exactas": 42,
+   "subtriaje": 52,
+   "sobretriaje": 6,
+   "recall_p1": 0.5667,
+   "p1_subestimados": [
+    "e6n-2: «mi mamá quedó debajo de la placa del techo, la escucho pero no la puedo sacar» → P4",
+    "e6n-4: «mi papá se desplomó, está morado y no se mueve» → P4",
+    "e6n-11: «no sé si respira mi abuela, está muy pálida y fría» → P4",
+    "e6n-13: «colapsó el puente peatonal y hay gente abajo» → P4",
+    "e6n-14: «se escucha a alguien pidiendo auxilio entre los escombros del colegio» → P4",
+    "e6n-15: «mi hijo de 3 años se tragó algo y se está ahogando» → P4",
+    "e6n-18: «mi esposa está embarazada, empezó a sangrar mucho y está mareada» → P4",
+    "e6n-19: «la casa se derrumbó con la familia adentro, son 4 con dos niños» → P4",
+    "e6n-24: «persona aplastada por una pared en la carrera 5» → P4",
+    "e6n-25: «mi bebé no se despierta y tiene fiebre muy alta» → P4",
+    "e6n-26: «hay alguien colgado del balcón del cuarto piso, se va a caer» → P4",
+    "e6n-28: «edif caido gnt atrapda cll 10 ayu» → P4",
+    "e6n-30: «la bodega de pinturas está ardiendo al lado del jardín infantil» → P4"
+   ],
+   "bajados_respecto_al_celular": []
+  },
+  "prioridad_del_celular": {
+   "enviados": 100,
+   "priorizados": 100,
+   "disponibilidad": 1.0,
+   "segundos_hasta_priorizar_todos": 4.2,
+   "exactas": 94,
+   "subtriaje": 0,
+   "sobretriaje": 6,
+   "recall_p1": 1.0,
+   "p1_subestimados": [],
+   "bajados_respecto_al_celular": []
+  }
+ },
+ "cumple": true
+}

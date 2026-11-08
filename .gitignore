@@ -21,6 +21,8 @@ dist/
 
 # Datos locales de la central
 *.sqlite
+*.sqlite-wal
+*.sqlite-shm
 *.db
 
 # Entorno y editores

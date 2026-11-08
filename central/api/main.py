@@ -17,6 +17,7 @@ from pydantic import BaseModel
 import config
 from agentes.coordinacion import agente as coordinacion
 from agentes.recepcion import agente as recepcion
+from agentes.resiliencia import entregar
 from registro import eventos
 from vista import incidentes, rechazados
 
@@ -146,6 +147,7 @@ def _salida(inc: incidentes.Incidente) -> Incidente:
 @app.post("/reportes")
 def reportes(entrada: EntradaReportes, conn: Conexion) -> SalidaReportes:
     r = recepcion.recibir(conn, entrada.mensajes, nodo=CONFIG.nodo, pasarela_id=entrada.pasarela_id)
+    entregar.entregar(CONFIG.url_par, r.recibidos)  # antes del SACK (#49)
     return SalidaReportes(sack=r.sack, rechazados=[Rechazado(**x) for x in r.rechazados])
 
 
@@ -244,6 +246,26 @@ def listar_eventos(
     evs = eventos.leer(conn, desde_seq=desde_seq, limite=limite)
     ultimo = conn.execute("SELECT coalesce(max(seq), 0) FROM eventos").fetchone()[0]
     return {"eventos": [asdict(e) for e in evs], "ultimo_seq": ultimo}
+
+
+class EventoEntrante(BaseModel):
+    id: str
+    nodo: str
+    tipo: Literal["reporte_recibido"]  # lo demás llega por GET /eventos
+    reporte_id: str
+    causa: str | None
+    datos: dict[str, Any]
+    creado_en: float
+
+
+class EntradaEventos(BaseModel):
+    eventos: list[EventoEntrante]
+
+
+@app.post("/eventos")
+def recibir_eventos(entrada: EntradaEventos, conn: Conexion) -> dict[str, int]:
+    """La otra central entrega un reporte antes de dar su SACK; no es para el tablero."""
+    return {"agregados": sum(eventos.importar(conn, e.model_dump()) for e in entrada.eventos)}
 
 
 @app.get("/salud")

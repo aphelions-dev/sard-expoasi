@@ -1,5 +1,8 @@
 """Agente de recepción: valida SARD1, deduplica por id, registra y devuelve SACK.
 
+Devuelve también el `reporte_recibido` de cada id con SACK, para que la API se lo entregue a la
+otra central antes de responder (`agentes/resiliencia/entregar.py`).
+
 Corre dentro de `POST /reportes`, porque la pasarela necesita el SACK en la misma respuesta.
 Ficha: `docs/fichas-agentes/recepcion.md`.
 """
@@ -15,6 +18,7 @@ from registro import eventos
 class Resultado:
     sack: list[str]
     rechazados: list[dict[str, str]]
+    recibidos: list[eventos.Evento]
 
 
 def recibir(
@@ -22,6 +26,7 @@ def recibir(
 ) -> Resultado:
     sacks: list[str] = []
     rechazados: list[dict[str, str]] = []
+    recibidos: list[eventos.Evento] = []
     for mensaje in mensajes:
         leido = sard1.leer(mensaje)
         if isinstance(leido, sard1.Rechazo):
@@ -43,5 +48,7 @@ def recibir(
                 conn, nodo=nodo, tipo="reporte_duplicado", reporte_id=leido.id,
                 datos={"pasarela_id": pasarela_id},
             )
+            nuevo = eventos.recibido(conn, leido.id)
+        recibidos.append(nuevo)
         sacks.append(sard1.sack(leido.id))
-    return Resultado(sack=sacks, rechazados=rechazados)
+    return Resultado(sack=sacks, rechazados=rechazados, recibidos=recibidos)

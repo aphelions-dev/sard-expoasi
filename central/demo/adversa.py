@@ -34,7 +34,7 @@ import pygeohash
 from demo.recorrido import pedir
 
 CENTRAL = Path(__file__).parents[1]
-CENTRALES = {"A": "http://localhost:8001", "B": "http://localhost:8002"}
+CENTRALES = {"A": "http://127.0.0.1:8001", "B": "http://127.0.0.1:8002"}
 ORDEN = ["P1", "P2", "P3", "P4"]
 CLAVE_INVALIDA = "clave-invalida-ensayo-adverso"
 

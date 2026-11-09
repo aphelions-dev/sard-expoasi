@@ -111,13 +111,13 @@ El código va en `bitchat-android/app/src/main/java/com/bitchat/android/sard/`.
 | Prioridad | `Prioridad.kt` | Las reglas del contrato. `palabras-criticas.txt` se copia de `contracts/` al compilar. |
 | Mensajes | `Sard1.kt` | Escribe y lee `SARD1` y `SACK`. |
 | Almacenamiento | `Almacen.kt` | JSON en `filesDir/sard/reportes.json`. Nunca borra. |
-| Pasarela | `Pasarela.kt` | `POST /reportes` a la central. |
+| Pasarela | `Pasarela.kt` | `POST /reportes` a la central, con failover A → B. |
 | Unión | `Sard.kt` | Crea, recibe, sube y confirma. |
 
 - **Transporte:** el SARD1 viaja como **mensaje público** de la malla y usa los saltos y el gossip
   de bitchat. Por ahora también se ve en el chat.
 - **Prueba de punta a punta:** central en el PC (`central/`, `iniciar.py A`). El celular pasarela
-  debe estar en la misma Wi-Fi, con la URL `http://<IP del PC>:8001`. En Windows hay que abrir los
+  debe estar en la misma Wi-Fi, con la central A en `http://<IP del PC>:8001` y la B en `:8002`. En Windows hay que abrir los
   puertos: `netsh advfirewall firewall add rule name=SARD-central dir=in action=allow protocol=TCP localport=8001-8002 remoteip=localsubnet`
   (como administrador).
 - Un build debug no reemplaza al bitchat oficial (otra firma): primero `adb uninstall com.bitchat.droid`.
@@ -138,6 +138,15 @@ El código va en `bitchat-android/app/src/main/java/com/bitchat/android/sard/`.
 - [x] Los SARD1 y SACK no se muestran en el chat.
 - [x] Probado en celulares: sin pasarela, A reintenta; al activar la pasarela llega y A ve
       "entregado". Vencimiento y reactivación: solo con tests (`ColaTest`).
+
+### Checklist Hito 4
+
+- [x] Failover (#14): antes de subir, `GET /salud` de la A (límite de 3 s, valor de la app); si
+      no responde, sube a la B. Si la A responde pero falla al recibir, también prueba la B.
+- [x] Los SARD1 y SACK no pasan por el filtro de spam de bitchat, que escondía los reintentos
+      idénticos.
+- [x] Probado en celulares: con la central A apagada, la pasarela subió a la B. Al encender la A,
+      copió de la B lo que le faltaba y ningún reporte se perdió.
 
 ## Terminado
 

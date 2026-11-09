@@ -39,16 +39,18 @@ resultado exacto.
   esperan su turno.
 - **Reintentos** con espera creciente hasta ver el `SACK`, y **vencimiento** a los 600 s de la
   `hora_unix` (contrato, reglas 2 y 5): vencido, el reporte se marca "no entregado" y deja de
-  reintentarse, sin borrarse. La reactivación al aparecer un vecino nuevo no se modela: con los
-  celulares quietos, un celular aislado nunca gana camino.
+  reintentarse, sin borrarse. La reactivación al aparecer un vecino nuevo (definida en #90) no se
+  modela: con los celulares quietos y sin celulares que lleguen, nunca aparece un vecino nuevo y un
+  celular aislado nunca gana camino. La reactivación la prueba la app (`ColaTest`, `app/README.md`).
 - **Pasarela**: sube lo que tiene a la central; con el `SACK`, lo difunde de vuelta por la malla.
   Si un vecino sigue reenviando algo ya confirmado, se le repite el `SACK`.
 - **Central**: simulada (acepta cada id una vez, cuenta duplicados, se puede "caer" con
   `--caida desde,hasta`) o la real con `--central` (`POST /reportes`, failover A → B por
   `GET /salud`; URLs en `CENTRAL_A_URL` y `CENTRAL_B_URL`).
-- **Reportes**: el generador (#4) toma texto, tipo y prioridad de los 100 reportes etiquetados
-  (`datos/sinteticos/reportes_etiquetados.csv`). La prioridad del CSV hace de "prioridad calculada
-  en el celular" mientras la app (P1) no tenga sus reglas.
+- **Reportes**: el generador (#4) toma texto, tipo y banderas de atrapados y heridos de los 100
+  reportes etiquetados (`datos/sinteticos/reportes_etiquetados.csv`). La prioridad del mensaje la
+  calculan las reglas del celular (`simulador/reglas.py`, contrato «Prioridad en el celular»), como
+  la app; la etiqueta del CSV queda como la verdad contra la que se mide el triaje (E6/E7).
 
 ## Recorrido de la demo
 

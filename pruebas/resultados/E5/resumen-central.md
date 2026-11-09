@@ -7,7 +7,7 @@ Malla base (semilla 5, 30 celulares, pérdida 10%) subiendo a la API real. La ce
 | Entregados | 60 de 60 (100%) |
 | Perdidos | 0 |
 | Confirmados al reportante | 60 |
-| Subidas por central | {'A': 25, 'B': 30} |
+| Subidas por central | {'A': 22, 'B': 32} |
 | Subidas que fallaron y se reintentaron | 8 |
 | Con `SACK` de la A pero ausentes en la B mientras la A está caída | 0  |
 | Ausentes en la B después de que la A vuelve | 0 |
@@ -17,7 +17,7 @@ Los reportes que la A confirmó justo antes de caer y la B no alcanzó a copiar 
 
 | Prioridad | Entregados | Latencia p50 (s) | p95 (s) | Máx (s) |
 |---|---|---|---|---|
-| P1 | 25/25 | 3 | 6 | 7 |
-| P2 | 12/12 | 3 | 6 | 6 |
-| P3 | 7/7 | 3 | 6 | 6 |
+| P1 | 16/16 | 3 | 6 | 6 |
+| P2 | 9/9 | 3 | 5 | 5 |
+| P3 | 19/19 | 3 | 7 | 7 |
 | P4 | 16/16 | 2 | 7 | 7 |

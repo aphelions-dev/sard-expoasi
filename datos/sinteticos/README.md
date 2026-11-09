@@ -63,3 +63,7 @@ prioridad del celular en P4, igual que la calibración. Solo con reglas y la lis
 exactas, 43 por debajo de su prioridad real y 4 por encima, todas las de arriba (con la lista del
 7 de noviembre eran 42, 52 y 6). Los P3 aparecen «por debajo» solo porque
 la calibración entra con P4 y las reglas no tienen nada que suba a P3.
+
+Con la prioridad que calculan las reglas del celular (contrato, «Prioridad en el celular»), en vez de
+P4, la central da 55 exactas, 21 por debajo y 24 por encima (`pruebas/resultados/E7/`). Los 4 P1 sin
+palabra crítica ni atrapados marcado quedan en P3: sin Jev, solo el coordinador los sube.

@@ -26,6 +26,7 @@ from .generador import cargar
 from .geo import a_latlon, geohash
 from .malla import Parametros, Simulacion
 from .metricas import RESULTADOS, calcular
+from .reglas import prioridad
 from .sard1 import Reporte
 
 CENTRAL = Path(__file__).parents[2] / "central"
@@ -125,9 +126,11 @@ def e4_central(centrales: Centrales) -> dict:
     filas = cargar()
     rng = random.Random(4)
     hora = int(time.time())
-    lineas = [Reporte(f"e4d-{i}", f["prioridad_real"], f["tipo_real"], 1, f["atrapados"] == "1",
-                      f["heridos"] == "1", False, "d2fkcd", hora, f["texto"]).linea()
-              for i, f in enumerate(rng.sample(filas, 20), start=1)]
+    lineas = []
+    for i, f in enumerate(rng.sample(filas, 20), start=1):
+        atrapados, heridos = f["atrapados"] == "1", f["heridos"] == "1"
+        lineas.append(Reporte(f"e4d-{i}", prioridad(1, atrapados, heridos, False, f["texto"])[0], f["tipo_real"],
+                              1, atrapados, heridos, False, "d2fkcd", hora, f["texto"]).linea())
     sacks = 0
     for pasarela in ("pasarela-1", "pasarela-2", "pasarela-3"):
         r = pedir(f"{URLS['A']}/reportes", {"mensajes": lineas, "pasarela_id": pasarela}) or {"sack": []}
@@ -183,8 +186,9 @@ def e5(centrales: Centrales, apagar_en: int = 120) -> dict:
 
 def e6_e7(centrales: Centrales) -> dict:
     """Los 100 reportes etiquetados, dos veces: con formulario neutro (P4, solo las banderas) para
-    medir lo que hace la central, y con la prioridad del celular igual a la etiqueta para comprobar
-    que la central nunca la baja."""
+    medir lo que hace la central sola, y con la prioridad que calculan las reglas del celular
+    (contrato, «Prioridad en el celular») para medir el sistema entero y comprobar que la central
+    nunca la baja. La etiqueta del CSV es la verdad contra la que se mide."""
     filas = cargar()
     rng = random.Random(6)
     hora = int(time.time())
@@ -194,7 +198,8 @@ def e6_e7(centrales: Centrales) -> dict:
         enviados = {}
         lineas = []
         for i, f in enumerate(filas, start=1):
-            prio = "P4" if modo == "formulario_neutro" else f["prioridad_real"]
+            prio = ("P4" if modo == "formulario_neutro" else
+                    prioridad(1, f["atrapados"] == "1", f["heridos"] == "1", False, f["texto"])[0])
             gh = geohash(*a_latlon(rng.uniform(0, 3000), rng.uniform(-1500, 1500)))
             r = Reporte(f"{disp}-{i}", prio, f["tipo_real"], 1, f["atrapados"] == "1", f["heridos"] == "1",
                         False, gh, hora + i, f["texto"])
@@ -292,7 +297,8 @@ def informe_e6(d: dict) -> str:
          f"Los 100 reportes etiquetados (`datos/sinteticos/`) contra la central A real. Jev: `{d['jev']}`."
          + (" Sin `JEV_API_KEY` esta corrida es E7; E6 con Jev se corre con `--env-file ../.env`." if sin_jev else ""),
          "", "- **Formulario neutro**: el celular manda P4 y solo las banderas; mide lo que agrega la central.",
-         "- **Prioridad del celular**: el celular manda la prioridad etiquetada; comprueba que la central nunca la baja.",
+         "- **Prioridad del celular**: el celular manda la prioridad de sus reglas (contrato, «Prioridad en el "
+         "celular»); mide el sistema entero y comprueba que la central nunca la baja.",
          "", "| Métrica | Formulario neutro | Prioridad del celular |", "|---|---|---|"]
     a, b = d["modos"]["formulario_neutro"], d["modos"]["prioridad_del_celular"]
     for nombre, k in (("Priorizados (disponibilidad)", "disponibilidad"), ("Exactas", "exactas"),
@@ -305,6 +311,9 @@ def informe_e6(d: dict) -> str:
           f"P1 que el formulario neutro deja por debajo ({len(a['p1_subestimados'])}): son los que solo Jev o "
           "un humano pueden rescatar.", ""]
     l += [f"- {x}" for x in a["p1_subestimados"]]
+    l += ["", f"P1 que quedan por debajo con la prioridad del celular ({len(b['p1_subestimados'])}): ni las reglas "
+          "del celular ni la central los suben.", ""]
+    l += [f"- {x}" for x in b["p1_subestimados"]]
     return "\n".join(l) + "\n"
 
 

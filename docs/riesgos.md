@@ -10,3 +10,4 @@
 | Bluetooth falla durante la demo | No llegan mensajes en vivo | Video de respaldo + simulador en vivo | Todos |
 | Cambios de licencia en bitchat-android (GPLv3) | Dudas al distribuir | El fork se mantiene GPLv3 y público; ver ADR 0001 | P1 |
 | Pocos celulares Android disponibles | Menos de 3 para la demo | Por definir | Todos |
+| La API de la central no tiene autenticación y su CORS es `*` (ADR 0008) | Con la central publicada, cualquiera que conozca la URL puede aprobar incidentes o cambiar recursos | Se acepta para esta entrega: datos sintéticos, la URL del tablero no se publica y `/eventos` viaja por la red privada de Railway. Próxima entrega: credencial para todo lo que no sea `POST /reportes` y `/salud`, y CORS solo para el dominio del tablero | P2 |

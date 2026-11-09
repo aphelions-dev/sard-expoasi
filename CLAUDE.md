@@ -11,7 +11,7 @@ celular pasarela con internet → central de riesgo con agentes → tablero con 
 - El registro de eventos de la central solo agrega, nunca borra (ADR 0003).
 - Ninguna acción se ejecuta sin aprobación humana.
 - La app completa es Android, sin Swift. El iPhone entra con el bitchat oficial (relevo) y con la
-  app web `tablero/app/reportar/` (ADR 0007).
+  app web `reportar/` (ADR 0007 y 0008).
 
 ## Contrato (resumen; la fuente es `contracts/protocolo-sard1.md`)
 
@@ -39,6 +39,6 @@ SACK|<id>
 
 ## Mapa
 
-`app/` P1 · `central/` P2 · `tablero/` `simulador/` `pruebas/` `datos/` P3 · `contracts/` los tres ·
+`app/` P1 · `central/` P2 · `tablero/` `reportar/` `simulador/` `pruebas/` `datos/` P3 · `contracts/` los tres ·
 estilo en `diseno/tokens.json` (se edita ahí y se corre `node diseno/generar.mjs`) ·
-plan en `docs/plan.md` · decisiones en `docs/decisiones/`.
+despliegue en `docs/despliegue.md` · plan en `docs/plan.md` · decisiones en `docs/decisiones/`.

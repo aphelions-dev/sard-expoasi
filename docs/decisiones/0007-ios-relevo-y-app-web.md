@@ -19,7 +19,7 @@ podía cubrirlos. Lo que se encontró (noviembre de 2026):
 
 1. **Relevo con el bitchat oficial.** Un iPhone con bitchat reenvía los mensajes públicos y con
    ellos los `SARD1`. Los muestra en el chat, porque no conoce SARD, y no tiene el formulario.
-2. **App web para reportar** (`tablero/app/reportar/`, en `/reportar/`). Arma el mismo `SARD1`
+2. **App web para reportar** (`reportar/`, una app aparte desde la ADR 0008). Arma el mismo `SARD1`
    que la app Android, con las mismas reglas de prioridad y la misma lista de palabras críticas.
    Lo guarda en el navegador, abre sin internet (service worker) y lo sube a la central como su
    propia pasarela (`POST /reportes`, A y si no B, `pasarela_id` = `web-<disp>`). Sin internet,

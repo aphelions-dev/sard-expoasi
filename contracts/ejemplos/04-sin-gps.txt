@@ -1,1 +1,1 @@
-SARD1|a3f9-0043|P2|FUEGO|0|001||1762481400|humo saliendo de una casa
+SARD1|a3f9-0043|P1|FUEGO|0|001||1762481400|humo saliendo de una casa

@@ -38,8 +38,9 @@ resultado exacto.
   esperan su turno.
 - **Reintentos** con espera creciente hasta ver el `SACK`, y **vencimiento** a los 600 s de la
   `hora_unix` (contrato, reglas 2 y 5): vencido, el reporte se marca "no entregado" y deja de
-  reintentarse, sin borrarse. La reactivación al aparecer un vecino nuevo no se modela: con los
-  celulares quietos, un celular aislado nunca gana camino.
+  reintentarse, sin borrarse. La reactivación al aparecer un vecino nuevo (definida en #90) no se
+  modela: con los celulares quietos y sin celulares que lleguen, nunca aparece un vecino nuevo y un
+  celular aislado nunca gana camino. La reactivación la prueba la app (`ColaTest`, `app/README.md`).
 - **Pasarela**: sube lo que tiene a la central; con el `SACK`, lo difunde de vuelta por la malla.
   Si un vecino sigue reenviando algo ya confirmado, se le repite el `SACK`.
 - **Central**: simulada (acepta cada id una vez, cuenta duplicados, se puede "caer" con

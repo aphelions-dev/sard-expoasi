@@ -22,12 +22,17 @@
    "enviados": 100,
    "priorizados": 100,
    "disponibilidad": 1.0,
-   "segundos_hasta_priorizar_todos": 2.2,
-   "exactas": 96,
-   "subtriaje": 0,
-   "sobretriaje": 4,
-   "recall_p1": 1.0,
-   "p1_subestimados": [],
+   "segundos_hasta_priorizar_todos": 2.3,
+   "exactas": 55,
+   "subtriaje": 21,
+   "sobretriaje": 24,
+   "recall_p1": 0.8667,
+   "p1_subestimados": [
+    "e6c-2: «mi mamá quedó debajo de la placa del techo, la escucho pero no la puedo sacar» → P3",
+    "e6c-13: «colapsó el puente peatonal y hay gente abajo» → P3",
+    "e6c-19: «la casa se derrumbó con la familia adentro, son 4 con dos niños» → P3",
+    "e6c-26: «hay alguien colgado del balcón del cuarto piso, se va a caer» → P3"
+   ],
    "bajados_respecto_al_celular": []
   }
  },

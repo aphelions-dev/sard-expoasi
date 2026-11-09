@@ -32,8 +32,9 @@ y recuperación. Sin `JEV_API_KEY` el triaje corre solo con reglas; con ella, co
 
 ### App Android
 
-**APK:** release [`app-v1.0`](https://github.com/aphelions-dev/sard-expoasi/releases/tag/app-v1.0)
-(`app-arm64-v8a-debug.apk`). Es un fork de bitchat con el botón SOS, prioridad por reglas, cola de
+**APK:** release [`app-v1.1`](https://github.com/aphelions-dev/sard-expoasi/releases/tag/app-v1.1)
+(`app-arm64-v8a-debug.apk`), con el estilo del tablero. Si ya tienes la
+[`app-v1.0`](https://github.com/aphelions-dev/sard-expoasi/releases/tag/app-v1.0), desinstálala antes porque tiene otra firma. Es un fork de bitchat con el botón SOS, prioridad por reglas, cola de
 reenvío por Bluetooth y modo pasarela con failover A → B. Probado con 3 celulares: un reporte creado
 sin internet llega a la central y el reportante ve «entregado». Cómo preparar la demo con celulares:
 [`app/README.md`](app/README.md#demo-con-celulares-hito-5).
@@ -57,7 +58,7 @@ Con `JEV_API_KEY` en `.env` el triaje usa Jev; sin ella, solo reglas.
 
 | # | Entregable | Dónde | Estado |
 |---|------------|-------|--------|
-| 1 | Prototipo funcional | `central/`, `tablero/`, `simulador/`, `app/` | Central, agentes, tablero y malla simulada funcionando de punta a punta. App Android (fork de bitchat) probada con 3 celulares; APK en el release [`app-v1.0`](https://github.com/aphelions-dev/sard-expoasi/releases/tag/app-v1.0). |
+| 1 | Prototipo funcional | `central/`, `tablero/`, `simulador/`, `app/` | Central, agentes, tablero y malla simulada funcionando de punta a punta. App Android (fork de bitchat) probada con 3 celulares; APK en el release [`app-v1.1`](https://github.com/aphelions-dev/sard-expoasi/releases/tag/app-v1.1). |
 | 2 | Código fuente | Este repo; cómo instalar y correr cada parte en `central/README.md`, `tablero/README.md` y `simulador/README.md` | Listo |
 | 3 | Documento de arquitectura | `docs/arquitectura.md`, decisiones en `docs/decisiones/` | Listo |
 | 4 | Fichas de agentes | `docs/fichas-agentes/` | Listo |

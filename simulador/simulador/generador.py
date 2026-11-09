@@ -1,8 +1,11 @@
 """Generador de reportes SARD1 sintéticos (#4).
 
-Los textos, el tipo y la prioridad salen de los 100 reportes etiquetados a mano
-(`datos/sinteticos/reportes_etiquetados.csv`). La prioridad del CSV hace de "prioridad calculada
-en el celular": las reglas de la app son de P1 y todavía no existen.
+Los textos, el tipo y las banderas de atrapados y heridos salen de los 100 reportes etiquetados a
+mano (`datos/sinteticos/reportes_etiquetados.csv`). La prioridad del mensaje la calculan las reglas
+del celular (`reglas.py`, como la app); la etiqueta del CSV (`prioridad_real`) es la verdad contra la
+que se mide el triaje, no lo que manda el celular. La etiqueta solo guía lo que el CSV no trae: una
+etiqueta P4 es un reporte sin personas afectadas, y solo las P1/P2 pueden traer marcada la bandera
+de niños o adultos mayores.
 
     PYTHONUTF8=1 uv run python -m simulador generar --n 20 --semilla 1
 """
@@ -11,6 +14,7 @@ import csv
 import random
 from pathlib import Path
 
+from .reglas import prioridad
 from .geo import a_latlon, caracteres, geohash, radio_gps
 from .sard1 import Reporte
 
@@ -39,14 +43,19 @@ class Generador:
         # el id como semilla, para no mover la secuencia del resto de la simulación.
         precision = caracteres(radio_gps(random.Random(f"{disp}-{n}")))
         gh = "" if self.rng.random() < self.sin_gps else geohash(*a_latlon(x, y), precision)
+        # Los dos sorteos se hacen siempre, para no mover la secuencia del resto de la simulación.
+        sorteo = self.rng.randint(0 if f["prioridad_real"] == "P4" else 1, 8)
+        personas = 0 if f["prioridad_real"] == "P4" else sorteo
+        vulnerables = self.rng.random() < 0.3 and f["prioridad_real"] in ("P1", "P2")
+        atrapados, heridos = f["atrapados"] == "1", f["heridos"] == "1"
         return Reporte(
             id=f"{disp}-{n}",
-            prioridad=f["prioridad_real"],
+            prioridad=prioridad(personas, atrapados, heridos, vulnerables, f["texto"])[0],
             tipo=f["tipo_real"],
-            personas=self.rng.randint(0 if f["prioridad_real"] == "P4" else 1, 8),
-            atrapados=f["atrapados"] == "1",
-            heridos=f["heridos"] == "1",
-            vulnerables=self.rng.random() < 0.3,
+            personas=personas,
+            atrapados=atrapados,
+            heridos=heridos,
+            vulnerables=vulnerables,
             geohash=gh,
             hora_unix=hora_unix,
             texto=f["texto"],

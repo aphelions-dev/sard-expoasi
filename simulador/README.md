@@ -17,6 +17,7 @@ PYTHONUTF8=1 uv run python -m simulador correr --desde ../pruebas/resultados/<co
 PYTHONUTF8=1 uv run python -m simulador escenarios                         # E1–E4 de pruebas/escenarios.md
 PYTHONUTF8=1 uv run python -m simulador escenarios-central                 # E4 central, E5, E6/E7 (levanta A y B)
 PYTHONUTF8=1 uv run python -m simulador recorrido                          # demo de 8 pasos con visor web
+PYTHONUTF8=1 uv run python -m simulador recorrido --celulares              # la demo: pasos 1 a 4 con la app
 PYTHONUTF8=1 uv run pytest                                                 # pruebas
 ```
 
@@ -38,16 +39,18 @@ resultado exacto.
   esperan su turno.
 - **Reintentos** con espera creciente hasta ver el `SACK`, y **vencimiento** a los 600 s de la
   `hora_unix` (contrato, reglas 2 y 5): vencido, el reporte se marca "no entregado" y deja de
-  reintentarse, sin borrarse. La reactivación al aparecer un vecino nuevo no se modela: con los
-  celulares quietos, un celular aislado nunca gana camino.
+  reintentarse, sin borrarse. La reactivación al aparecer un vecino nuevo (definida en #90) no se
+  modela: con los celulares quietos y sin celulares que lleguen, nunca aparece un vecino nuevo y un
+  celular aislado nunca gana camino. La reactivación la prueba la app (`ColaTest`, `app/README.md`).
 - **Pasarela**: sube lo que tiene a la central; con el `SACK`, lo difunde de vuelta por la malla.
   Si un vecino sigue reenviando algo ya confirmado, se le repite el `SACK`.
 - **Central**: simulada (acepta cada id una vez, cuenta duplicados, se puede "caer" con
   `--caida desde,hasta`) o la real con `--central` (`POST /reportes`, failover A → B por
   `GET /salud`; URLs en `CENTRAL_A_URL` y `CENTRAL_B_URL`).
-- **Reportes**: el generador (#4) toma texto, tipo y prioridad de los 100 reportes etiquetados
-  (`datos/sinteticos/reportes_etiquetados.csv`). La prioridad del CSV hace de "prioridad calculada
-  en el celular" mientras la app (P1) no tenga sus reglas.
+- **Reportes**: el generador (#4) toma texto, tipo y banderas de atrapados y heridos de los 100
+  reportes etiquetados (`datos/sinteticos/reportes_etiquetados.csv`). La prioridad del mensaje la
+  calculan las reglas del celular (`simulador/reglas.py`, contrato «Prioridad en el celular»), como
+  la app; la etiqueta del CSV queda como la verdad contra la que se mide el triaje (E6/E7).
 
 ## Recorrido de la demo
 
@@ -57,6 +60,11 @@ simulada y las centrales reales (que levanta y apaga), y sirve un visor en `http
 tenue, el camino que llegó a la pasarela en grueso, `SACK` de vuelta, centrales A/B y el paso actual.
 Se avanza con Enter o con el botón del visor; `--seguido --pausa 6` avanza solo. Cómo se presenta:
 el guion.
+
+Con `--celulares` (#86), los pasos 1 a 4 los hacen los celulares de la app: el script no crea
+reportes simulados, espera el primer `reporte_recibido` de la central A que no sea del simulador
+(lo sube la pasarela del celular C) y sigue ese id en los pasos 4 a 6. La malla simulada arranca en
+el paso 7, para la ráfaga. Al arrancar imprime las URL de las centrales para la pasarela del celular.
 
 ## Parámetros por defecto
 

@@ -20,10 +20,10 @@
   "variacion": 0.2,
   "vence_s": 600,
   "sin_gps": 0.1,
-  "hora_base": 1794181713,
+  "hora_base": 1794242557,
   "caida": null,
   "velocidad": 0.0,
-  "prefijo": "e51713n",
+  "prefijo": "e52557n",
   "por_prioridad": true
  },
  "apagada_A_en_s": 120,
@@ -33,8 +33,8 @@
  "tasa_entrega": 1.0,
  "confirmados_reportante": 60,
  "subidas_por_central": {
-  "A": 25,
-  "B": 30
+  "A": 22,
+  "B": 32
  },
  "subidas_fallidas": 8,
  "con_sack_pero_ausentes_en_B_con_A_caida": [],
@@ -42,25 +42,25 @@
  "perdidos": 0,
  "latencia_por_prioridad": {
   "P1": {
-   "creados": 25,
-   "entregados": 25,
+   "creados": 16,
+   "entregados": 16,
    "p50_s": 3,
    "p95_s": 6,
-   "max_s": 7
+   "max_s": 6
   },
   "P2": {
-   "creados": 12,
-   "entregados": 12,
+   "creados": 9,
+   "entregados": 9,
    "p50_s": 3,
-   "p95_s": 6,
-   "max_s": 6
+   "p95_s": 5,
+   "max_s": 5
   },
   "P3": {
-   "creados": 7,
-   "entregados": 7,
+   "creados": 19,
+   "entregados": 19,
    "p50_s": 3,
-   "p95_s": 6,
-   "max_s": 6
+   "p95_s": 7,
+   "max_s": 7
   },
   "P4": {
    "creados": 16,

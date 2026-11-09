@@ -24,13 +24,19 @@ Requisitos (de `.java-version`, `gradle/libs.versions.toml` y el wrapper del for
 **Android SDK 37** (compileSdk y targetSdk), AGP 9.3.1, Kotlin 2.4.10 y Gradle 9.6.1, que lo baja
 el wrapper.
 
-1. Instalar Android Studio, que trae su propio JDK 21. En *SDK Manager*: Android API 37 y
-   *Platform-Tools* (`adb`).
-2. Abrir `app/bitchat-android` en Android Studio y dejar que sincronice Gradle.
-3. Compilar: *Build → Build APK(s)* o `./gradlew assembleDebug`. El APK queda en
-   `app/build/outputs/apk/debug/app-debug.apk`.
+1. Instalar Android Studio y, en *SDK Manager*, Android API 37 y *Platform-Tools* (`adb`).
+2. Instalar JDK 21 (`winget install EclipseAdoptium.Temurin.21.JDK`): el JDK que trae Android
+   Studio es el 25 y Gradle no lo acepta. No aceptar el arreglo automático que ofrece Android
+   Studio (agrega el plugin foojay y falla la verificación de dependencias).
+3. Compilar desde `app/bitchat-android`, en Git Bash:
+   `JAVA_HOME="/c/Program Files/Eclipse Adoptium/jdk-21.0.13.9-hotspot" ./gradlew :app:assembleDebug`
+   (unos 5 min la primera vez). En Android Studio: *Settings → Build Tools → Gradle → Gradle JDK*
+   = temurin-21. El APK queda en `app/build/outputs/apk/debug/app-arm64-v8a-debug.apk`.
 4. Instalar en cada celular, con *Depuración USB* activada:
-   `adb install -r app/build/outputs/apk/debug/app-debug.apk`.
+   `adb install -r app/build/outputs/apk/debug/app-arm64-v8a-debug.apk`.
+
+Para probar la malla sin compilar sirve el APK oficial de la misma versión:
+`gh release download v2.2.0 -R permissionlesstech/bitchat-android -p bitchat-android-arm64.apk`.
 
 La app pide permisos de Bluetooth, ubicación (Android la exige para escanear BLE) y notificaciones.
 
@@ -80,8 +86,9 @@ Agentes, triaje con Jev, base de datos de la central, tablero, simulador.
 ### Checklist Hito 1
 
 - [x] Fork creado y agregado como submódulo en `app/bitchat-android`.
-- [ ] Compila en Android Studio sin cambios.
-- [ ] APK instalado en 3 celulares Android (A, B, C).
+- [x] Compila sin cambios (Windows, JDK 21, `:app:assembleDebug`).
+- [x] APK instalado en 3 celulares Android: moto g52 (A), moto g32 (B), moto g04s (C).
+- [x] Los mensajes llegan entre los 3.
 - [ ] **Salto:** un mensaje público de A llega a C pasando por B, con A y C fuera de alcance
       directo (en otra habitación o a más de unos 30 m).
 - [ ] **Alcance:** distancia a la que dos celulares dejan de verse, en interior y en exterior.

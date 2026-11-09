@@ -22,7 +22,7 @@ SARD1|a3f9-0042|P1|ATRAP|3|101|d2fkcd|1762481000|edificio colapsado calle 23
 |---|-------|---------|-------------|-------------|
 | 0 | cabecera | `SARD1` literal | sí | Versión del protocolo. |
 | 1 | id | `<disp>-<contador>` | sí | ID corto del dispositivo + contador local. Único por reporte. |
-| 2 | prioridad | `P1`…`P4` | sí | P1 crítica, P4 baja. La calculan las reglas en el celular. |
+| 2 | prioridad | `P1`…`P4` | sí | P1 crítica, P4 baja. La calculan las reglas en el celular (ver "Prioridad en el celular"). |
 | 3 | tipo | `ATRAP` `MEDIC` `FUEGO` `VIA` `DESAP` `OTRO` | sí | Tipo de emergencia. |
 | 4 | personas | entero ≥ 0 | sí | Personas afectadas estimadas. |
 | 5 | banderas | 3 dígitos `0`/`1` | sí | Posición 1: atrapados. 2: heridos. 3: niños o adultos mayores. |
@@ -68,6 +68,20 @@ pasarela y la malla hasta el reportante. Antes de darlo, la central le entrega e
    celular ve un vecino nuevo en la malla.
 6. Un mensaje mal formado no recibe `SACK`: la central lo rechaza con sus motivos y lo registra como
    `reporte_rechazado`. El emisor no debe reintentarlo sin corregirlo.
+
+## Prioridad en el celular
+
+Gana la primera fila que se cumple, de arriba abajo. Solo reglas, sin red ni modelos (ADR 0004).
+
+| Prioridad | Cuándo |
+|-----------|--------|
+| P1 | Atrapados (bandera 1) o el texto tiene una palabra crítica |
+| P2 | Heridos (bandera 2) o niños o adultos mayores (bandera 3) |
+| P3 | Una o más personas afectadas (`personas` ≥ 1) |
+| P4 | Ninguna persona afectada (`personas` = 0) |
+
+El tipo de emergencia no cambia la prioridad. La central puede subirla con sus agentes, nunca
+bajarla (ADR 0005).
 
 ## Palabras críticas
 

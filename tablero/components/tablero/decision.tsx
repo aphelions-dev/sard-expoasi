@@ -158,7 +158,7 @@ export function BarraDecision({ inc, nodo, coordinador, lugar, onDecidido }: Pro
         <span aria-hidden="true" className="grid size-4 place-items-center rounded-full bg-foreground font-mono text-[0.625rem] text-background">
           4
         </span>
-        <h3 id="t-decision" className="font-semibold">
+        <h3 id="t-decision" className="shrink-0 font-semibold">
           Tu decisión
         </h3>
         <span className="truncate text-muted-foreground" title={lugar(a.accion)}>

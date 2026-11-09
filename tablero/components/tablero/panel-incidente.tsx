@@ -19,6 +19,7 @@ import {
   fuenteLegible,
   TIPO,
   coordenadas,
+  duracion,
   precision,
   haceCuanto,
   horaLocal,
@@ -157,7 +158,7 @@ export function PanelIncidente({
         `Las centrales no coinciden en el ${numero.get(d.reporte_id) ?? d.reporte_id}: ${d.prioridades.join(" vs ")} (se muestra la más alta).`
     ),
     ...(inc.vigencia.sin_noticias_recientes
-      ? [`Sin noticias hace ${inc.vigencia.minutos_sin_noticias} min.`]
+      ? [`Sin noticias hace ${duracion(inc.vigencia.minutos_sin_noticias)}.`]
       : []),
   ]
 

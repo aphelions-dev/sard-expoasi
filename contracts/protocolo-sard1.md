@@ -65,7 +65,8 @@ pasarela y la malla hasta el reportante. Antes de darlo, la central le entrega e
 5. Un reporte vence a los 600 s (10 min) de su `hora_unix`, en el reportante y en cada relevo
    (unos 14 intentos). Vencido, queda marcado como "no entregado" y se deja de reintentar, pero nunca
    se borra. Se reactiva con una ronda nueva de reintentos (la espera vuelve a 2 s) cuando el
-   celular ve un vecino nuevo en la malla.
+   celular ve un vecino nuevo en la malla: un par conectado cuyo id no estaba en la lista anterior
+   de vecinos. La ronda nueva vence a los 600 s de reactivarse.
 6. Un mensaje mal formado no recibe `SACK`: la central lo rechaza con sus motivos y lo registra como
    `reporte_rechazado`. El emisor no debe reintentarlo sin corregirlo.
 
@@ -89,6 +90,12 @@ La lista vive en `contracts/palabras-criticas.txt`, con la regla de comparación
 archivo. La app y la central leen ese mismo archivo: un reporte que contenga una de ellas es P1
 y ningún modelo baja esa prioridad (ADR 0005).
 
+## Transporte en la malla
+
+Los `SARD1` y `SACK` viajan como **mensajes públicos** de la malla de bitchat (difusión a todos los
+vecinos, hasta 7 saltos). Cada celular los reconoce por la cabecera y no los muestra en el chat.
+Como se reenvían idénticos hasta el `SACK`, cada celular descarta los repetidos por `id`.
+
 ## Sincronización
 
 - **Pasarela.** Antes de subir, consulta `GET /salud` de la central A; si no responde, sube a la B.
@@ -100,7 +107,5 @@ y ningún modelo baja esa prioridad (ADR 0005).
 
 ## Por definir
 
-- Longitud máxima de `texto` y del mensaje completo (límite de la malla, P1; se mide en #1).
+- Longitud máxima de `texto` y del mensaje completo (límite de la malla, P1; por medir con los celulares: bitchat parte en fragmentos lo que pasa de 512 bytes).
 - Qué tan vieja puede ser la posición del GPS para usarla en un reporte (P1).
-- Cómo detecta la app un vecino nuevo para reactivar un reporte vencido (regla 5; se confirma en
-  #1 con bitchat-android).

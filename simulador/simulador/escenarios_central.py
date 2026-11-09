@@ -29,7 +29,7 @@ from .metricas import RESULTADOS, calcular
 from .sard1 import Reporte
 
 CENTRAL = Path(__file__).parents[2] / "central"
-URLS = {"A": "http://localhost:8001", "B": "http://localhost:8002"}
+URLS = {"A": "http://127.0.0.1:8001", "B": "http://127.0.0.1:8002"}
 ORDEN = {"P1": 1, "P2": 2, "P3": 3, "P4": 4}
 
 

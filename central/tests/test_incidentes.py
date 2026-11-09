@@ -144,3 +144,9 @@ def test_dos_centrales_triaron_distinto_se_conservan_ambas(conn, tmp_path):
     (inc,) = incidentes.todos(conn).values()
     (d,) = inc.incertidumbre["discrepancias_entre_centrales"]
     assert d["prioridades"] == ["P1", "P2"] and inc.prioridad == "P1"
+
+
+def test_sin_jev_junta_la_misma_zona_aunque_uno_sea_mas_preciso(conn):
+    preciso = A2.replace("d29e4m", "d29e4kqr")
+    incs = pipeline(conn, [A1, preciso], JevCorrelacion(falla=True))
+    assert len(incs) == 1

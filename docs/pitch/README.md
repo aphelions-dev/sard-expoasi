@@ -4,7 +4,7 @@
 |---------|--------|
 | `pitch.pdf` | La presentación ejecutiva (9 diapositivas, unos 5 minutos) en PDF. **Pendiente**: se exporta desde la presentación cuando el equipo apruebe la versión. |
 | `guion-demo.md` | La demo de 5 minutos: los 8 pasos, quién los muestra y el plan B de cada uno. |
-| `sard-demo-respaldo.mp4` | Video de respaldo (2 min 56 s, sin audio): el recorrido de 8 pasos grabado el 7 de noviembre de 2026 con la malla simulada y las centrales y el tablero reales, incluida la aprobación en el tablero y la caída de la central A. Plan B si la demo en vivo falla. |
+| `sard-demo-respaldo.mp4` | Video de respaldo (3 min 4 s, sin audio): el recorrido de 8 pasos grabado el 8 de noviembre de 2026 con la malla simulada y las centrales y el tablero (Next.js) reales, incluida la aprobación en el tablero y la caída de la central A con 12 subidas a la B. Termina con la frase de cierre. Plan B si la demo en vivo falla. |
 
 Orden: pitch (5 min) y luego la demo (5 min).
 
@@ -25,5 +25,6 @@ Share). Cada diapositiva tiene notas para quien la presenta.
 | 8 | IA con límites, y lo que todavía falta | P2 | 35 s |
 | 9 | Cierre | P3 | 20 s |
 
-Versión 1, del 7 de noviembre de 2026. Cambiarán la diapositiva 4 cuando la app Android funcione con
-celulares reales, y la 7 y la 8 cuando se mida el triaje con Jev (E6).
+Versión 2, del 8 de noviembre de 2026: captura del tablero en Next.js (diapositiva 6) y resultados con
+la central y las palabras críticas nuevas (7 y 8). Cambiarán la diapositiva 4 cuando la app Android
+funcione con celulares reales, y la 7 y la 8 cuando se mida el triaje con Jev (E6).

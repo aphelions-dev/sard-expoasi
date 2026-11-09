@@ -3,7 +3,7 @@
 Es el plan B de los pasos 1 a 3 mientras no haya celulares (la app es de P1): los celulares y la
 malla son simulados; las centrales A y B, los agentes y el tablero son los reales.
 
-    cd tablero && npm run dev                         # el tablero, en otra terminal (paso 6)
+    cd tablero && npm run dev -- -p 5173              # el tablero, en otra terminal (paso 6)
     cd simulador && PYTHONUTF8=1 uv run python -m simulador recorrido
     # visor de la malla: http://localhost:8090 · avanzar: Enter aquí o "Siguiente paso" en el visor
     # --seguido: avanza solo (para ensayar o grabar el video) · --env-file ../.env: con Jev
@@ -184,11 +184,14 @@ def main(seguido: bool = False, env_file: str | None = None, pausa_s: float = 8.
     estado = Estado(sim)
     corriendo = threading.Event()  # pausa la malla entre los pasos 1 y 2
     pedidos: list = []             # lo que el hilo principal le pide a la simulación, en su hilo
+    programados: list = []         # (paso de la malla, función): reportes que llegan más tarde
 
     def al_paso(t: int) -> None:
         corriendo.wait()
         while pedidos:
             pedidos.pop(0)()
+        while programados and programados[0][0] <= t:
+            programados.pop(0)[1]()
         sim.p.hora_base = int(time.time()) - t  # hora_unix real en cada reporte nuevo
 
     sim.al_paso = al_paso
@@ -219,10 +222,13 @@ def main(seguido: bool = False, env_file: str | None = None, pausa_s: float = 8.
         webbrowser.open(f"http://localhost:{PUERTO}")
         centrales.levantar("A")
         centrales.levantar("B")
-        for entidad, recurso, n in [("Bomberos", "equipo de rescate", 1), ("Bomberos", "máquina de bomberos", 1),
-                                    ("Cruz Roja", "ambulancia", 2)]:
-            pedir(f"{URLS['A']}/recursos", {"entidad": entidad, "recurso": recurso, "disponibles": n,
-                                            "coordinador": "sala de crisis"})
+        for entidad, recurso, matricula in [("Bomberos", "equipo de rescate", "BM-R1"),
+                                            ("Bomberos", "máquina de bomberos", "BM-M3"),
+                                            ("Cruz Roja", "ambulancia", "CR-114"),
+                                            ("Cruz Roja", "ambulancia", "CR-207")]:
+            pedir(f"{URLS['A']}/recursos/unidades", {"entidad": entidad, "recurso": recurso,
+                                                     "matricula": matricula,
+                                                     "reportado_por": f"registrador {entidad}"})
         hilo.start()
 
         # 1 · Reporte
@@ -283,19 +289,25 @@ def main(seguido: bool = False, env_file: str | None = None, pausa_s: float = 8.
         libres = [n.id for n in sim.nodos if not n.pasarela and n.vivo]
         rafaga = [(rng.choice(libres), rng.choice(filas)) for _ in range(20)]
         antes = len(sim.seguimiento)
-        for i, (nodo, fila) in enumerate(rafaga):
-            pedidos.append(lambda nodo=nodo, fila=fila: sim.crear(nodo, fila))
-        estado.poner(7, "Ráfaga de 20 reportes desde toda la malla.")
+        # Uno cada 2 pasos de la malla (~20 s): la A cae con la ráfaga a medias, así que buena parte
+        # de los reportes nace después y tiene que llegar por la B. Si salieran todos juntos, la malla
+        # los entregaría a la A antes del apagón y la caída no se vería.
+        inicio = sim.t
+        programados.extend((inicio + 2 * i, lambda nodo=nodo, fila=fila: sim.crear(nodo, fila))
+                           for i, (nodo, fila) in enumerate(rafaga))
+        estado.poner(7, "Ráfaga de 20 reportes desde toda la malla durante unos 20 s.")
         time.sleep(2)
         for k in (3, 2, 1):
             estado.agregar(f"Apagando la central A en {k}…")
             time.sleep(1)
         en_vuelo = sum(s.llegada is None for s in list(sim.seguimiento.values()))
+        faltan = len(programados)
         centrales.apagar("A")
         with estado.lock:
             estado.centrales["A"] = "caida"
-        estado.agregar(f"Central A apagada (API y agentes) con {en_vuelo} reportes todavía en la malla.")
-        esperar()
+        estado.agregar(f"Central A apagada (API y agentes) con {en_vuelo} reportes en la malla y "
+                       f"{faltan} todavía por crearse.")
+        esperar(lambda: not programados, limite_s=60)
 
         # 8 · Recuperación
         ids = [x for x in list(sim.seguimiento)[antes:]]

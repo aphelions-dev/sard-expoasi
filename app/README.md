@@ -24,13 +24,19 @@ Requisitos (de `.java-version`, `gradle/libs.versions.toml` y el wrapper del for
 **Android SDK 37** (compileSdk y targetSdk), AGP 9.3.1, Kotlin 2.4.10 y Gradle 9.6.1, que lo baja
 el wrapper.
 
-1. Instalar Android Studio, que trae su propio JDK 21. En *SDK Manager*: Android API 37 y
-   *Platform-Tools* (`adb`).
-2. Abrir `app/bitchat-android` en Android Studio y dejar que sincronice Gradle.
-3. Compilar: *Build → Build APK(s)* o `./gradlew assembleDebug`. El APK queda en
-   `app/build/outputs/apk/debug/app-debug.apk`.
+1. Instalar Android Studio y, en *SDK Manager*, Android API 37 y *Platform-Tools* (`adb`).
+2. Instalar JDK 21 (`winget install EclipseAdoptium.Temurin.21.JDK`): el JDK que trae Android
+   Studio es el 25 y Gradle no lo acepta. No aceptar el arreglo automático que ofrece Android
+   Studio (agrega el plugin foojay y falla la verificación de dependencias).
+3. Compilar desde `app/bitchat-android`, en Git Bash:
+   `JAVA_HOME="/c/Program Files/Eclipse Adoptium/jdk-21.0.13.9-hotspot" ./gradlew :app:assembleDebug`
+   (unos 5 min la primera vez). En Android Studio: *Settings → Build Tools → Gradle → Gradle JDK*
+   = temurin-21. El APK queda en `app/build/outputs/apk/debug/app-arm64-v8a-debug.apk`.
 4. Instalar en cada celular, con *Depuración USB* activada:
-   `adb install -r app/build/outputs/apk/debug/app-debug.apk`.
+   `adb install -r app/build/outputs/apk/debug/app-arm64-v8a-debug.apk`.
+
+Para probar la malla sin compilar sirve el APK oficial de la misma versión:
+`gh release download v2.2.0 -R permissionlesstech/bitchat-android -p bitchat-android-arm64.apk`.
 
 La app pide permisos de Bluetooth, ubicación (Android la exige para escanear BLE) y notificaciones.
 
@@ -51,7 +57,8 @@ La app pide permisos de Bluetooth, ubicación (Android la exige para escanear BL
 | Relevo | no | Guarda y reenvía reportes ajenos por prioridad. |
 | Pasarela | sí | Sube los reportes a la central por HTTP con failover A → B y devuelve `SACK` a la malla. |
 
-Cómo se elige el rol (ajuste en la app, detección de internet u otro): **por definir**.
+Cómo se elige el rol: con el interruptor **Modo pasarela** de la hoja SOS, junto a la URL de la
+central. Sin activarlo, el celular es reportante y relevo.
 Cantidad de celulares para la demo: por definir, mínimo 3.
 
 ## Alcance
@@ -80,8 +87,9 @@ Agentes, triaje con Jev, base de datos de la central, tablero, simulador.
 ### Checklist Hito 1
 
 - [x] Fork creado y agregado como submódulo en `app/bitchat-android`.
-- [ ] Compila en Android Studio sin cambios.
-- [ ] APK instalado en 3 celulares Android (A, B, C).
+- [x] Compila sin cambios (Windows, JDK 21, `:app:assembleDebug`).
+- [x] APK instalado en 3 celulares Android: moto g52 (A), moto g32 (B), moto g04s (C).
+- [x] Los mensajes llegan entre los 3.
 - [ ] **Salto:** un mensaje público de A llega a C pasando por B, con A y C fuera de alcance
       directo (en otra habitación o a más de unos 30 m).
 - [ ] **Alcance:** distancia a la que dos celulares dejan de verse, en interior y en exterior.
@@ -92,6 +100,80 @@ Agentes, triaje con Jev, base de datos de la central, tablero, simulador.
       le llega el mensaje (gossip sync).
 - [ ] Resultados en un comentario del issue #1. Si no funciona, avisar para decidir el plan B
       (transporte simulado) antes del Hito 2.
+
+## Cómo funciona (Hito 2)
+
+El código va en `bitchat-android/app/src/main/java/com/bitchat/android/sard/`.
+
+| Pieza | Archivo | Qué hace |
+|-------|---------|----------|
+| Formulario | `SardPantalla.kt` | El botón **SOS** del chat abre el formulario, *Mis reportes* con su estado y el ajuste de pasarela. |
+| Prioridad | `Prioridad.kt` | Las reglas del contrato. `palabras-criticas.txt` se copia de `contracts/` al compilar. |
+| Mensajes | `Sard1.kt` | Escribe y lee `SARD1` y `SACK`. |
+| Almacenamiento | `Almacen.kt` | JSON en `filesDir/sard/reportes.json`. Nunca borra. |
+| Pasarela | `Pasarela.kt` | `POST /reportes` a la central, con failover A → B. |
+| Unión | `Sard.kt` | Crea, recibe, sube y confirma. |
+
+- **Transporte:** el SARD1 viaja como **mensaje público** de la malla y usa los saltos y el gossip
+  de bitchat. Por ahora también se ve en el chat.
+- **Prueba de punta a punta:** central en el PC (`central/`, `iniciar.py A`). El celular pasarela
+  debe estar en la misma Wi-Fi, con la central A en `http://<IP del PC>:8001` y la B en `:8002`. En Windows hay que abrir los
+  puertos: `netsh advfirewall firewall add rule name=SARD-central dir=in action=allow protocol=TCP localport=8001-8002 remoteip=localsubnet`
+  (como administrador).
+- Un build debug no reemplaza al bitchat oficial (otra firma): primero `adb uninstall com.bitchat.droid`.
+
+### Checklist Hito 2
+
+- [x] Formulario offline y prioridad por reglas (#5).
+- [x] Almacenamiento local (#6).
+- [x] Modo pasarela con `POST /reportes` y `SACK` (#7).
+- [x] Probado en 3 celulares: A sin internet → malla → C pasarela → central → tablero, y A ve
+      "entregado".
+
+### Checklist Hito 3
+
+- [x] Cola de reenvío por prioridad (P1 primero, luego `hora_unix`), sin descartar P3/P4 (#10).
+- [x] Reintentos 2, 4, 8, 16, 32 s y luego 60 s, con ±20 %, en el reportante y en cada relevo.
+- [x] Vencimiento a los 600 s ("no entregado", sin borrar) y reactivación con un vecino nuevo.
+- [x] Los SARD1 y SACK no se muestran en el chat.
+- [x] Probado en celulares: sin pasarela, A reintenta; al activar la pasarela llega y A ve
+      "entregado". Vencimiento y reactivación: solo con tests (`ColaTest`).
+
+### Checklist Hito 4
+
+- [x] Failover (#14): antes de subir, `GET /salud` de la A (límite de 3 s, valor de la app); si
+      no responde, sube a la B. Si la A responde pero falla al recibir, también prueba la B.
+- [x] Los SARD1 y SACK no pasan por el filtro de spam de bitchat, que escondía los reintentos
+      idénticos.
+- [x] Probado en celulares: con la central A apagada, la pasarela subió a la B. Al encender la A,
+      copió de la B lo que le faltaba y ningún reporte se perdió.
+
+## Demo con celulares (Hito 5)
+
+Pasos 1 a 4 del guion (`docs/pitch/guion-demo.md`) con los celulares; la ráfaga y la caída del
+paso 7 las hace el simulador (#86). El simulador entero queda de plan B.
+
+**APK:** release [`sard-v1.0`](https://github.com/aphelions-dev/bitchat-android/releases/tag/sard-v1.0)
+del fork (`app-arm64-v8a-debug.apk`; `app-universal-debug.apk` para otros procesadores). Si el
+celular tiene el bitchat oficial, desinstalarlo antes, porque tiene otra firma.
+
+| Celular | Rol | Preparación |
+|---------|-----|-------------|
+| A (moto g52) | Reportante | Sin Wi-Fi ni datos, con Bluetooth y ubicación. App abierta. |
+| B (moto g32) | Relevo, y segundo reporte del paso 3 | Igual que A, entre A y C. |
+| C (moto g04s) | Pasarela | Wi-Fi en la misma red que el PC. SOS → Modo pasarela: central A `http://<IP del PC>:8001`, central B `:8002`, Guardar y activar. |
+
+Antes de empezar:
+
+- [ ] PC: puertos 8001 y 8002 abiertos (`netsh ... SARD-central`, ver "Cómo funciona"). La IP
+      sale de `ipconfig`.
+- [ ] Centrales y tablero levantados con el recorrido (#86).
+- [ ] En C, SOS muestra "Guardado ✓" y no hay texto rojo.
+- [ ] Prueba en seco: A envía un reporte, que aparece en el tablero, y A ve "entregado".
+- [ ] Pantallas encendidas y apps abiertas: los reintentos corren con la app abierta.
+
+En pantalla durante el paso 1: al enviar, la hoja SOS muestra el mensaje SARD1, sus bytes y la
+prioridad con su motivo. Paso 2: *Mis reportes* → "pendiente · intento N". Paso 4: "✓ entregado".
 
 ## Terminado
 

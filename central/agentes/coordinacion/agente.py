@@ -24,8 +24,8 @@ ENTIDAD = {
     "OTRO": ("Sala de crisis", "verificación y asignación"),
 }
 
-# Recurso que usaría cada tipo (`contracts/api-central.md`, POST /recursos). Cuántos hay lo
-# declara el coordinador; la vista del incidente dice cuántos quedan.
+# Recurso que usaría cada tipo (`contracts/api-central.md`, Recursos). Las unidades las registra
+# cada entidad; la vista del incidente dice cuántas hay disponibles y cuáles tiene asignadas.
 RECURSO = {
     "ATRAP": "equipo de rescate",
     "FUEGO": "máquina de bomberos",

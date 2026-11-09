@@ -12,11 +12,12 @@ from typing import Annotated, Any, Literal
 
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 import config
 from agentes.coordinacion import agente as coordinacion
 from agentes.recepcion import agente as recepcion
+from agentes.resiliencia import entregar
 from registro import eventos
 from vista import incidentes, rechazados
 
@@ -94,21 +95,40 @@ class Aprobacion(BaseModel):
     nota: str = ""
 
 
-class Declaracion(BaseModel):
+EstadoUnidad = Literal["disponible", "asignada", "no_disponible"]
+
+
+class RegistroUnidad(BaseModel):
     entidad: str
     recurso: str
-    disponibles: int = Field(ge=0)
-    coordinador: str
+    matricula: str
+    reportado_por: str
+
+
+class CambioEstado(BaseModel):
+    estado: EstadoUnidad
+    incidente_id: str | None = None
+    reportado_por: str
+    nota: str = ""
+
+
+class Unidad(BaseModel):
+    matricula: str
+    estado: EstadoUnidad
+    incidente_id: str | None
+    reportado_por: str
+    reportado_en: float
+    nota: str
 
 
 class Recurso(BaseModel):
     entidad: str
     recurso: str
-    declarados: int
-    comprometidos: int
     disponibles: int
-    coordinador: str
-    declarado_en: float
+    asignadas: int
+    no_disponibles: int
+    solicitudes_abiertas: list[str]
+    unidades: list[Unidad]
 
 
 class ReporteRechazado(BaseModel):
@@ -127,6 +147,7 @@ def _salida(inc: incidentes.Incidente) -> Incidente:
 @app.post("/reportes")
 def reportes(entrada: EntradaReportes, conn: Conexion) -> SalidaReportes:
     r = recepcion.recibir(conn, entrada.mensajes, nodo=CONFIG.nodo, pasarela_id=entrada.pasarela_id)
+    entregar.entregar(CONFIG.url_par, r.recibidos)  # antes del SACK (#49)
     return SalidaReportes(sack=r.sack, rechazados=[Rechazado(**x) for x in r.rechazados])
 
 
@@ -163,6 +184,14 @@ def aprobar(incidente_id: str, entrada: Aprobacion, conn: Conexion) -> Incidente
         datos={"incidente_id": incidente_id, "accion_id": inc.accion_propuesta["id"],
                **entrada.model_dump()},
     )
+    a = inc.accion_propuesta
+    if entrada.decision == "aprobar" and a["recurso"]:
+        # Aprobar es solicitar el recurso (SCI-211); la unidad la asigna la entidad dueña.
+        eventos.agregar(
+            conn, nodo=CONFIG.nodo, tipo="recurso_solicitado",
+            datos={"incidente_id": incidente_id, "accion_id": a["id"], "entidad": a["entidad"],
+                   "recurso": a["recurso"], "coordinador": entrada.coordinador},
+        )
     return _salida(incidentes.todos(conn)[incidente_id])
 
 
@@ -171,13 +200,37 @@ def listar_recursos(conn: Conexion) -> list[Recurso]:
     return [Recurso(**r) for r in incidentes.recursos(conn)]
 
 
-@app.post("/recursos")
-def declarar_recurso(entrada: Declaracion, conn: Conexion) -> list[Recurso]:
+@app.post("/recursos/unidades")
+def registrar_unidad(entrada: RegistroUnidad, conn: Conexion) -> list[Recurso]:
+    """La entidad registra una unidad (ingreso del SCI-211); entra disponible."""
     if (entrada.entidad, entrada.recurso) not in coordinacion.RECURSOS:
         validos = ", ".join(f"{r} ({e})" for e, r in sorted(coordinacion.RECURSOS))
         raise HTTPException(422, f"recurso desconocido; los válidos son: {validos}")
-    eventos.agregar(conn, nodo=CONFIG.nodo, tipo="recurso_declarado", datos=entrada.model_dump())
+    if entrada.matricula in _unidades(conn):
+        raise HTTPException(409, f"la matrícula {entrada.matricula} ya está registrada")
+    eventos.agregar(conn, nodo=CONFIG.nodo, tipo="unidad_registrada", datos=entrada.model_dump())
     return listar_recursos(conn)
+
+
+@app.post("/recursos/unidades/{matricula}/estado")
+def cambiar_estado(matricula: str, entrada: CambioEstado, conn: Conexion) -> list[Recurso]:
+    """La entidad reporta un cambio de estado; liberar es volver a `disponible`."""
+    if matricula not in _unidades(conn):
+        raise HTTPException(404, f"no existe la unidad {matricula}")
+    if entrada.estado == "asignada":
+        if not entrada.incidente_id:
+            raise HTTPException(422, "para asignar una unidad hace falta el incidente_id")
+        if incidentes.uno(conn, entrada.incidente_id) is None:
+            raise HTTPException(404, f"no existe el incidente {entrada.incidente_id}")
+    elif entrada.incidente_id is not None:
+        raise HTTPException(422, "incidente_id solo va con el estado asignada")
+    eventos.agregar(conn, nodo=CONFIG.nodo, tipo="unidad_estado",
+                    datos={"matricula": matricula, **entrada.model_dump()})
+    return listar_recursos(conn)
+
+
+def _unidades(conn: sqlite3.Connection) -> dict[str, dict[str, Any]]:
+    return incidentes.unidades(eventos.leer(conn, tipos=["unidad_registrada", "unidad_estado"]))
 
 
 @app.get("/rechazados")
@@ -193,6 +246,26 @@ def listar_eventos(
     evs = eventos.leer(conn, desde_seq=desde_seq, limite=limite)
     ultimo = conn.execute("SELECT coalesce(max(seq), 0) FROM eventos").fetchone()[0]
     return {"eventos": [asdict(e) for e in evs], "ultimo_seq": ultimo}
+
+
+class EventoEntrante(BaseModel):
+    id: str
+    nodo: str
+    tipo: Literal["reporte_recibido"]  # lo demás llega por GET /eventos
+    reporte_id: str
+    causa: str | None
+    datos: dict[str, Any]
+    creado_en: float
+
+
+class EntradaEventos(BaseModel):
+    eventos: list[EventoEntrante]
+
+
+@app.post("/eventos")
+def recibir_eventos(entrada: EntradaEventos, conn: Conexion) -> dict[str, int]:
+    """La otra central entrega un reporte antes de dar su SACK; no es para el tablero."""
+    return {"agregados": sum(eventos.importar(conn, e.model_dump()) for e in entrada.eventos)}
 
 
 @app.get("/salud")

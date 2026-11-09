@@ -1,4 +1,4 @@
-"""Orden por impacto y confianza, vigencia, recursos declarados, rechazados y nota obligatoria."""
+"""Orden por impacto y confianza, vigencia, recursos por unidad, rechazados y nota obligatoria."""
 
 import time
 
@@ -59,35 +59,64 @@ def test_vigencia_marca_lo_que_lleva_mas_de_una_hora_sin_noticias(cliente):
     assert not v["inc-bb02-1"]["sin_noticias_recientes"]
 
 
-def test_recursos_declarados_se_descuentan_al_aprobar(cliente):
+def registrar(cliente, matricula, entidad="Cruz Roja", recurso="ambulancia"):
+    return cliente.post("/recursos/unidades", json={
+        "entidad": entidad, "recurso": recurso, "matricula": matricula, "reportado_por": "CR sala"})
+
+
+def estado(cliente, matricula, estado, incidente_id=None, nota=""):
+    return cliente.post(f"/recursos/unidades/{matricula}/estado", json={
+        "estado": estado, "incidente_id": incidente_id, "reportado_por": "CR sala", "nota": nota})
+
+
+def test_aprobar_solicita_y_la_entidad_asigna_y_libera(cliente):
     subir(cliente, [linea("aa01-1"), linea("bb02-1", geohash="d2u000")])
     procesar(cliente)
+    primero, segundo = [i["id"] for i in cliente.get("/incidentes").json()]
     inc = cliente.get("/incidentes").json()[0]
     assert inc["accion_propuesta"]["recurso"] == "ambulancia"
-    assert inc["recurso"]["disponibles"] is None  # nadie lo ha declarado: no se inventa
-    assert len(inc["recurso"]["compiten"]) == 1
+    assert inc["recurso"] == {"recurso": "ambulancia", "entidad": "Cruz Roja", "disponibles": None,
+                              "compiten": [segundo], "solicitado": False, "asignadas": []}
+    assert cliente.get("/recursos").json() == []  # sin unidades registradas no se inventa nada
 
-    r = cliente.post("/recursos", json={"entidad": "Cruz Roja", "recurso": "ambulancia",
-                                        "disponibles": 1, "coordinador": "sala"})
-    assert r.json()[0]["disponibles"] == 1
-    aprobar = cliente.post(f"/incidentes/{inc['id']}/aprobacion",
-                           json={"decision": "aprobar", "coordinador": "sala", "nota": "va"})
-    assert aprobar.status_code == 200
-    assert cliente.get("/recursos").json()[0] == {
-        **cliente.get("/recursos").json()[0], "comprometidos": 1, "disponibles": 0}
-    otro = [i for i in cliente.get("/incidentes").json() if i["id"] != inc["id"]][0]
-    assert otro["recurso"]["disponibles"] == 0 and otro["recurso"]["compiten"] == []
+    (fila,) = registrar(cliente, "CR-114").json()
+    assert fila["disponibles"] == 1 and fila["unidades"][0]["estado"] == "disponible"
 
-    # Devolver la unidad es declarar otra vez el número actual.
-    cliente.post("/recursos", json={"entidad": "Cruz Roja", "recurso": "ambulancia",
-                                    "disponibles": 1, "coordinador": "sala"})
-    assert cliente.get("/recursos").json()[0]["disponibles"] == 1
+    # Aprobar solicita el recurso, pero no toca la unidad.
+    cliente.post(f"/incidentes/{primero}/aprobacion",
+                 json={"decision": "aprobar", "coordinador": "sala", "nota": "va"})
+    (fila,) = cliente.get("/recursos").json()
+    assert fila["disponibles"] == 1 and fila["solicitudes_abiertas"] == [primero]
+    incs = {i["id"]: i for i in cliente.get("/incidentes").json()}
+    assert incs[primero]["recurso"]["solicitado"] and incs[primero]["recurso"]["disponibles"] == 1
+
+    # La Cruz Roja reporta la asignación: la solicitud se cierra y deja de competir.
+    (fila,) = estado(cliente, "CR-114", "asignada", primero).json()
+    assert (fila["disponibles"], fila["asignadas"], fila["solicitudes_abiertas"]) == (0, 1, [])
+    assert fila["unidades"][0]["incidente_id"] == primero
+    incs = {i["id"]: i for i in cliente.get("/incidentes").json()}
+    assert incs[primero]["recurso"]["asignadas"] == ["CR-114"]
+    assert incs[segundo]["recurso"]["compiten"] == [] and incs[segundo]["recurso"]["disponibles"] == 0
+
+    # Liberar es volver a disponible; no_disponible no cuenta como disponible.
+    assert estado(cliente, "CR-114", "disponible").json()[0]["disponibles"] == 1
+    (fila,) = estado(cliente, "CR-114", "no_disponible", nota="sin tripulación").json()
+    assert (fila["disponibles"], fila["no_disponibles"]) == (0, 1)
+    assert fila["unidades"][0]["nota"] == "sin tripulación"
+
+    tipos = [e["tipo"] for e in cliente.get("/eventos").json()["eventos"]]
+    assert tipos.count("recurso_solicitado") == 1 and tipos.count("unidad_estado") == 3
 
 
-def test_recurso_desconocido_se_rechaza(cliente):
-    r = cliente.post("/recursos", json={"entidad": "Cruz Roja", "recurso": "helicóptero",
-                                        "disponibles": 1, "coordinador": "sala"})
-    assert r.status_code == 422
+def test_errores_al_registrar_y_reportar_unidades(cliente):
+    assert registrar(cliente, "X-1", recurso="helicóptero").status_code == 422
+    assert registrar(cliente, "CR-114").status_code == 200
+    assert registrar(cliente, "CR-114").status_code == 409
+    assert estado(cliente, "NO-EXISTE", "disponible").status_code == 404
+    assert estado(cliente, "CR-114", "asignada").status_code == 422
+    assert estado(cliente, "CR-114", "asignada", "inc-nada").status_code == 404
+    assert estado(cliente, "CR-114", "disponible", "inc-nada").status_code == 422
+    assert estado(cliente, "CR-114", "en_camino").status_code == 422
 
 
 def test_aprobar_lo_marcado_para_revisar_exige_nota(cliente):

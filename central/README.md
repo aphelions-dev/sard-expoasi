@@ -29,7 +29,7 @@ El ejecutor común está en `agentes/ejecutor.py`.
 | `SARD_NODO` | `A` | Qué central es (`A` o `B`) |
 | `SARD_DB` | `datos/central-<nodo>.sqlite` | Base de la instancia |
 | `JEV_API_KEY` | — | Clave de Jev; sin ella el triaje y la correlación quedan solo con reglas |
-| `CENTRAL_A_URL`, `CENTRAL_B_URL` | `http://localhost:8001` y `:8002` | Dónde está cada central, para sincronizarse y para el relevo |
+| `CENTRAL_A_URL`, `CENTRAL_B_URL` | — | Dónde está cada central, para sincronizarse y entregarle cada reporte antes del `SACK`. En una sola máquina, `http://127.0.0.1:8001` y `:8002`: en Windows, `localhost` prueba primero IPv6 y tarda unos 2 s, más que la espera de 1 s de la entrega |
 
 ## Centrales A y B
 
@@ -76,7 +76,9 @@ dos veces el mismo reporte.
 | `decision_humana` | API (coordinador) | Aprobación o rechazo de la propuesta vigente |
 | `agente_error` | Cualquier agente | Un agente falló con un evento; se reintenta |
 | `par_caido`, `par_recuperado` | Resiliencia | La otra central dejó de responder o volvió |
-| `recurso_declarado` | API (coordinador) | Cuántas unidades hay de un recurso (`POST /recursos`); reemplaza la declaración anterior |
+| `recurso_solicitado` | API (coordinador) | Al aprobar una propuesta con recurso: queda pedido, sin unidad asignada |
+| `unidad_registrada` | API (entidad) | Una entidad registra una unidad con su matrícula (`POST /recursos/unidades`); entra disponible |
+| `unidad_estado` | API (entidad) | La entidad reporta que una unidad quedó disponible, asignada a un incidente o no disponible |
 
 ## Decisiones provisionales del contrato
 

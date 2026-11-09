@@ -20,7 +20,7 @@ Requisitos: Python 3.12+ con [uv](https://docs.astral.sh/uv/) y Node 20+. Puerto
 
 ```bash
 git clone https://github.com/aphelions-dev/sard-expoasi.git && cd sard-expoasi
-(cd tablero && npm install && npm run dev)                          # terminal 1: tablero → http://localhost:5173
+(cd tablero && npm install && npm run dev -- -p 5173)              # terminal 1: tablero → http://localhost:5173
 cd simulador && uv sync && PYTHONUTF8=1 uv run python -m simulador recorrido   # terminal 2: el recorrido
 ```
 
@@ -29,6 +29,21 @@ por los 8 pasos de la condición de integración (Enter o «Siguiente paso»): r
 transmisión, agentes, priorización, aprobación en el tablero, **caída de la central A en plena carga**
 y recuperación. Sin `JEV_API_KEY` el triaje corre solo con reglas; con ella, copiar `.env.example` a
 `.env` y agregar `--env-file ../.env`. Guion y plan B de cada paso: `docs/pitch/guion-demo.md`.
+
+### Con Docker, sin instalar nada más
+
+Requisito: Docker. Levanta las centrales A y B con sus agentes y el tablero, cada central con su
+propio volumen para el registro de eventos:
+
+```bash
+docker compose up --build -d          # centrales en :8001 y :8002, tablero en http://localhost:5173
+docker compose run --rm simulador     # carga reportes sintéticos por la malla simulada
+docker compose stop central-a         # condición adversa: cae la A y el tablero sigue con la B
+docker compose start central-a        # vuelve la A y trae lo que hizo la B
+docker compose down -v                # apaga todo y borra los registros
+```
+
+Con `JEV_API_KEY` en `.env` el triaje usa Jev; sin ella, solo reglas.
 
 ## Entregables
 
@@ -73,9 +88,8 @@ Uso responsable de la IA: `docs/uso-responsable-ia.md`. Riesgos y planes B: `doc
 
 - La malla se muestra con el simulador mientras la app Android no esté lista; el simulador modela
   alcance, pérdida y batería, pero no reemplaza la prueba con celulares.
-- Las reglas de triaje tienen falsos positivos y variantes que no detectan (#43); sin Jev, 13 de 30
-  casos críticos sin palabra crítica dependen del coordinador.
-- Si la central A cae justo después de confirmar un reporte, la B lo recibe cuando la A vuelve (#49).
+- Las reglas no interpretan negaciones («no hay atrapados» sube a P1, con aviso de posible
+  negación); sin Jev, 4 de 30 casos críticos sin palabra crítica dependen del coordinador.
 - Todos los datos son sintéticos.
 
 ## Equipo

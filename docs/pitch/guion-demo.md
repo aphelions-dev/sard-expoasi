@@ -9,7 +9,7 @@ Mientras no haya celulares (la app es de P1), los pasos 1 a 3 usan el **plan B**
 de celulares y malla. Las centrales A y B, los agentes y el tablero son los reales.
 
 ```bash
-cd tablero && npm run dev                                         # terminal 1: tablero (paso 6)
+cd tablero && npm run dev -- -p 5173                              # terminal 1: tablero (paso 6)
 cd simulador && PYTHONUTF8=1 uv run python -m simulador recorrido  # terminal 2: el recorrido
 ```
 
@@ -20,7 +20,7 @@ cd simulador && PYTHONUTF8=1 uv run python -m simulador recorrido  # terminal 2:
   perdió nada.
 - Se avanza con **Enter** en la terminal o con **«Siguiente paso»** en el visor. `--seguido` avanza solo
   (para ensayar o grabar el video, #23); `--env-file ../.env` usa Jev.
-- El script levanta A y B con bases nuevas, declara 1 equipo de rescate, 1 máquina de bomberos y 2
+- El script levanta A y B con bases nuevas, registra como unidades 1 equipo de rescate, 1 máquina de bomberos y 2
   ambulancias, y en el paso 7 apaga la A entera (API y agentes) con aviso «3… 2… 1…».
 - Puertos libres: 8001, 8002, 8090 y 5173.
 
@@ -32,7 +32,7 @@ mismos incidentes.
 
 | Paso | Qué se ve | Quién lo muestra | Plan B si falla |
 |------|-----------|------------------|-----------------|
-| 1. Reporte | Sin internet se crea el reporte; prioridad P1 por reglas («atrapad» y atrapados marcado); el mensaje SARD1 de 133 bytes | P1 | Celulares: visor del simulador (lo que se usa hoy) |
+| 1. Reporte | Sin internet se crea el reporte; prioridad P1 por reglas («atrap» y atrapados marcado); el mensaje SARD1 de 133 bytes | P1 | Celulares: visor del simulador (lo que se usa hoy) |
 | 2. Almacenamiento | El reporte queda «pendiente» en la cola del celular | P1 | Visor del simulador |
 | 3. Transmisión | Salta por los relevos hasta la pasarela; dos vecinos reportan lo mismo; se resalta el camino que llegó | P1 | Visor del simulador |
 | 4. Agentes | La central A responde `SACK`, que vuelve hasta el reportante: «entregado» | P2 | `central/demo/recorrido.py` |

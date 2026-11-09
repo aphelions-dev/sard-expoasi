@@ -4,6 +4,7 @@
   "nodos": 30,
   "pasarelas": 1,
   "lado_m": 150.0,
+  "focos": 1,
   "alcance_m": 50.0,
   "perdida": 0.1,
   "reportes": 60,
@@ -17,12 +18,12 @@
   "espera_base_s": 2.0,
   "espera_tope_s": 60.0,
   "variacion": 0.2,
-  "vence_s": null,
+  "vence_s": 600,
   "sin_gps": 0.1,
-  "hora_base": 1794089349,
+  "hora_base": 1794181713,
   "caida": null,
   "velocidad": 0.0,
-  "prefijo": "e59349n",
+  "prefijo": "e51713n",
   "por_prioridad": true
  },
  "apagada_A_en_s": 120,
@@ -33,42 +34,40 @@
  "confirmados_reportante": 60,
  "subidas_por_central": {
   "A": 25,
-  "B": 31
+  "B": 30
  },
- "subidas_fallidas": 0,
- "con_sack_pero_ausentes_en_B_con_A_caida": [
-  "e59349n12-2"
- ],
+ "subidas_fallidas": 8,
+ "con_sack_pero_ausentes_en_B_con_A_caida": [],
  "con_sack_pero_ausentes_en_B_tras_volver_A": [],
  "perdidos": 0,
  "latencia_por_prioridad": {
   "P1": {
-   "creados": 16,
-   "entregados": 16,
-   "p50_s": 2,
-   "p95_s": 5,
-   "max_s": 5
+   "creados": 25,
+   "entregados": 25,
+   "p50_s": 3,
+   "p95_s": 6,
+   "max_s": 7
   },
   "P2": {
-   "creados": 22,
-   "entregados": 22,
-   "p50_s": 4,
-   "p95_s": 5,
+   "creados": 12,
+   "entregados": 12,
+   "p50_s": 3,
+   "p95_s": 6,
    "max_s": 6
   },
   "P3": {
-   "creados": 8,
-   "entregados": 8,
-   "p50_s": 2,
-   "p95_s": 4,
-   "max_s": 4
+   "creados": 7,
+   "entregados": 7,
+   "p50_s": 3,
+   "p95_s": 6,
+   "max_s": 6
   },
   "P4": {
-   "creados": 14,
-   "entregados": 14,
+   "creados": 16,
+   "entregados": 16,
    "p50_s": 2,
-   "p95_s": 5,
-   "max_s": 5
+   "p95_s": 7,
+   "max_s": 7
   }
  },
  "cumple": true

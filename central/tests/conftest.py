@@ -18,6 +18,7 @@ def cliente(tmp_path, monkeypatch):
     monkeypatch.setenv("SARD_NODO", "A")
     monkeypatch.setenv("SARD_DB", str(tmp_path / "central.sqlite"))
     monkeypatch.delenv("JEV_API_KEY", raising=False)
+    monkeypatch.delenv("CENTRAL_B_URL", raising=False)
     import api.main
 
     importlib.reload(api.main)

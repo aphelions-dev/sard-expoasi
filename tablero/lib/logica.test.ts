@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { ErrorApi, elegirActiva, mensajeDecision } from "./api/central";
 import type { Incidente, Prioridad, Salud } from "./api/tipos";
 import { agrupar, conteos, filtrar, porDecidir } from "./cola";
-import { haceCuanto, lugarLegible } from "./formato";
+import { duracion, haceCuanto, lugarLegible } from "./formato";
+import { aP1 } from "./use-novedades";
 import { citaLegible, enPalabras, motivoRechazo, palabraCompleta, senalLegible } from "./lenguaje";
 
 const ok = (central: "A" | "B"): Salud => ({ estado: "ok", central, jev: "ok" });
@@ -109,4 +110,20 @@ describe("cola por estado", () => {
   });
   it("«Por decidir» aparece aunque esté vacía; las demás, solo si tienen algo", () =>
     expect(agrupar([]).map((x) => x.grupo.id)).toEqual(["decidir"]));
+});
+
+describe("duracion", () => {
+  it("minutos, horas con minutos y, pasadas 6 h, solo horas", () => {
+    expect(duracion(45)).toBe("45 min");
+    expect(duracion(125)).toBe("2 h 5 min");
+    expect(duracion(1801)).toBe("30 h");
+  });
+});
+
+describe("aP1", () => {
+  const inc = (id: string, prioridad: Prioridad) => ({ id, prioridad }) as Incidente;
+  it("avisa lo que llega como P1 y lo que sube a P1, no lo que ya era P1", () => {
+    const antes = new Map<string, Prioridad>([["a", "P1"], ["b", "P2"]]);
+    expect(aP1(antes, [inc("a", "P1"), inc("b", "P1"), inc("c", "P1"), inc("d", "P3")])).toEqual(["b", "c"]);
+  });
 });

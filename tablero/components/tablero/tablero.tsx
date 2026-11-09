@@ -5,6 +5,7 @@ import dynamic from "next/dynamic"
 
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { notificar, prepararSonido, tono } from "@/lib/avisos"
 import { elegirActiva, incidentes, rechazados, recursos, salud, type Nodo } from "@/lib/api/central"
 import type { Incidente, Rechazado, Recurso, Salud } from "@/lib/api/tipos"
 import { filtrar, porDecidir, type Filtro } from "@/lib/cola"
@@ -22,6 +23,7 @@ import { PanelIncidente } from "./panel-incidente"
 import { Rechazados } from "./rechazados"
 import { Recursos } from "./recursos"
 import { TarjetaMapa } from "./tarjeta-mapa"
+import { AvisoP1 } from "./aviso-p1"
 
 // MapLibre pesa ~1 MB y necesita el navegador: se carga aparte, sin prerender.
 const Mapa = dynamic(() => import("./mapa").then((m) => m.Mapa), {
@@ -30,6 +32,7 @@ const Mapa = dynamic(() => import("./mapa").then((m) => m.Mapa), {
 })
 
 const CADA_MS = 3000
+const TITULO = "SARD · Tablero del coordinador"
 
 async function leerSaludes(): Promise<Record<Nodo, Salud | null>> {
   const [A, B] = await Promise.all([salud("A"), salud("B")])
@@ -41,6 +44,7 @@ type Zona = "cola" | "mapa" | "panel" // en pantallas angostas se ve una a la ve
 
 export function Tablero() {
   const [coordinador, setCoordinador] = usePreferencia("sard.coordinador", "")
+  const [sonido, setSonido] = usePreferencia("sard.sonido", "si")
   const [filtro, setFiltro] = useState<Filtro>("todos")
   const [zonaFiltro, setZonaFiltro] = useState<ZonaFiltro | null>(null)
   const [seleccion, setSeleccion] = useState<string | null>(null)
@@ -93,6 +97,30 @@ export function Tablero() {
   const elegido = seleccion ? (incs.find((i) => i.id === seleccion) ?? null) : (filtrar(enLaZona, filtro)[0] ?? null)
   const perdido = seleccion !== null && elegido === null && lista.datos !== null
   const sinRecuperar = rech.datos?.filter((r) => !r.recuperado).length ?? 0
+  const alertas = incs.filter((i) => novedades.alertas.includes(i.id))
+
+  // El navegador deja sonar solo después de un clic en la página: el primero prepara el audio.
+  useEffect(() => {
+    window.addEventListener("pointerdown", prepararSonido, { once: true })
+    return () => window.removeEventListener("pointerdown", prepararSonido)
+  }, [])
+
+  // Cada llegada suena (más fuerte si trae un P1) y, con la pestaña oculta, notifica al sistema.
+  const { llegada } = novedades
+  useEffect(() => {
+    if (!llegada) return
+    if (sonido === "si") tono(llegada.p1)
+    notificar(
+      llegada.p1 ? "Nuevo P1 en SARD" : "Reportes nuevos en SARD",
+      llegada.nuevos === 1 ? "Llegó 1 incidente nuevo." : `Llegaron ${llegada.nuevos} incidentes nuevos.`,
+    )
+  }, [llegada, sonido])
+
+  // Lo nuevo sin abrir se cuenta en la pestaña, para verlo desde otra ventana.
+  const sinVer = novedades.nuevos.length
+  useEffect(() => {
+    document.title = sinVer ? `(${sinVer}) ${TITULO}` : TITULO
+  }, [sinVer])
 
   function elegir(id: string) {
     novedades.visto(id)
@@ -111,6 +139,14 @@ export function Tablero() {
     setZonaFiltro(null)
     elegir(primero.id)
     document.querySelector(`[data-id="${CSS.escape(primero.id)}"]`)?.scrollIntoView({ block: "nearest" })
+  }
+
+  /** Abre un P1 del aviso aunque los filtros lo escondan. */
+  function verAlerta(id: string) {
+    setFiltro("todos")
+    setZonaFiltro(null)
+    elegir(id)
+    requestAnimationFrame(() => document.querySelector(`[data-id="${CSS.escape(id)}"]`)?.scrollIntoView({ block: "nearest" }))
   }
 
   function abrirDetalle() {
@@ -228,7 +264,11 @@ export function Tablero() {
         pendientes={porDecidir(incs)}
         coordinador={coordinador}
         onCoordinador={setCoordinador}
+        sonido={sonido === "si"}
+        onSonido={(v) => setSonido(v ? "si" : "no")}
       />
+
+      <AvisoP1 incidentes={alertas} barrio={barrio} ahora={ahora} onAbrir={verAlerta} onDescartar={novedades.descartarAlertas} />
 
       {saludes.datos && !activa && (
         <p role="alert" className="shrink-0 border-b border-p1/40 bg-p1-surface px-3 py-1.5 text-xs text-p1">

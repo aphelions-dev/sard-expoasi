@@ -153,6 +153,25 @@
     animation: llegada 2.4s ease-out 1;
   }
 }
+@keyframes aviso {
+  0% {
+    transform: translateY(-100%);
+  }
+  12%,
+  100% {
+    transform: translateY(0);
+  }
+  30%,
+  60% {
+    background-color: color-mix(in oklch, var(--p1) 35%, var(--p1-surface));
+  }
+}
+/* El aviso de P1 baja y late dos veces; con movimiento reducido aparece quieto. */
+@utility animate-aviso {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: aviso 1.6s ease-out 1;
+  }
+}
 @utility animate-latido {
   @media (prefers-reduced-motion: no-preference) {
     animation: latido 1.2s ease-out 3;

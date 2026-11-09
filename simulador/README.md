@@ -45,9 +45,10 @@ resultado exacto.
 - **Central**: simulada (acepta cada id una vez, cuenta duplicados, se puede "caer" con
   `--caida desde,hasta`) o la real con `--central` (`POST /reportes`, failover A → B por
   `GET /salud`; URLs en `CENTRAL_A_URL` y `CENTRAL_B_URL`).
-- **Reportes**: el generador (#4) toma texto, tipo y prioridad de los 100 reportes etiquetados
-  (`datos/sinteticos/reportes_etiquetados.csv`). La prioridad del CSV hace de "prioridad calculada
-  en el celular" mientras la app (P1) no tenga sus reglas.
+- **Reportes**: el generador (#4) toma texto, tipo y banderas de atrapados y heridos de los 100
+  reportes etiquetados (`datos/sinteticos/reportes_etiquetados.csv`). La prioridad del mensaje la
+  calculan las reglas del celular (`simulador/reglas.py`, contrato «Prioridad en el celular»), como
+  la app; la etiqueta del CSV queda como la verdad contra la que se mide el triaje (E6/E7).
 
 ## Recorrido de la demo
 

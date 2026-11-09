@@ -6,14 +6,14 @@
 
 | Caso | Entrega (peor) | SACK al reportante | Saltos | Duplicados | Con camino a pasarela | Apagados |
 |---|---|---|---|---|---|---|
-| con prioridad | 98.4% (95.0%) | 97.9% | 2.84 | 0 | 29.9 de 30 | 6.7 |
+| con prioridad | 98.8% (95.5%) | 98.4% | 2.77 | 0 | 29.9 de 30 | 5.9 |
 | orden de llegada | 98.4% (95.5%) | 98.0% | 2.81 | 0 | 29.9 de 30 | 6.3 |
 
 Latencia hasta la central, en segundos: mediana promedio (p95 en el peor caso).
 
 | Caso | P1 | P2 | P3 | P4 |
 |---|---|---|---|---|
-| con prioridad | 6.3 (24) · 589/589 | 24.6 (76) · 484/485 | 50.4 (124) · 504/511 | 77.3 (175) · 390/415 |
-| orden de llegada | 25.4 (134) · 620/628 | 25.1 (132) · 479/485 | 30.6 (140) · 503/512 | 25.3 (148) · 366/375 |
+| con prioridad | 5.4 (20) · 562/564 | 13.8 (57) · 281/284 | 42.4 (102) · 722/722 | 74.6 (155) · 410/430 |
+| orden de llegada | 26.5 (134) · 596/605 | 28.1 (127) · 285/286 | 29.1 (137) · 721/734 | 25.3 (148) · 366/375 |
 
 En cada celda de latencia, después del punto: entregados/creados sumando las semillas.

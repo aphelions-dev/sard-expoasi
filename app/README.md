@@ -148,6 +148,33 @@ El código va en `bitchat-android/app/src/main/java/com/bitchat/android/sard/`.
 - [x] Probado en celulares: con la central A apagada, la pasarela subió a la B. Al encender la A,
       copió de la B lo que le faltaba y ningún reporte se perdió.
 
+## Demo con celulares (Hito 5)
+
+Pasos 1 a 4 del guion (`docs/pitch/guion-demo.md`) con los celulares; la ráfaga y la caída del
+paso 7 las hace el simulador (#86). El simulador entero queda de plan B.
+
+**APK:** release [`sard-v1.0`](https://github.com/aphelions-dev/bitchat-android/releases/tag/sard-v1.0)
+del fork (`app-arm64-v8a-debug.apk`; `app-universal-debug.apk` para otros procesadores). Si el
+celular tiene el bitchat oficial, desinstalarlo antes, porque tiene otra firma.
+
+| Celular | Rol | Preparación |
+|---------|-----|-------------|
+| A (moto g52) | Reportante | Sin Wi-Fi ni datos, con Bluetooth y ubicación. App abierta. |
+| B (moto g32) | Relevo, y segundo reporte del paso 3 | Igual que A, entre A y C. |
+| C (moto g04s) | Pasarela | Wi-Fi en la misma red que el PC. SOS → Modo pasarela: central A `http://<IP del PC>:8001`, central B `:8002`, Guardar y activar. |
+
+Antes de empezar:
+
+- [ ] PC: puertos 8001 y 8002 abiertos (`netsh ... SARD-central`, ver "Cómo funciona"). La IP
+      sale de `ipconfig`.
+- [ ] Centrales y tablero levantados con el recorrido (#86).
+- [ ] En C, SOS muestra "Guardado ✓" y no hay texto rojo.
+- [ ] Prueba en seco: A envía un reporte, que aparece en el tablero, y A ve "entregado".
+- [ ] Pantallas encendidas y apps abiertas: los reintentos corren con la app abierta.
+
+En pantalla durante el paso 1: al enviar, la hoja SOS muestra el mensaje SARD1, sus bytes y la
+prioridad con su motivo. Paso 2: *Mis reportes* → "pendiente · intento N". Paso 4: "✓ entregado".
+
 ## Terminado
 
 Un reporte creado sin internet llega a la central pasando por al menos un relevo, el reportante ve

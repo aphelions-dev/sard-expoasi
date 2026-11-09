@@ -10,7 +10,8 @@ celular pasarela con internet → central de riesgo con agentes → tablero con 
 - Jev nunca baja una prioridad; las reglas ganan cuando hay palabra crítica (ADR 0005).
 - El registro de eventos de la central solo agrega, nunca borra (ADR 0003).
 - Ninguna acción se ejecuta sin aprobación humana.
-- Solo Android. Nada de iOS, macOS ni Swift.
+- La app completa es Android, sin Swift. El iPhone entra con el bitchat oficial (relevo) y con la
+  app web `tablero/app/reportar/` (ADR 0007).
 
 ## Contrato (resumen; la fuente es `contracts/protocolo-sard1.md`)
 
@@ -39,4 +40,5 @@ SACK|<id>
 ## Mapa
 
 `app/` P1 · `central/` P2 · `tablero/` `simulador/` `pruebas/` `datos/` P3 · `contracts/` los tres ·
+estilo en `diseno/tokens.json` (se edita ahí y se corre `node diseno/generar.mjs`) ·
 plan en `docs/plan.md` · decisiones en `docs/decisiones/`.

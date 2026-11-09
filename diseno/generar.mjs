@@ -104,7 +104,8 @@ for (const [ruta, contenido] of salidas) {
     console.log(`omitido ${ruta}: falta el submódulo (git submodule update --init)`)
     continue
   }
-  const actual = existsSync(archivo) ? readFileSync(archivo, "utf8") : ""
+  // Con core.autocrlf, Git en Windows deja CRLF en la copia de trabajo: se compara sin él.
+  const actual = existsSync(archivo) ? readFileSync(archivo, "utf8").replace(/\r\n/g, "\n") : ""
   if (actual === contenido) continue
   if (revisar) {
     console.error(`desactualizado: ${ruta}`)

@@ -17,6 +17,7 @@ PYTHONUTF8=1 uv run python -m simulador correr --desde ../pruebas/resultados/<co
 PYTHONUTF8=1 uv run python -m simulador escenarios                         # E1–E4 de pruebas/escenarios.md
 PYTHONUTF8=1 uv run python -m simulador escenarios-central                 # E4 central, E5, E6/E7 (levanta A y B)
 PYTHONUTF8=1 uv run python -m simulador recorrido                          # demo de 8 pasos con visor web
+PYTHONUTF8=1 uv run python -m simulador recorrido --celulares              # la demo: pasos 1 a 4 con la app
 PYTHONUTF8=1 uv run pytest                                                 # pruebas
 ```
 
@@ -57,6 +58,11 @@ simulada y las centrales reales (que levanta y apaga), y sirve un visor en `http
 tenue, el camino que llegó a la pasarela en grueso, `SACK` de vuelta, centrales A/B y el paso actual.
 Se avanza con Enter o con el botón del visor; `--seguido --pausa 6` avanza solo. Cómo se presenta:
 el guion.
+
+Con `--celulares` (#86), los pasos 1 a 4 los hacen los celulares de la app: el script no crea
+reportes simulados, espera el primer `reporte_recibido` de la central A que no sea del simulador
+(lo sube la pasarela del celular C) y sigue ese id en los pasos 4 a 6. La malla simulada arranca en
+el paso 7, para la ráfaga. Al arrancar imprime las URL de las centrales para la pasarela del celular.
 
 ## Parámetros por defecto
 

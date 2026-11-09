@@ -45,6 +45,8 @@ def main() -> None:
     rc.add_argument("--seguido", action="store_true", help="avanzar solo, sin Enter (ensayo o video)")
     rc.add_argument("--pausa", type=float, default=8.0, help="segundos por paso con --seguido")
     rc.add_argument("--env-file", help="archivo .env con JEV_API_KEY")
+    rc.add_argument("--celulares", action="store_true",
+                    help="pasos 1 a 4 con los celulares de la app; el simulador solo hace la ráfaga del paso 7")
 
     c = sub.add_parser("correr", help="corre la malla y guarda resultados en pruebas/resultados/")
     for f in fields(Parametros):
@@ -67,7 +69,7 @@ def main() -> None:
 
     if a.cmd == "recorrido":
         from .recorrido import main as recorrido
-        recorrido(a.seguido, a.env_file, a.pausa)
+        recorrido(a.seguido, a.env_file, a.pausa, a.celulares)
         return
 
     if a.cmd == "generar":

@@ -57,7 +57,8 @@ La app pide permisos de Bluetooth, ubicación (Android la exige para escanear BL
 | Relevo | no | Guarda y reenvía reportes ajenos por prioridad. |
 | Pasarela | sí | Sube los reportes a la central por HTTP con failover A → B y devuelve `SACK` a la malla. |
 
-Cómo se elige el rol (ajuste en la app, detección de internet u otro): **por definir**.
+Cómo se elige el rol: con el interruptor **Modo pasarela** de la hoja SOS, junto a la URL de la
+central. Sin activarlo, el celular es reportante y relevo.
 Cantidad de celulares para la demo: por definir, mínimo 3.
 
 ## Alcance
@@ -99,6 +100,35 @@ Agentes, triaje con Jev, base de datos de la central, tablero, simulador.
       le llega el mensaje (gossip sync).
 - [ ] Resultados en un comentario del issue #1. Si no funciona, avisar para decidir el plan B
       (transporte simulado) antes del Hito 2.
+
+## Cómo funciona (Hito 2)
+
+El código va en `bitchat-android/app/src/main/java/com/bitchat/android/sard/`.
+
+| Pieza | Archivo | Qué hace |
+|-------|---------|----------|
+| Formulario | `SardPantalla.kt` | El botón **SOS** del chat abre el formulario, *Mis reportes* con su estado y el ajuste de pasarela. |
+| Prioridad | `Prioridad.kt` | Las reglas del contrato. `palabras-criticas.txt` se copia de `contracts/` al compilar. |
+| Mensajes | `Sard1.kt` | Escribe y lee `SARD1` y `SACK`. |
+| Almacenamiento | `Almacen.kt` | JSON en `filesDir/sard/reportes.json`. Nunca borra. |
+| Pasarela | `Pasarela.kt` | `POST /reportes` a la central. |
+| Unión | `Sard.kt` | Crea, recibe, sube y confirma. |
+
+- **Transporte:** el SARD1 viaja como **mensaje público** de la malla y usa los saltos y el gossip
+  de bitchat. Por ahora también se ve en el chat.
+- **Prueba de punta a punta:** central en el PC (`central/`, `iniciar.py A`). El celular pasarela
+  debe estar en la misma Wi-Fi, con la URL `http://<IP del PC>:8001`. En Windows hay que abrir los
+  puertos: `netsh advfirewall firewall add rule name=SARD-central dir=in action=allow protocol=TCP localport=8001-8002 remoteip=localsubnet`
+  (como administrador).
+- Un build debug no reemplaza al bitchat oficial (otra firma): primero `adb uninstall com.bitchat.droid`.
+
+### Checklist Hito 2
+
+- [x] Formulario offline y prioridad por reglas (#5).
+- [x] Almacenamiento local (#6).
+- [x] Modo pasarela con `POST /reportes` y `SACK` (#7).
+- [x] Probado en 3 celulares: A sin internet → malla → C pasarela → central → tablero, y A ve
+      "entregado".
 
 ## Terminado
 

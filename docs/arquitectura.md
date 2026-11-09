@@ -43,8 +43,9 @@ flowchart LR
 | Tablero | Stack por definir | Muestra incidentes con evidencia e incertidumbre; el coordinador aprueba o rechaza | P3 |
 | Simulador | Python | Modela la malla con pérdida, batería y densidad; puede enviar a la central real | P3 |
 
-El mismo APK cumple los tres papeles de la malla; cómo se elige el papel de cada celular está por
-definir (`app/README.md`).
+El mismo APK cumple los tres papeles de la malla. Todo celular es reportante y relevo; es pasarela
+el que tiene activado el interruptor «Modo pasarela» con las URL de las centrales A y B
+(`app/README.md`).
 
 ## 2. Distribución de agentes
 
@@ -160,7 +161,7 @@ por los mismos eventos. A qué central enviar lo decide la pasarela.
 
 | Dónde | Qué guarda | Cómo |
 |-------|-----------|------|
-| Celular | Reportes propios y ajenos con su estado (pendiente, entregado, no entregado) | Por definir (P1). Un reporte vencido se marca, nunca se borra |
+| Celular | Reportes propios y ajenos con su estado (pendiente, entregado, no entregado) | Archivo JSON en el celular (`filesDir/sard/reportes.json`). Un reporte vencido se marca, nunca se borra |
 | Central | Registro de eventos | SQLite en modo WAL, un archivo por central (`central/datos/central-<nodo>.sqlite`, fuera del repo) |
 | Tablero | Nada propio | Lee `GET /incidentes` |
 
@@ -211,6 +212,4 @@ central están en `central/uv.lock`.
 ## Por definir
 
 - Stack del tablero.
-- Cómo se elige el papel de cada celular.
-- Cómo guarda los reportes el celular y los tiempos de reintento.
-- Cuándo vence un reporte y la longitud máxima del texto (`contracts/protocolo-sard1.md`).
+- La longitud máxima del texto y la antigüedad máxima del GPS (`contracts/protocolo-sard1.md`).

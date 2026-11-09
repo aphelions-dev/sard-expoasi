@@ -130,6 +130,15 @@ El código va en `bitchat-android/app/src/main/java/com/bitchat/android/sard/`.
 - [x] Probado en 3 celulares: A sin internet → malla → C pasarela → central → tablero, y A ve
       "entregado".
 
+### Checklist Hito 3
+
+- [x] Cola de reenvío por prioridad (P1 primero, luego `hora_unix`), sin descartar P3/P4 (#10).
+- [x] Reintentos 2, 4, 8, 16, 32 s y luego 60 s, con ±20 %, en el reportante y en cada relevo.
+- [x] Vencimiento a los 600 s ("no entregado", sin borrar) y reactivación con un vecino nuevo.
+- [x] Los SARD1 y SACK no se muestran en el chat.
+- [x] Probado en celulares: sin pasarela, A reintenta; al activar la pasarela llega y A ve
+      "entregado". Vencimiento y reactivación: solo con tests (`ColaTest`).
+
 ## Terminado
 
 Un reporte creado sin internet llega a la central pasando por al menos un relevo, el reportante ve

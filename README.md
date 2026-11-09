@@ -30,6 +30,14 @@ transmisión, agentes, priorización, aprobación en el tablero, **caída de la 
 y recuperación. Sin `JEV_API_KEY` el triaje corre solo con reglas; con ella, copiar `.env.example` a
 `.env` y agregar `--env-file ../.env`. Guion y plan B de cada paso: `docs/pitch/guion-demo.md`.
 
+### App Android
+
+**APK:** release [`app-v1.0`](https://github.com/aphelions-dev/sard-expoasi/releases/tag/app-v1.0)
+(`app-arm64-v8a-debug.apk`). Es un fork de bitchat con el botón SOS, prioridad por reglas, cola de
+reenvío por Bluetooth y modo pasarela con failover A → B. Probado con 3 celulares: un reporte creado
+sin internet llega a la central y el reportante ve «entregado». Cómo preparar la demo con celulares:
+[`app/README.md`](app/README.md#demo-con-celulares-hito-5).
+
 ### Con Docker, sin instalar nada más
 
 Requisito: Docker. Levanta las centrales A y B con sus agentes y el tablero, cada central con su
@@ -49,11 +57,11 @@ Con `JEV_API_KEY` en `.env` el triaje usa Jev; sin ella, solo reglas.
 
 | # | Entregable | Dónde | Estado |
 |---|------------|-------|--------|
-| 1 | Prototipo funcional | `central/`, `tablero/`, `simulador/`, `app/` | Central, agentes, tablero y malla simulada funcionando de punta a punta. La app Android (fork de bitchat) está en curso. |
+| 1 | Prototipo funcional | `central/`, `tablero/`, `simulador/`, `app/` | Central, agentes, tablero y malla simulada funcionando de punta a punta. App Android (fork de bitchat) probada con 3 celulares; APK en el release [`app-v1.0`](https://github.com/aphelions-dev/sard-expoasi/releases/tag/app-v1.0). |
 | 2 | Código fuente | Este repo; cómo instalar y correr cada parte en `central/README.md`, `tablero/README.md` y `simulador/README.md` | Listo |
 | 3 | Documento de arquitectura | `docs/arquitectura.md`, decisiones en `docs/decisiones/` | Listo |
-| 4 | Fichas de agentes | `docs/fichas-agentes/` | Listo; la de comunicación (app) tiene campos por definir |
-| 5 | Protocolo de comunicación | `contracts/protocolo-sard1.md`, `contracts/api-central.md`, ejemplos en `contracts/ejemplos/` | Listo; por definir con la app: largo máximo del texto y cómo detecta un vecino nuevo |
+| 4 | Fichas de agentes | `docs/fichas-agentes/` | Listo |
+| 5 | Protocolo de comunicación | `contracts/protocolo-sard1.md`, `contracts/api-central.md`, ejemplos en `contracts/ejemplos/` | Listo; por definir con la app: largo máximo del texto y antigüedad del GPS |
 | 6 | Resultados de pruebas | `pruebas/resultados/README.md` | E1–E5 y E7 con métricas, estrés, errores observados y limitaciones. E6 (triaje con Jev) pendiente de la clave |
 | 7 | Pitch y demostración | `docs/pitch/` | Presentación v1 (el PDF se agrega al aprobarla) y recorrido de 8 pasos ensayado con una condición adversa. Video de respaldo pendiente |
 
@@ -86,8 +94,8 @@ Uso responsable de la IA: `docs/uso-responsable-ia.md`. Riesgos y planes B: `doc
 
 ## Limitaciones conocidas
 
-- La malla se muestra con el simulador mientras la app Android no esté lista; el simulador modela
-  alcance, pérdida y batería, pero no reemplaza la prueba con celulares.
+- La app se probó con 3 celulares; las pruebas de escala (decenas de celulares, pérdida, batería)
+  se hacen con el simulador, que modela la malla pero no reemplaza una prueba de campo.
 - Las reglas no interpretan negaciones («no hay atrapados» sube a P1, con aviso de posible
   negación); sin Jev, 4 de 30 casos críticos sin palabra crítica dependen del coordinador.
 - Todos los datos son sintéticos.

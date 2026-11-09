@@ -1,0 +1,15 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "central/Dockerfile",
+    "watchPatterns": ["/central/**", "/contracts/**"]
+  },
+  "deploy": {
+    "startCommand": "python iniciar.py B",
+    "healthcheckPath": "/salud",
+    "healthcheckTimeout": 120,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  }
+}

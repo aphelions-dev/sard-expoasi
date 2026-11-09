@@ -1,6 +1,7 @@
 # Demo completa de SARD en un solo comando, con datos sintéticos:
 #
-#   docker compose up --build                     # centrales A y B + tablero en http://localhost:5173
+#   docker compose up --build                     # centrales A y B, tablero en http://localhost:5173
+#                                                 # y app de reportes en http://localhost:5174
 #   docker compose run --rm simulador             # carga reportes sintéticos por la malla simulada
 #   docker compose stop central-a                 # la condición adversa: cae la A, sigue la B
 #
@@ -47,6 +48,14 @@ services:
   tablero:
     build: ./tablero
     ports: ["5173:80"]
+    depends_on: [central-a, central-b]
+    restart: unless-stopped
+
+  # App web de reportes para el público (ADR 0008). En un celular necesita HTTPS: ver
+  # docs/despliegue.md.
+  reportar:
+    build: ./reportar
+    ports: ["5174:80"]
     depends_on: [central-a, central-b]
     restart: unless-stopped
 

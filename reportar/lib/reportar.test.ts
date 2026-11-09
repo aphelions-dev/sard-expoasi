@@ -13,7 +13,7 @@ import {
 } from "./sard1"
 
 const contrato = readFileSync(
-  new URL("../../../contracts/palabras-criticas.txt", import.meta.url),
+  new URL("../../contracts/palabras-criticas.txt", import.meta.url),
   "utf8"
 )
 const palabras = leerLista(contrato)
@@ -128,7 +128,7 @@ describe("lista de palabras", () => {
   it("la copia de public/ es la del contrato", () =>
     expect(
       readFileSync(
-        new URL("../../public/palabras-criticas.txt", import.meta.url),
+        new URL("../public/palabras-criticas.txt", import.meta.url),
         "utf8"
       )
     ).toBe(contrato))

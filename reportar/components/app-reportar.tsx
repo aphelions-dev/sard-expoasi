@@ -1,6 +1,6 @@
 "use client"
 
-// App web para reportar desde un celular sin la app Android (iPhone incluido, ADR 0007). Arma el
+// App web para reportar desde un celular sin la app Android (iPhone incluido, ADR 0007 y 0008). Arma el
 // mismo SARD1 que la app, lo guarda en el navegador y lo sube a la central cuando hay internet.
 // No entra a la malla Bluetooth: el navegador no puede (ver el ADR). El botón «Copiar» deja el
 // mensaje listo para pegarlo en el chat público de bitchat, que sí la recorre.
@@ -24,8 +24,8 @@ import {
   vencido,
   type Estado,
   type Guardado,
-} from "@/lib/reportar/cola"
-import { subir } from "@/lib/reportar/envio"
+} from "@/lib/cola"
+import { subir } from "@/lib/envio"
 import {
   NOMBRE_TIPO,
   TIPOS,
@@ -38,7 +38,7 @@ import {
   type Datos,
   type Prioridad,
   type Tipo,
-} from "@/lib/reportar/sard1"
+} from "@/lib/sard1"
 import { cn } from "@/lib/utils"
 
 const CLAVE = {
@@ -153,9 +153,7 @@ export function AppReportar() {
       .then((t) => setPalabras(leerLista(t)))
       .catch(() => setPalabras([]))
     if ("serviceWorker" in navigator)
-      navigator.serviceWorker
-        .register("/sw.js", { scope: "/reportar/" })
-        .catch(() => {})
+      navigator.serviceWorker.register("/sw.js").catch(() => {})
     // Volver a tener internet hace lo que en la malla hace un vecino nuevo: los vencidos empiezan
     // una ronda nueva (regla 5).
     const conectado = () => guardar((l) => reactivar(l, Date.now()))

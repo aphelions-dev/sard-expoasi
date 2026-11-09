@@ -1,6 +1,6 @@
 // La app web sube sus reportes como su propia pasarela: `POST /reportes` a la central A y, si no
 // responde, a la B (`contracts/api-central.md`), igual que `Pasarela.kt` en Android.
-import { CENTRALES, type Nodo } from "@/lib/api/central"
+import { CENTRALES, type Nodo } from "./centrales"
 import { leerSack } from "./sard1"
 
 export type Subida = {

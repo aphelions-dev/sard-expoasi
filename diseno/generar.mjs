@@ -1,5 +1,6 @@
 // Genera los tokens de cada interfaz desde diseno/tokens.json, la única fuente del estilo de SARD:
-//   tablero/app/tokens.css   (tema claro en :root y oscuro en .dark)
+//   tablero/app/tokens.css y reportar/app/tokens.css   (tema de Tailwind, claro en :root y oscuro
+//   en .dark)
 //   simulador/visor/tokens.css   (solo el oscuro, el de la sala)
 //   app/bitchat-android/.../sard/SardColores.kt   (colores de estado para Compose)
 //
@@ -14,8 +15,24 @@ const AVISO = "Generado por diseno/generar.mjs desde diseno/tokens.json. No edit
 const bloque = (selector, valores, extra = []) =>
   [`${selector} {`, ...extra, ...Object.entries(valores).map(([k, v]) => `    --${k}: ${v};`), "}"].join("\n")
 
-const cssTablero = [
+// Tailwind lee los tokens como clases (`bg-p1`, `rounded-lg`). Las fuentes las carga next/font en
+// cada app con las variables --font-fira-sans y --font-fira-code.
+const temaTailwind = [
+  "@theme inline {",
+  `    --font-sans: var(--font-fira-sans), ui-sans-serif, system-ui, "Segoe UI", sans-serif;`,
+  `    --font-mono: var(--font-fira-code), ui-monospace, "Cascadia Mono", monospace;`,
+  "    --font-heading: var(--font-sans);",
+  ...Object.keys(tokens.claro).map((k) => `    --color-${k}: var(--${k});`),
+  ...[["sm", 0.6], ["md", 0.8], ["lg", 1], ["xl", 1.4], ["2xl", 1.8], ["3xl", 2.2], ["4xl", 2.6]].map(([n, f]) =>
+    f === 1 ? `    --radius-${n}: var(--radius);` : `    --radius-${n}: calc(var(--radius) * ${f});`
+  ),
+  "}",
+].join("\n")
+
+const cssWeb = [
   `/* ${AVISO} */`,
+  "",
+  temaTailwind,
   "",
   bloque(":root", tokens.claro, [`    --radius: ${tokens.radio};`]),
   "",
@@ -91,7 +108,8 @@ const kotlin = [
 ].join("\n")
 
 const salidas = [
-  ["tablero/app/tokens.css", cssTablero],
+  ["tablero/app/tokens.css", cssWeb],
+  ["reportar/app/tokens.css", cssWeb],
   ["simulador/visor/tokens.css", cssVisor],
   ["app/bitchat-android/app/src/main/java/com/bitchat/android/sard/SardColores.kt", kotlin],
 ]

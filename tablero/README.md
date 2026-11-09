@@ -22,22 +22,11 @@ Las URLs de las centrales salen de `NEXT_PUBLIC_CENTRAL_A_URL` y `NEXT_PUBLIC_CE
 
 ## Estructura
 
-- `app/`: el tablero (`/`) y la app web de reportes (`/reportar/`). Los colores están en
-  `tokens.css`, generado desde `diseno/tokens.json` (ver `diseno/README.md`).
-- `components/reportar/` y `lib/reportar/`: la app web de reportes (ADR 0007).
+- `app/`: la página y los estilos. Los colores y su tema de Tailwind están en `tokens.css`,
+  generado desde `diseno/tokens.json` (ver `diseno/README.md`).
 - `components/tablero/`: las piezas del tablero (barra de estado, cola, mapa, panel, recursos).
 - `components/ui/`: lo escriben los CLI de shadcn y mapcn. No se editan a mano; se envuelven.
 - `lib/`: cliente de la API, tipos del contrato y lógica sin interfaz (con sus pruebas).
-
-## App web de reportes (`/reportar/`)
-
-Para el celular que no tiene la app Android, como un iPhone (ADR 0007). Arma el mismo `SARD1`,
-con las reglas de prioridad del celular y `public/palabras-criticas.txt`, una copia de
-`contracts/` que `npm run dev` y `npm run build` refrescan. Guarda los reportes en el navegador,
-abre sin internet (`public/sw.js`) y los sube con `POST /reportes` a la central A o, si no, a la B.
-Sin internet, «Copiar para bitchat» deja el mensaje listo para el chat público de bitchat.
-
-En un celular, el service worker y la ubicación necesitan HTTPS. El despliegue está por definir.
 
 ## Qué hace
 

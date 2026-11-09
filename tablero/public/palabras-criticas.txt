@@ -1,0 +1,52 @@
+# Palabras críticas (ADR 0005). Las usan la app (prioridad en el celular) y la central (triaje).
+# Si el texto de un reporte contiene alguna, la prioridad es P1 y ningún modelo la puede bajar.
+#
+# Cómo se comparan: el texto se pasa a minúsculas y sin tildes, y cada línea se busca como
+# fragmento (así "atrap" cubre atrapado, atrapados y "atrapda" escrito con prisa). Una línea
+# por entrada; las que empiezan por # son comentarios.
+#
+# Un fragmento corto también aparece dentro de otras palabras: "gas" estaba en "llegaste" y
+# "gaseosa". Para esos casos va la frase completa ("huele a gas", "fuga de gas").
+# Las negaciones no se interpretan: "no hay atrapados" sube a P1 igual (ver docs/riesgos.md).
+
+atrap
+no puedo salir
+no podemos salir
+no pueden salir
+sepultad
+encerra
+escombros
+aplastad
+no respira
+no puede respirar
+no está respirando
+no le entra aire
+si respira
+ahog
+inconscien
+no responde
+no reac
+no se mueve
+no se despierta
+desplom
+desmay
+convulsi
+hemorragi
+sangra mucho
+sangrar mucho
+sangrando mucho
+sangre
+incendi
+fuego
+llamas
+quemando
+ardiendo
+humo
+explosi
+huele a gas
+huele mucho a gas
+huele fuerte a gas
+olor a gas
+fuga de gas
+escape de gas
+auxilio

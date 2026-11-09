@@ -4,9 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "predev": "node scripts/copiar-worker.mjs",
+    "predev": "node scripts/copiar-worker.mjs && node scripts/copiar-palabras.mjs",
     "dev": "next dev",
-    "prebuild": "node scripts/copiar-worker.mjs",
+    "prebuild": "node scripts/copiar-worker.mjs && node scripts/copiar-palabras.mjs",
     "build": "next build",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",

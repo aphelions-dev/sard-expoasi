@@ -10,7 +10,8 @@ celular pasarela con internet → central de riesgo con agentes → tablero con 
 - Jev nunca baja una prioridad; las reglas ganan cuando hay palabra crítica (ADR 0005).
 - El registro de eventos de la central solo agrega, nunca borra (ADR 0003).
 - Ninguna acción se ejecuta sin aprobación humana.
-- Solo Android. Nada de iOS, macOS ni Swift.
+- La app completa es Android, sin Swift. El iPhone entra con el bitchat oficial (relevo) y con la
+  app web `reportar/` (ADR 0007 y 0008).
 
 ## Contrato (resumen; la fuente es `contracts/protocolo-sard1.md`)
 
@@ -19,7 +20,7 @@ SARD1|<id>|<prioridad>|<tipo>|<personas>|<banderas>|<geohash>|<hora_unix>|<texto
 SACK|<id>
 ```
 
-- prioridad `P1`…`P4`; tipo `ATRAP MEDIC FUEGO VIA DESAP OTRO`; banderas 3 dígitos
+- prioridad `P1`…`P4`; tipo `ATRAP MEDIC FUEGO DESLIZ INUND GAS VIA DESAP OTRO`; banderas 3 dígitos
   (atrapados, heridos, niños/adultos mayores); geohash 6 caracteres o vacío.
 - Reenviar P1/P2 primero sin descartar P3/P4; reintentos con espera creciente hasta `SACK`;
   cada id se acepta una vez; ordenar por `hora_unix`; lo vencido se marca, no se borra.
@@ -38,5 +39,6 @@ SACK|<id>
 
 ## Mapa
 
-`app/` P1 · `central/` P2 · `tablero/` `simulador/` `pruebas/` `datos/` P3 · `contracts/` los tres ·
-plan en `docs/plan.md` · decisiones en `docs/decisiones/`.
+`app/` P1 · `central/` P2 · `tablero/` `reportar/` `simulador/` `pruebas/` `datos/` P3 · `contracts/` los tres ·
+estilo en `diseno/tokens.json` (se edita ahí y se corre `node diseno/generar.mjs`) ·
+despliegue en `docs/despliegue.md` · plan en `docs/plan.md` · decisiones en `docs/decisiones/`.

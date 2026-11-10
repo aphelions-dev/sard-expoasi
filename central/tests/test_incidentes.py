@@ -150,3 +150,30 @@ def test_sin_jev_junta_la_misma_zona_aunque_uno_sea_mas_preciso(conn):
     preciso = A2.replace("d29e4m", "d29e4kqr")
     incs = pipeline(conn, [A1, preciso], JevCorrelacion(falla=True))
     assert len(incs) == 1
+
+
+def _un_reporte(conn, linea, jev_triaje):
+    r = sard1.leer(linea)
+    eventos.agregar(conn, nodo="A", tipo="reporte_recibido", reporte_id=r.id, datos=asdict(r))
+    ejecutor.procesar_pendientes(conn, agente="t", consume="reporte_recibido",
+                                 produce="reporte_priorizado",
+                                 procesar=triaje.procesar(jev_triaje), nodo="A")
+    (inc,) = pipeline(conn, [], JevCorrelacion()).values()
+    return inc
+
+
+def test_marcado_otro_con_tipo_claro_en_el_texto_va_a_la_entidad_de_ese_tipo(conn):
+    otro = "SARD1|ff66-1|P2|OTRO|2|000|d29e4k|1762481000|se escucha gente bajo los escombros"
+    inc = _un_reporte(conn, otro, JevFalso(tipo="ATRAP"))
+    a = inc.accion_propuesta
+    assert inc.tipo == "OTRO"  # el tipo del incidente es el que marcó quien reportó
+    assert (a["entidad"], a["recurso"]) == ("Bomberos", "equipo de rescate")
+    assert "se trata como personas atrapadas" in a["justificacion"]
+    assert any("tipo de emergencia" in f for f in a["falta_confirmar"])
+    assert inc.incertidumbre["revisar"]
+
+
+def test_tipo_marcado_por_quien_reporta_no_se_cambia(conn):
+    medico = "SARD1|gg77-1|P2|MEDIC|1|010|d29e4k|1762481000|mi vecino se cayó"
+    inc = _un_reporte(conn, medico, JevFalso(tipo="ATRAP"))
+    assert inc.accion_propuesta["entidad"] == "Cruz Roja"

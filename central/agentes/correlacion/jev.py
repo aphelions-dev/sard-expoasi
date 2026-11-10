@@ -19,10 +19,14 @@ MAX_CANDIDATOS = 5
 def preguntas(candidatos: list[str]) -> dict[str, Noul]:
     q: dict[str, Noul] = {}
     for i, inc in enumerate(candidatos):
+        # El falso nombra el caso que se confundía: dos emergencias distintas en el mismo foco, a
+        # la misma hora. Probada con Jev el 9/nov/2026 junto a la redacción anterior.
         q[f"mismo_{i}"] = Noul(
-            instructions=f"`reporte_nuevo` describe el mismo suceso que `candidatos.{inc}`",
-            criteria={"true": "Es el mismo derrumbe, incendio, persona o lugar visto por otra persona",
-                      "false": "Es otro suceso, aunque sea del mismo tipo o de la misma zona"},
+            instructions=f"`reporte_nuevo` y `candidatos.{inc}` hablan del mismo hecho",
+            criteria={"true": "Los dos cuentan el mismo derrumbe, el mismo incendio o la misma persona herida "
+                              "o desaparecida, con otras palabras o con cifras distintas",
+                      "false": "Cuentan hechos distintos que ocurren en el mismo sitio y a la misma hora: "
+                               "a unas personas les pasó una cosa y a otras, otra"},
         )
         q[f"contradice_{i}"] = Noul(
             instructions=f"`reporte_nuevo` contradice algún dato concreto de `candidatos.{inc}`",

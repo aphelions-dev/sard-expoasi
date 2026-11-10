@@ -6,6 +6,9 @@ export const TIPO: Record<Tipo, string> = {
   ATRAP: "Personas atrapadas",
   MEDIC: "Atención médica",
   FUEGO: "Incendio",
+  DESLIZ: "Deslizamiento",
+  INUND: "Inundación",
+  GAS: "Fuga de gas",
   VIA: "Vía afectada",
   DESAP: "Persona desaparecida",
   OTRO: "Otro",
@@ -34,13 +37,18 @@ export const ESTADO: Record<Estado, string> = {
 };
 
 /** "hace 5 min", "hace 2 h 10 min". `ahora` en segundos unix. */
-export function haceCuanto(horaUnix: number, ahora: number): string {
-  const min = Math.max(0, Math.floor((ahora - horaUnix) / 60));
-  if (min < 1) return "ahora";
-  if (min < 60) return `hace ${min} min`;
+/** Minutos en palabras de la sala: «45 min», «2 h 5 min», «30 h». Pasada la hora, los minutos sueltos
+ *  sobran cuando ya son muchas horas. */
+export function duracion(min: number): string {
+  if (min < 60) return `${min} min`;
   const h = Math.floor(min / 60);
   const resto = min % 60;
-  return resto ? `hace ${h} h ${resto} min` : `hace ${h} h`;
+  return resto && h < 6 ? `${h} h ${resto} min` : `${h} h`;
+}
+
+export function haceCuanto(horaUnix: number, ahora: number): string {
+  const min = Math.max(0, Math.floor((ahora - horaUnix) / 60));
+  return min < 1 ? "ahora" : `hace ${duracion(min)}`;
 }
 
 export function horaLocal(horaUnix: number): string {

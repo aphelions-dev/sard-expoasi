@@ -22,8 +22,9 @@ Las URLs de las centrales salen de `NEXT_PUBLIC_CENTRAL_A_URL` y `NEXT_PUBLIC_CE
 
 ## Estructura
 
-- `app/`: la página y los tokens de diseño (`globals.css`).
-- `components/tablero/`: las piezas del tablero (barra de estado, cola, mapa, panel, recursos).
+- `app/`: la página y los estilos. Los colores y su tema de Tailwind están en `tokens.css`,
+  generado desde `diseno/tokens.json` (ver `diseno/README.md`).
+- `components/tablero/`: las piezas del tablero (barra de estado, cola, mapa, panel, boletín).
 - `components/ui/`: lo escriben los CLI de shadcn y mapcn. No se editan a mano; se envuelven.
 - `lib/`: cliente de la API, tipos del contrato y lógica sin interfaz (con sus pruebas).
 
@@ -36,29 +37,33 @@ Las URLs de las centrales salen de `NEXT_PUBLIC_CENTRAL_A_URL` y `NEXT_PUBLIC_CE
   vigencia, **incertidumbre** (corroboración, dispositivos, testigos directos, motivos de revisión,
   contradicciones, discrepancias entre centrales, sin IA o sin ubicación) y la **evidencia** de cada
   reporte con las señales del triaje y su origen (formulario, texto o Jev).
-- **Acción propuesta** con entidad, recurso disponible, incidentes que compiten por él y lo que falta
-  confirmar. Aprobar o rechazar es un botón explícito; si el incidente está marcado para revisar,
+- **Acción propuesta** con la entidad, el recurso que se le solicita y lo que falta confirmar.
+  Aprobar o rechazar es un botón explícito; si el incidente está marcado para revisar,
   aprobar exige una nota (el `422` del contrato).
 - **Salud** de la central A, la B y Jev (`GET /salud` cada 3 s). Si la A no responde, el tablero lee
   y decide en la B y lo avisa.
 - **Barrio** de cada incidente en la cola y el detalle ("Chipre · comuna 01"), calculado desde el
   geohash con los límites oficiales. Fuera de Manizales (Villamaría) dice "sin barrio": no se
   inventa un nombre.
-- **Mapa** (siempre visible, al centro): un rombo por celda de geohash con el color de la prioridad
-  más alta, el icono del tipo, cuántos incidentes hay en la celda y un punto si alguno está para
-  revisar. Lo ya decidido se atenúa. La celda (~600 m × 1,2 km) se dibuja punteada porque la
-  ubicación real está en algún lugar de ese rectángulo. Al pasar el cursor, un tooltip resume los
-  incidentes de la celda; el clic los recorre. Hospitales, clínicas y bomberos van en círculos
-  atenuados. **Funciona sin internet**: todo lo dibujado es local; las calles de OpenStreetMap son
-  una capa opcional que se apaga.
+- **Mapa** (siempre visible, al centro). De lejos, cada barrio toma el color de lo más grave que
+  tiene por decidir y lleva su número. De cerca, o con un barrio elegido, el barrio queda en
+  contorno y se ve cada incidente: si el GPS fue preciso, un punto con el icono del tipo; si no, se
+  pinta su barrio y una etiqueta dice cuántos hay «sin sitio exacto» (fuera de los barrios se dibuja
+  el rectángulo del geohash, porque no hay otro límite que usar). Los puntos que en
+  pantalla se taparían se juntan en un círculo con el número (`lib/racimos.ts`); el clic acerca
+  hasta separarlos, o los recorre si están en el mismo sitio. Lo ya decidido se atenúa. Hospitales,
+  clínicas y bomberos van en círculos atenuados. **Funciona sin internet**: todo lo dibujado es
+  local; las calles de OpenStreetMap son una capa opcional que se apaga.
 - **Cerca del incidente**: hospitales/clínicas y estaciones de bomberos más cercanos en línea recta.
-- **Recursos** (pestaña): los recursos del contrato (equipo de rescate, máquina de bomberos,
-  ambulancia, equipo de búsqueda, cuadrilla) unidad por unidad, como en el SCI-211: cuántas
-  están disponibles, asignadas o fuera de servicio, y las solicitudes sin unidad, con aviso si
-  faltan. Quien representa a la entidad registra cada unidad con su matrícula
-  (`POST /recursos/unidades`) y reporta sus cambios: asignarla a un incidente, liberarla o
-  marcarla no disponible con una nota. Aprobar un incidente solo solicita el recurso. Un recurso
-  sin unidades se marca: la coordinación propone sin saber si hay.
+- **Cola por secciones** (`lib/cola.ts`): por decidir, por decidir sin noticias hace más de una
+  hora, aprobados y descartados. Dentro de cada prioridad, lo que quizá ya no aplica (todos sus
+  reportes parecen negar la palabra de alerta) va al final con su marca; la prioridad no baja.
+- **Boletín** (pestaña): borrador de texto con el corte del momento, armado con una plantilla
+  (`lib/boletin.ts`), sin IA: totales por prioridad y estado, barrios con más por decidir, acciones
+  aprobadas y lo solicitado a cada entidad. Se edita en pantalla, se copia o se descarga.
+- **Recursos**: el tablero ya no lleva el inventario de unidades ni muestra cuántas hay. La central
+  conserva `GET /recursos` y `POST /recursos/unidades` (contrato y ADR 0006); aquí solo se ve qué
+  recurso se solicita al aprobar.
 - **Rechazados** (pestaña, con el número sin recuperar): los mensajes mal formados o cortados, en el
   orden de la central, con sus motivos y solo los campos que llegaron (`GET /rechazados`). Marca
   "Recuperado" si después llegó una versión válida.
@@ -83,7 +88,7 @@ de mapcn. Su worker se copia a `public/vendor/` antes de `dev` y `build`
 ## Diseño
 
 Consola de operaciones, con el reparto de los sistemas de despacho: franja de estado arriba; cola,
-mapa y decisión en tres paneles redimensionables; recursos fijos abajo. Fira Sans para el texto y
+mapa y decisión en tres paneles redimensionables. Fira Sans para el texto y
 Fira Code para ids, geohash y horas. Tokens en `app/globals.css`:
 
 - Grises neutros, bordes finos, radio chico, sin sombras ni degradados.

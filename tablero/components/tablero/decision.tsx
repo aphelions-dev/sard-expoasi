@@ -1,15 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { Check, LoaderCircle, TriangleAlert, X } from "lucide-react"
+import { Check, LoaderCircle, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { decidir, mensajeDecision, type Nodo } from "@/lib/api/central"
 import type { Incidente } from "@/lib/api/tipos"
 import { cn } from "@/lib/utils"
-
-import { Prioridad } from "./insignias"
 
 const vigenteDe = (inc: Incidente) =>
   inc.accion_propuesta && inc.decision?.accion_id === inc.accion_propuesta.id ? inc.decision : null
@@ -22,57 +20,16 @@ export function Propuesta({ inc, lugar }: { inc: Incidente; lugar: (texto: strin
   }
   const vigente = vigenteDe(inc)
   const anterior = inc.decision && !vigente ? inc.decision : null
-  const r = inc.recurso
 
   return (
     <div className="space-y-2.5 text-xs">
-      <div className="flex items-start gap-2">
-        <Prioridad p={a.prioridad} />
-        <p className="text-sm font-medium">{lugar(a.accion)}</p>
-      </div>
-
-      <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
-        <dt className="text-muted-foreground">Entidad</dt>
-        <dd>{a.entidad}</dd>
-        {a.recurso && (
-          <>
-            <dt className="text-muted-foreground">Recurso</dt>
-            <dd className="flex flex-wrap items-center gap-2">
-              {a.recurso}
-              {r && (
-                <span className={cn("font-mono", r.disponibles === 0 ? "text-p1" : r.disponibles === null ? "text-p2" : "text-muted-foreground")}>
-                  {r.disponibles === null ? "sin unidades registradas" : `${r.disponibles} disponible${r.disponibles === 1 ? "" : "s"}`}
-                </span>
-              )}
-            </dd>
-          </>
-        )}
-        {r && (r.solicitado || r.asignadas.length > 0) && (
-          <>
-            <dt className="text-muted-foreground">Unidad</dt>
-            <dd>
-              {r.asignadas.length > 0 ? (
-                <span className="font-mono">{r.asignadas.join(", ")}</span>
-              ) : (
-                <span className="text-p2">Solicitada; {r.entidad} todavía no asigna una unidad</span>
-              )}
-            </dd>
-          </>
-        )}
-        <dt className="text-muted-foreground">Personas</dt>
-        <dd className="font-mono">{a.personas_estimadas}</dd>
-      </dl>
-
-      {r && r.compiten.length > 0 && r.asignadas.length === 0 && (
-        <p className="flex gap-1.5 rounded-sm border border-p2/40 bg-p2-surface p-2 text-p2" title={r.compiten.join(", ")}>
-          <TriangleAlert className="mt-px size-3.5 shrink-0" aria-hidden="true" />
-          <span>
-            Compite por {r.recurso} con <strong>{r.compiten.length}</strong> incidente{r.compiten.length > 1 ? "s" : ""} sin unidad
-            asignada de igual o mayor prioridad.
-          </span>
+      {/* La entidad va en la frase; la prioridad y las personas, arriba en el incidente. */}
+      <p className="text-sm font-medium">{lugar(a.accion)}</p>
+      {a.recurso && (
+        <p>
+          <span className="text-muted-foreground">Recurso que se solicita:</span> {a.recurso}
         </p>
       )}
-
 
       {a.falta_confirmar.length > 0 && (
         <div>
@@ -144,6 +101,11 @@ export function BarraDecision({ inc, nodo, coordinador, lugar, onDecidido }: Pro
         {vigente.decision === "aprobar" ? <Check className="size-4 shrink-0" aria-hidden="true" /> : <X className="size-4 shrink-0" aria-hidden="true" />}
         <div>
           <strong>{vigente.decision === "aprobar" ? "Aprobada" : "Rechazada"}</strong> por {vigente.coordinador}
+          {vigente.decision === "aprobar" && a.recurso && (
+            <p className="mt-0.5 text-foreground/80">
+              Se solicita {a.recurso} a {a.entidad}.
+            </p>
+          )}
           {vigente.nota && <p className="mt-0.5 text-foreground/80">«{vigente.nota}»</p>}
         </div>
       </div>
@@ -158,7 +120,7 @@ export function BarraDecision({ inc, nodo, coordinador, lugar, onDecidido }: Pro
         <span aria-hidden="true" className="grid size-4 place-items-center rounded-full bg-foreground font-mono text-[0.625rem] text-background">
           4
         </span>
-        <h3 id="t-decision" className="font-semibold">
+        <h3 id="t-decision" className="shrink-0 font-semibold">
           Tu decisión
         </h3>
         <span className="truncate text-muted-foreground" title={lugar(a.accion)}>

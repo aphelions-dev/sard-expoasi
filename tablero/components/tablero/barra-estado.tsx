@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronDown, Moon, Sun, UserRound } from "lucide-react"
+import { BellOff, BellRing, ChevronDown, Moon, Sun, UserRound } from "lucide-react"
 import { useTheme } from "next-themes"
 
 import { Button } from "@/components/ui/button"
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import type { Nodo } from "@/lib/api/central"
 import type { Incidente, Salud } from "@/lib/api/tipos"
+import { pedirPermisoNotificar, prepararSonido } from "@/lib/avisos"
 import { cn } from "@/lib/utils"
 
 import { Punto } from "./insignias"
@@ -20,6 +21,8 @@ interface Props {
   pendientes: number
   coordinador: string
   onCoordinador: (v: string) => void
+  sonido: boolean
+  onSonido: (v: boolean) => void
 }
 
 type EstadoPunto = "ok" | "caido" | "aviso" | "espera"
@@ -40,7 +43,7 @@ function Sistema({ partes, resumen, estado }: { partes: Parte[]; resumen: string
           <button
             type="button"
             className={cn(
-              "flex h-7 items-center gap-1.5 rounded-sm px-2 font-medium hover:bg-accent",
+              "flex h-7 items-center gap-1.5 rounded-sm px-2 font-medium whitespace-nowrap hover:bg-accent",
               estado === "caido" && "bg-p1-surface text-p1 hover:bg-p1-surface",
               estado === "aviso" && "bg-p2-surface text-p2 hover:bg-p2-surface",
             )}
@@ -102,6 +105,8 @@ function Identidad({ coordinador, onCoordinador }: { coordinador: string; onCoor
     e.preventDefault()
     onCoordinador(borrador.trim())
     setAbierto(false)
+    // Empieza el turno: buen momento para pedir el permiso de avisar con la pestaña oculta.
+    pedirPermisoNotificar()
   }
 
   return (
@@ -122,12 +127,15 @@ function Identidad({ coordinador, onCoordinador }: { coordinador: string; onCoor
       >
         <UserRound aria-hidden="true" />
         {nombre ? (
-          <span className="max-w-40 truncate">
+          // En el celular solo el ícono: el nombre no cabe junto al estado del sistema.
+          <span className="max-w-40 truncate max-sm:sr-only">
             <span className="hidden text-muted-foreground lg:inline">Decide: </span>
             {nombre}
           </span>
         ) : (
-          <span>Identifícate para decidir</span>
+          <span>
+            Identifícate<span className="max-sm:hidden"> para decidir</span>
+          </span>
         )}
         <ChevronDown aria-hidden="true" className="opacity-60" />
       </PopoverTrigger>
@@ -166,7 +174,7 @@ function Identidad({ coordinador, onCoordinador }: { coordinador: string; onCoor
 
 /** Franja superior en tres bloques: el sistema (¿puedo confiar en lo que veo?), la cola (¿cuánto
  *  hay por hacer?) y quién decide. */
-export function BarraEstado({ saludes, activa, incidentes, pendientes, coordinador, onCoordinador }: Props) {
+export function BarraEstado({ saludes, activa, incidentes, pendientes, coordinador, onCoordinador, sonido, onSonido }: Props) {
   const { resolvedTheme, setTheme } = useTheme()
   const salud = activa && saludes ? saludes[activa] : null
   const jev: EstadoPunto = !salud ? "espera" : salud.jev === "ok" ? "ok" : "aviso"
@@ -176,7 +184,7 @@ export function BarraEstado({ saludes, activa, incidentes, pendientes, coordinad
   const revisar = incidentes.filter((i) => i.incertidumbre.revisar && abierto(i)).length
 
   return (
-    <header className="flex h-12 shrink-0 items-center gap-3 border-b bg-card px-3 text-xs md:gap-5">
+    <header className="flex h-12 shrink-0 items-center gap-2 border-b bg-card px-3 text-xs sm:gap-3 md:gap-5">
       <div className="flex shrink-0 items-center gap-2">
         <span className="grid size-7 place-items-center rounded-sm bg-foreground font-mono text-[0.6875rem] font-bold text-background">
           SA
@@ -231,6 +239,22 @@ export function BarraEstado({ saludes, activa, incidentes, pendientes, coordinad
 
       <div className="ml-auto flex items-center gap-1.5">
         <Identidad coordinador={coordinador} onCoordinador={onCoordinador} />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => {
+            if (!sonido) {
+              prepararSonido()
+              pedirPermisoNotificar()
+            }
+            onSonido(!sonido)
+          }}
+          aria-pressed={sonido}
+          aria-label={sonido ? "Silenciar el aviso sonoro de llegadas" : "Activar el aviso sonoro de llegadas"}
+          title={sonido ? "Suena al llegar algo nuevo (más fuerte si es P1). Clic para silenciar." : "Silenciado. Clic para que suene al llegar algo nuevo."}
+        >
+          {sonido ? <BellRing /> : <BellOff className="text-muted-foreground" />}
+        </Button>
         <Button
           variant="ghost"
           size="icon"

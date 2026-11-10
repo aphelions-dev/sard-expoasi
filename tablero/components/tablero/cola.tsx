@@ -5,8 +5,8 @@ import { ArrowDown, Clock, MapPinOff, TriangleAlert, Users } from "lucide-react"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
 import type { Incidente } from "@/lib/api/tipos"
-import { FILTROS, agrupar, conteos, filtrar, type Filtro } from "@/lib/cola"
-import { TIPO, haceCuanto } from "@/lib/formato"
+import { FILTROS, agrupar, conteos, filtrar, quizaNoAplica, type Filtro } from "@/lib/cola"
+import { TIPO, duracion, haceCuanto } from "@/lib/formato"
 import type { Barrio } from "@/lib/geo"
 import { cn } from "@/lib/utils"
 import type { Zona } from "@/lib/zonas"
@@ -35,7 +35,7 @@ interface Props {
   onVerNuevos: () => void
 }
 
-/** Cola en filas densas, en el orden que decide la central. Los filtros esconden, no reordenan. */
+/** Cola en filas densas, por secciones (`lib/cola.ts`) y en el orden que decide la central. */
 export function Cola({
   incidentes,
   cargando,
@@ -77,7 +77,7 @@ export function Cola({
       aria-label="Cola de incidentes"
     >
       <div
-        className="flex h-9 shrink-0 items-center gap-0.5 border-b px-1.5"
+        className="flex h-9 shrink-0 items-center gap-0.5 overflow-x-auto border-b px-1.5 [scrollbar-width:none]"
         role="tablist"
         aria-label="Filtrar incidentes"
       >
@@ -88,7 +88,7 @@ export function Cola({
             aria-selected={filtro === f.id}
             onClick={() => onFiltro(f.id)}
             className={cn(
-              "flex h-6 items-center gap-1.5 rounded-sm px-2 text-xs text-muted-foreground transition-colors hover:text-foreground",
+              "flex h-6 shrink-0 items-center gap-1.5 rounded-sm px-2 text-xs whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground",
               filtro === f.id && "bg-accent font-medium text-foreground"
             )}
           >
@@ -152,6 +152,7 @@ export function Cola({
                     const Icono = ICONO_TIPO[inc.tipo]
                     const decidido =
                       inc.estado === "aprobada" || inc.estado === "rechazada"
+                    const dudoso = !decidido && quizaNoAplica(inc)
                     const avisos =
                       inc.incertidumbre.revisar ||
                       inc.impacto.vulnerables ||
@@ -172,6 +173,7 @@ export function Cola({
                           className={cn(
                             "relative grid w-full gap-0.5 py-2 pr-2.5 pl-3.5 text-left text-xs transition-colors hover:bg-accent/60 focus-visible:bg-accent focus-visible:outline-none",
                             recientes.has(inc.id) && "animate-llegada",
+                            nuevos.includes(inc.id) && !elegida && "bg-foreground/[0.05]",
                             elegida && "bg-accent",
                             decidido && !elegida && "opacity-60"
                           )}
@@ -185,6 +187,11 @@ export function Cola({
                           />
                           <span className="flex min-w-0 items-center gap-1.5">
                             <Prioridad p={inc.prioridad} />
+                            {nuevos.includes(inc.id) && (
+                              <span className="shrink-0 rounded-sm bg-foreground px-1 text-[0.625rem] leading-4 font-bold text-background">
+                                NUEVO
+                              </span>
+                            )}
                             <Icono
                               aria-hidden="true"
                               className="size-3.5 shrink-0"
@@ -225,6 +232,14 @@ export function Cola({
                                   Revisar
                                 </span>
                               )}
+                              {dudoso && (
+                                <span
+                                  className="text-muted-foreground"
+                                  title="El mensaje podría estar diciendo que la emergencia no ocurrió o ya pasó. La prioridad no baja: va al final de su prioridad hasta que lo confirmes."
+                                >
+                                  Quizá ya no aplica
+                                </span>
+                              )}
                               {inc.impacto.vulnerables && (
                                 <span className="font-medium">
                                   Niños o mayores
@@ -245,8 +260,8 @@ export function Cola({
                                     className="size-3"
                                     aria-hidden="true"
                                   />
-                                  {inc.vigencia.minutos_sin_noticias} min sin
-                                  noticias
+                                  {duracion(inc.vigencia.minutos_sin_noticias)}{" "}
+                                  sin noticias
                                 </span>
                               )}
                               {decidido && <EstadoInsignia e={inc.estado} />}

@@ -1,6 +1,6 @@
 # 0002 — Solo Android por ahora
 
-**Estado:** aceptada
+**Estado:** aceptada · reemplazada en parte por la 0007 (iPhone con bitchat oficial y app web)
 
 **Contexto:** equipo de 3 personas, tiempo limitado y celulares Android disponibles.
 

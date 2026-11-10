@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { ErrorApi, elegirActiva, mensajeDecision } from "./api/central";
 import type { Incidente, Prioridad, Salud } from "./api/tipos";
-import { agrupar, conteos, filtrar, porDecidir } from "./cola";
-import { haceCuanto, lugarLegible } from "./formato";
+import { agrupar, conteos, filtrar, porDecidir, quizaNoAplica } from "./cola";
+import { duracion, haceCuanto, lugarLegible } from "./formato";
+import { aP1 } from "./use-novedades";
 import { citaLegible, enPalabras, motivoRechazo, palabraCompleta, senalLegible } from "./lenguaje";
 
 const ok = (central: "A" | "B"): Salud => ({ estado: "ok", central, jev: "ok" });
@@ -96,17 +97,43 @@ describe("motivoRechazo", () => {
 })
 
 describe("cola por estado", () => {
-  const inc = (id: string, estado: Incidente["estado"], asignadas: string[] | null = null) =>
-    ({ id, estado, recurso: asignadas === null ? null : { asignadas } }) as unknown as Incidente;
-  it("separa por lo que falta hacer, sin reordenar dentro de cada sección", () => {
-    const s = agrupar([
-      inc("a", "aprobada", []), inc("b", "pendiente"), inc("c", "rechazada"),
-      inc("d", "aprobada", ["CR-114"]), inc("e", "sin_propuesta"), inc("f", "aprobada"),
-    ]);
-    expect(s.map((x) => [x.grupo.id, x.incidentes.map((i) => i.id)])).toEqual([
-      ["decidir", ["b", "e"]], ["esperando", ["a"]], ["atencion", ["d", "f"]], ["descartados", ["c"]],
-    ]);
+  const inc = (id: string, estado: Incidente["estado"], extra: { viejo?: boolean; prioridad?: Prioridad; negado?: boolean } = {}) =>
+    ({
+      id, estado, prioridad: extra.prioridad ?? "P1", reportes: ["r1"],
+      vigencia: { sin_noticias_recientes: !!extra.viejo },
+      incertidumbre: { motivos: extra.negado ? ["r1: posible negación de «fuego»: la prioridad no baja, confirmar si aplica"] : [] },
+    }) as unknown as Incidente;
+  const ids = (lista: Incidente[]) => agrupar(lista).map((x) => [x.grupo.id, x.incidentes.map((i) => i.id)]);
+  it("separa por lo que falta hacer, sin reordenar dentro de cada sección", () =>
+    expect(ids([
+      inc("a", "aprobada"), inc("b", "pendiente"), inc("c", "rechazada"),
+      inc("d", "pendiente", { viejo: true }), inc("e", "sin_propuesta"), inc("f", "aprobada", { viejo: true }),
+    ])).toEqual([["decidir", ["b", "e"]], ["sin_noticias", ["d"]], ["aprobados", ["a", "f"]], ["descartados", ["c"]]]));
+  it("lo que quizá no aplica va al final de su prioridad, nunca debajo de una prioridad menor", () =>
+    expect(ids([
+      inc("a", "pendiente", { negado: true }), inc("b", "pendiente"), inc("c", "pendiente", { prioridad: "P2" }),
+    ])).toEqual([["decidir", ["b", "a", "c"]]]));
+  it("con varios reportes, solo si todos lo niegan", () => {
+    const i = inc("a", "pendiente", { negado: true });
+    expect(quizaNoAplica(i)).toBe(true);
+    expect(quizaNoAplica({ ...i, reportes: ["r1", "r2"] })).toBe(false);
   });
   it("«Por decidir» aparece aunque esté vacía; las demás, solo si tienen algo", () =>
     expect(agrupar([]).map((x) => x.grupo.id)).toEqual(["decidir"]));
+});
+
+describe("duracion", () => {
+  it("minutos, horas con minutos y, pasadas 6 h, solo horas", () => {
+    expect(duracion(45)).toBe("45 min");
+    expect(duracion(125)).toBe("2 h 5 min");
+    expect(duracion(1801)).toBe("30 h");
+  });
+});
+
+describe("aP1", () => {
+  const inc = (id: string, prioridad: Prioridad) => ({ id, prioridad }) as Incidente;
+  it("avisa lo que llega como P1 y lo que sube a P1, no lo que ya era P1", () => {
+    const antes = new Map<string, Prioridad>([["a", "P1"], ["b", "P2"]]);
+    expect(aP1(antes, [inc("a", "P1"), inc("b", "P1"), inc("c", "P1"), inc("d", "P3")])).toEqual(["b", "c"]);
+  });
 });

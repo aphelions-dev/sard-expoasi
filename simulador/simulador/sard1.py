@@ -5,7 +5,7 @@ import re
 from dataclasses import dataclass
 
 PRIORIDADES = ("P1", "P2", "P3", "P4")
-TIPOS = ("ATRAP", "MEDIC", "FUEGO", "VIA", "DESAP", "OTRO")
+TIPOS = ("ATRAP", "MEDIC", "FUEGO", "DESLIZ", "INUND", "GAS", "VIA", "DESAP", "OTRO")
 RE_ID = re.compile(r"^[0-9A-Za-z]+-[0-9]+$")
 RE_GEOHASH = re.compile(r"^[0-9b-hjkmnp-z]{6,9}$")  # 6 a 9 según la precisión del GPS
 

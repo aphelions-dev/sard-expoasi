@@ -20,9 +20,9 @@ const DESTELLO_MS = 2400
 const PUNTO: Record<Prioridad, string> = { P1: "bg-p1", P2: "bg-p2", P3: "bg-p3", P4: "bg-p4" }
 
 /** Expresiones de pintura de la capa de barrios, leídas del estado de cada uno. */
-/** `relleno`: de lejos el barrio se pinta de su prioridad; de cerca queda solo su contorno, para que
- *  la única área de color sea la zona de cada incidente. */
-export function pinturaBarrios(c: { barrio: string; borde: string; texto: string; p: Record<Prioridad, string> }, relleno: boolean) {
+/** `cerca`: el estado que llega es solo el de los incidentes sin ubicación exacta, cuyo sitio es
+ *  «en este barrio o cerca»; el barrio se pinta más suave para que los puntos precisos manden. */
+export function pinturaBarrios(c: { barrio: string; borde: string; texto: string; p: Record<Prioridad, string> }, cerca: boolean) {
   // feature-state no tiene tipo: las expresiones lo piden explícito o MapLibre descarta la pintura.
   const p = ["to-string", ["coalesce", ["feature-state", "p"], "-"]]
   const color = ["match", p, "P1", c.p.P1, "P2", c.p.P2, "P3", c.p.P3, "P4", c.p.P4, c.barrio]
@@ -36,9 +36,9 @@ export function pinturaBarrios(c: { barrio: string; borde: string; texto: string
     ["boolean", ["feature-state", "apagado"], false], 0.22,
     ["min", 0.7, ["+", 0.32, ["*", 0.08, n]]],
   ]
-  const opacidad = relleno ? ["*", fuera, ["min", 0.9, ["+", base, ["*", 0.5, pulso]]]] : ["*", fuera, 0.45]
+  const opacidad = ["*", fuera, cerca ? 0.6 : 1, ["min", 0.9, ["+", base, ["*", 0.5, pulso]]]]
   return {
-    fill: { "fill-color": relleno ? color : c.barrio, "fill-opacity": opacidad } as never,
+    fill: { "fill-color": color, "fill-opacity": opacidad } as never,
     hover: { "fill-opacity": ["min", 0.9, ["+", opacidad, 0.15]] } as never,
     line: {
       "line-color": ["case", ["boolean", ["feature-state", "sel"], false], c.texto, ["==", p, "-"], c.texto, color],

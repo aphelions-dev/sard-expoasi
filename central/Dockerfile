@@ -10,6 +10,4 @@ RUN uv sync --frozen --no-dev --no-install-project
 COPY contracts /repo/contracts
 COPY central .
 ENV PATH="/repo/central/.venv/bin:$PATH"
-# El registro de eventos (SQLite) vive en un volumen: sobrevive a reiniciar el contenedor.
-VOLUME /repo/central/datos
 CMD ["python", "iniciar.py", "A"]

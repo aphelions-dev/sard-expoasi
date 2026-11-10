@@ -48,7 +48,7 @@ Las URLs de las centrales salen de `NEXT_PUBLIC_CENTRAL_A_URL` y `NEXT_PUBLIC_CE
 - **Mapa** (siempre visible, al centro). De lejos, cada barrio toma el color de lo más grave que
   tiene por decidir y lleva su número. De cerca, o con un barrio elegido, el barrio queda en
   contorno y se ve cada incidente: si el GPS fue preciso, un punto con el icono del tipo; si no, se
-  pinta su barrio y una etiqueta dice cuántos hay «sin sitio exacto» (fuera de los barrios se dibuja
+  pinta su barrio y un círculo punteado con un número dice cuántos hay sin sitio exacto (fuera de los barrios se dibuja
   el rectángulo del geohash, porque no hay otro límite que usar). Los puntos que en
   pantalla se taparían se juntan en un círculo con el número (`lib/racimos.ts`); el clic acerca
   hasta separarlos, o los recorre si están en el mismo sitio. Lo ya decidido se atenúa. Hospitales,

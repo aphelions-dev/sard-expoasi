@@ -2,7 +2,8 @@
 
 E1–E4 con el simulador y la central simulada, 10 semillas por caso (reproducibles), con los tiempos
 de reintento y el vencimiento a 600 s del contrato (#58). E4 (parte central), E5 y E7 contra las
-centrales A y B reales, levantadas con bases nuevas y sin Jev. Última corrida: 9 de noviembre de
+centrales A y B reales, levantadas con bases nuevas y sin Jev; E6, igual pero con Jev (`jev-1.14.0`),
+el 9 de noviembre. Resumen para el jurado: `docs/entregables/06-resultados-pruebas.md`. Última corrida: 9 de noviembre de
 2026, con la prioridad que calculan las reglas del celular (contrato, «Prioridad en el celular», #82)
 en vez de la etiqueta del CSV, la central que copia cada reporte a la otra antes del `SACK` (#74, #75)
 y las palabras críticas corregidas (#69).
@@ -21,7 +22,7 @@ PYTHONUTF8=1 uv run python -m simulador escenarios-central --env-file ../.env   
 | E3 | [`E3/resumen.md`](E3/resumen.md) | Con la cola llena, la mediana de P1 es 5,4 s con prioridad contra 26,5 s en orden de llegada (5 veces más rápido); P4 pasa de 25 s a 75 s. |
 | E4 | [`E4/resumen.md`](E4/resumen.md), [`E4/resumen-central.md`](E4/resumen-central.md) | Con 2 y 3 pasarelas llegan 8,4 y 11,4 copias duplicadas por corrida, pero la central real registra exactamente 1 `reporte_recibido` por id en la A y en la B. |
 | E5 | [`E5/resumen-central.md`](E5/resumen-central.md) | Se apaga la A entera en el segundo 120 con carga en curso: 60 de 60 entregados, la pasarela sube a la B (25 subidas a la A, 30 a la B), 0 perdidos y ninguno confirmado que falte en la B mientras la A está caída. |
-| E6 | — | Pendiente: necesita `JEV_API_KEY`. El comando está listo. |
+| E6 | [`E6/resumen-central.md`](E6/resumen-central.md) | Con Jev, recall de P1 de 100 % en los dos modos (30 de 30). Con la prioridad del celular, 62 exactas, subtriaje 7 (ninguno P1), sobretriaje 31 y 0 bajados; priorizar los 100 tarda 18,5 s. |
 | E7 | [`E7/resumen-central.md`](E7/resumen-central.md) | Sin Jev, la central prioriza los 100 en 2,2 s (disponibilidad 100 %). Con formulario neutro, 53 exactas y recall de P1 de 87 % (4 P1 sin palabra crítica quedan en P4); con la prioridad de las reglas del celular, 55 exactas, el mismo recall (esos 4 quedan en P3) y 0 bajados. |
 
 ## Hallazgos
@@ -45,7 +46,8 @@ PYTHONUTF8=1 uv run python -m simulador escenarios-central --env-file ../.env   
    del 7 de noviembre eran 13 (recall de P1 de 57 %); con la corregida en #69, 4 (recall 87 %). Son
    P1 que no dicen ninguna palabra crítica («quedó debajo de la placa», «hay alguien colgado del
    balcón»; lista en `E7/resumen-central.md`). Las reglas del celular tampoco los suben (no traen
-   atrapados marcado: quedan en P3), así que sin Jev solo el coordinador los rescata. Hasta el 8 de
+   atrapados marcado: quedan en P3), así que sin Jev solo el coordinador los rescata. **Con Jev
+   (E6, 9 de noviembre) los 4 quedan en P1.** Hasta el 8 de
    noviembre el simulador mandaba la etiqueta del CSV como prioridad del celular y por eso parecía
    que no se perdía ninguno; con las reglas del contrato (#82) se ve el hueco real. La central
    nunca baja la prioridad del celular (0 bajados).
@@ -59,6 +61,7 @@ PYTHONUTF8=1 uv run python -m simulador escenarios-central --env-file ../.env   
 | E5, caída en carga | 60 reportes en 300 s con la central A apagada en el segundo 120 | 60/60 entregados, 0 perdidos |
 | Recorrido de la demo | Ráfaga de 20 reportes durante ~20 s y la central A apagada a mitad de la ráfaga (`python -m simulador recorrido`) | 23/23 entregados y confirmados; 11 subidas a la B durante la caída; A y B coinciden al volver la A |
 | E7, triaje en lote | 200 reportes de una vez sin Jev | Priorizados en 2,2 s cada lote de 100 |
+| E6, triaje en lote con Jev | 200 reportes de una vez con Jev | Priorizados en 20,3 y 18,5 s cada lote de 100 |
 
 ## Errores observados
 
@@ -84,9 +87,10 @@ centrales en `127.0.0.1` (#76) llegaba entera a la A antes del apagón y ya no m
 
 | Parte | Comando | Pruebas |
 |-------|---------|---------|
-| Central (P2) | `cd central && uv run pytest` | 65 |
-| Tablero | `cd tablero && npm test` | 38 |
-| Simulador | `cd simulador && uv run pytest` | 24 |
+| Central (P2) | `cd central && uv run pytest` | 67 |
+| Tablero | `cd tablero && npm test` | 40 |
+| App web de reportes | `cd reportar && npm test` | 18 |
+| Simulador | `cd simulador && uv run pytest` | 39 |
 
 ## Limitaciones
 
@@ -95,4 +99,4 @@ centrales en `127.0.0.1` (#76) llegaba entera a la A antes del apagón y ya no m
 - La reactivación de un reporte vencido al aparecer un vecino nuevo (contrato, regla 5) no se mide:
   con los celulares quietos, un celular aislado nunca gana camino. Se confirma con la app en #1.
 - E4 (parte central), E5 y E7 dependen del reloj real y no son reproducibles al 100 %.
-- E7 usa la central sin Jev; E6 queda pendiente de la clave.
+- E7 usa la central sin Jev y E6 con `jev-1.14.0`: otra versión del modelo puede dar otras probabilidades.

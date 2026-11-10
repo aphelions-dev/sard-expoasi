@@ -5,6 +5,8 @@
 // la prioridad (fuera de los barrios, como el rectángulo del geohash), no como un icono; aquí solo
 // va lo que el área no dice sola, cuántos hay y si piden revisión. Con 8 o más (~20 m), un punto;
 // los puntos que en pantalla se tocarían se juntan en uno con el número (`lib/racimos.ts`).
+import { CircleDashed } from "lucide-react"
+
 import { MapMarker, MarkerContent, MarkerTooltip, useMap } from "@/components/ui/map"
 import type { Incidente, Prioridad } from "@/lib/api/tipos"
 import { TIPO, precision } from "@/lib/formato"
@@ -140,13 +142,15 @@ export function MarcaZona({
       <MarkerContent>
         <span
           className={cn(
-            "flex h-6 items-center gap-1 rounded-full border border-dashed border-background bg-foreground px-2 text-[0.6875rem] leading-none font-semibold text-background shadow-sm",
-            elegido && "outline-2 outline-offset-2 outline-foreground",
+            "flex h-5 items-center gap-1 rounded-full border bg-card/90 pr-1.5 pl-1 font-mono text-[0.6875rem] leading-none font-semibold text-foreground shadow-sm",
+            elegido && "border-foreground",
           )}
           aria-label={`${grupo.length} incidente${grupo.length > 1 ? "s" : ""} sin ubicación exacta en esta zona${revisar ? ", alguno para revisar" : ""}`}
         >
-          <span className="font-mono">{grupo.length}</span> sin sitio exacto
-          {revisar && <span aria-hidden="true" className="size-2 rounded-full bg-revisar" />}
+          {/* Círculo punteado: no se sabe el sitio. Del color del más grave. */}
+          <CircleDashed aria-hidden="true" className={cn("size-3.5", TEXTO[grupo[0].prioridad])} />
+          {grupo.length}
+          {revisar && <span aria-hidden="true" className="size-1.5 rounded-full bg-revisar" />}
         </span>
       </MarkerContent>
       <MarkerTooltip className="rounded-none bg-transparent p-0 text-popover-foreground shadow-none">

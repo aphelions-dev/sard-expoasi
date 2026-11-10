@@ -11,7 +11,7 @@
 // creer que se sabe el sitio exacto. Hospitales y bomberos (simbología FGDC) van apagados.
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react"
 import type { StyleSpecification } from "maplibre-gl"
-import { ChevronDown, FireExtinguisher, Maximize2, Minimize2, Play, Scan, Square } from "lucide-react"
+import { ChevronDown, CircleDashed, FireExtinguisher, Maximize2, Minimize2, Play, Scan, Square } from "lucide-react"
 
 import "@/lib/maplibre-local" // antes que el mapa: worker local, sin internet
 import { Map, MapControls, MapGeoJSON, MapMarker, MarkerContent, MarkerTooltip, useMap } from "@/components/ui/map"
@@ -413,7 +413,7 @@ export function Mapa({ geo, incidentes: todos, seleccion, onSeleccion, barrio, z
         {leyenda && (
           <div className="space-y-2 border-t px-2.5 py-2">
             <p>De lejos, cada barrio toma el color de lo más grave que tiene por decidir, más intenso cuantos más incidentes tiene. Clic en un barrio: ver solo ese barrio en la cola.</p>
-            <p>Acércate o haz clic en un barrio para ver cada incidente: si el GPS fue preciso (hasta ~20 m), un punto con el icono del tipo en el sitio exacto; si no, se pinta su barrio y una etiqueta dice cuántos hay «sin sitio exacto»: están en ese barrio o cerca.</p>
+            <p>Acércate o haz clic en un barrio para ver cada incidente: si el GPS fue preciso (hasta ~20 m), un punto con el icono del tipo en el sitio exacto; si no, se pinta su barrio y un círculo punteado con un número dice cuántos hay sin sitio exacto: están en ese barrio o cerca.</p>
             <p>Un círculo con un número son varios puntos que se taparían: haz clic para acercarte y separarlos.</p>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               {(["P1", "P2", "P3", "P4"] as const).map((p) => (
@@ -440,7 +440,11 @@ export function Mapa({ geo, incidentes: todos, seleccion, onSeleccion, barrio, z
                 >
                   3
                 </span>
-                incidentes en la misma zona
+                puntos juntos
+              </span>
+              <span className="flex items-center gap-1">
+                <CircleDashed aria-hidden="true" className="size-3.5" />
+                sin sitio exacto
               </span>
               <span className="flex items-center gap-1">
                 <span aria-hidden="true" className="size-2.5 rounded-full bg-revisar" />

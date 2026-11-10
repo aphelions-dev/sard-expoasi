@@ -64,7 +64,7 @@ Con `JEV_API_KEY` en `.env` el triaje usa Jev; sin ella, solo reglas.
 | 4 | Fichas de agentes | [`docs/entregables/04-fichas-agentes.md`](docs/entregables/04-fichas-agentes.md), una por agente en `docs/fichas-agentes/` | Listo |
 | 5 | Protocolo de comunicación | [`docs/entregables/05-protocolo-comunicacion.md`](docs/entregables/05-protocolo-comunicacion.md); el contrato en `contracts/` | Listo; por definir con la app: largo máximo del texto y antigüedad del GPS |
 | 6 | Resultados de pruebas | [`docs/entregables/06-resultados-pruebas.md`](docs/entregables/06-resultados-pruebas.md); datos en `pruebas/resultados/` | E1 a E7 con métricas, estrés, errores observados y limitaciones |
-| 7 | Pitch y demostración | `docs/pitch/` | Presentación v1 (el PDF se agrega al aprobarla) y recorrido de 8 pasos ensayado con una condición adversa. Video de respaldo pendiente |
+| 7 | Pitch y demostración | [`docs/pitch/pitch.pdf`](docs/pitch/pitch.pdf), guion en `docs/pitch/guion-demo.md` | Presentación de 9 diapositivas, recorrido de 8 pasos con la caída de la central A y video de respaldo (`docs/pitch/sard-demo-respaldo.mp4`) |
 
 ## Resultados clave
 

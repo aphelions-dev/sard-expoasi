@@ -11,7 +11,7 @@ La evaluación no depende solo de la presentación: el jurado debe poder reprodu
 | 4 | Fichas de agentes | Objetivo, entradas, salidas, herramientas, memoria, límites de autonomía, manejo de errores y criterios de terminación | [04-fichas-agentes.md](04-fichas-agentes.md) | Listo |
 | 5 | Protocolo de comunicación | Esquema del mensaje, reintentos, confirmaciones, deduplicación y estrategia de sincronización | [05-protocolo-comunicacion.md](05-protocolo-comunicacion.md) | Listo; por definir el largo máximo del texto y la antigüedad del GPS |
 | 6 | Resultados de pruebas | Métricas, escenarios ejecutados, errores observados, limitaciones y pruebas de estrés | [06-resultados-pruebas.md](06-resultados-pruebas.md) | Listo, E1 a E7 |
-| 7 | Pitch y demostración | Presentación ejecutiva y demostración reproducible bajo al menos una condición adversa | `docs/pitch/` | Guion y video de respaldo listos; falta exportar `pitch.pdf` |
+| 7 | Pitch y demostración | Presentación ejecutiva y demostración reproducible bajo al menos una condición adversa | [`docs/pitch/pitch.pdf`](../pitch/pitch.pdf), guion en `docs/pitch/guion-demo.md` y video de respaldo | Listo |
 
 ## Verificación contra las bases
 
@@ -67,7 +67,6 @@ pérdida del nodo y recuperación) se muestran en la demo: `docs/pitch/guion-dem
 
 ### Lo que falta
 
-- Exportar `docs/pitch/pitch.pdf` (entregable 7).
 - Fijar el largo máximo del texto y la antigüedad del GPS (entregable 5).
 - Autenticación de la API: hoy cualquiera con la URL puede aprobar (`docs/riesgos.md`).
 - Probar con un iPhone real el relevo por bitchat (ADR 0007).

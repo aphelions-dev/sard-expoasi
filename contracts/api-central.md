@@ -80,9 +80,11 @@ con quién y cuándo.
 | `asignada` | Trabajando en un incidente (`incidente_id`) |
 | `no_disponible` | No se puede usar: mantenimiento, descanso del personal, sin tripulación |
 
-Recursos por tipo de incidente: `ATRAP` equipo de rescate (Bomberos), `FUEGO` máquina de bomberos
-(Bomberos), `MEDIC` ambulancia (Cruz Roja), `DESAP` equipo de búsqueda (Cruz Roja), `VIA` cuadrilla
-(Defensa Civil), `OTRO` ninguno (sala de crisis).
+Recursos por tipo de incidente: `ATRAP` y `DESLIZ` equipo de rescate (Bomberos); `FUEGO`, `INUND` y
+`GAS` máquina de bomberos (Bomberos); `MEDIC` ambulancia (Cruz Roja); `DESAP` equipo de búsqueda
+(Cruz Roja); `VIA` cuadrilla (Defensa Civil); `OTRO` ninguno (sala de crisis). Si el incidente es
+`OTRO` y el triaje vio con claridad otro tipo en el texto, la propuesta usa la entidad y el recurso
+de ese tipo; el `tipo` del incidente no cambia.
 
 ### GET /recursos
 

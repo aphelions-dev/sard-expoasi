@@ -23,7 +23,7 @@ SARD1|a3f9-0042|P1|ATRAP|3|101|d2fkcd|1762481000|edificio colapsado calle 23
 | 0 | cabecera | `SARD1` literal | sí | Versión del protocolo. |
 | 1 | id | `<disp>-<contador>` | sí | ID corto del dispositivo + contador local. Único por reporte. |
 | 2 | prioridad | `P1`…`P4` | sí | P1 crítica, P4 baja. La calculan las reglas en el celular (ver "Prioridad en el celular"). |
-| 3 | tipo | `ATRAP` `MEDIC` `FUEGO` `VIA` `DESAP` `OTRO` | sí | Tipo de emergencia. |
+| 3 | tipo | `ATRAP` `MEDIC` `FUEGO` `DESLIZ` `INUND` `GAS` `VIA` `DESAP` `OTRO` | sí | Tipo de emergencia: personas atrapadas, urgencia médica, incendio, deslizamiento, inundación, fuga de gas, vía afectada, persona desaparecida u otro. |
 | 4 | personas | entero ≥ 0 | sí | Personas afectadas estimadas. |
 | 5 | banderas | 3 dígitos `0`/`1` | sí | Posición 1: atrapados. 2: heridos. 3: niños o adultos mayores. |
 | 6 | geohash | 6 a 9 caracteres, o vacío | no | Zona del reportante. El largo dice la precisión (ver «Ubicación»). Vacío si no hay GPS (`\|\|` seguidos). |

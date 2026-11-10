@@ -12,6 +12,19 @@ import {
   useSyncExternalStore,
 } from "react"
 
+import {
+  IconAlertCircle,
+  IconFirstAidKit,
+  IconFlame,
+  IconLifebuoy,
+  IconMountain,
+  IconRipple,
+  IconRoadOff,
+  IconUserSearch,
+  IconWind,
+  type Icon,
+} from "@tabler/icons-react"
+
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -33,10 +46,8 @@ import {
   leerLista,
   limpiarTexto,
   mensaje,
-  palabraCritica,
   prioridad as calcularPrioridad,
   type Datos,
-  type Prioridad,
   type Tipo,
 } from "@/lib/sard1"
 import { cn } from "@/lib/utils"
@@ -95,19 +106,33 @@ const VACIO: Formulario = {
   texto: "",
 }
 
-// Quien reporta no tiene por qué saber qué es «P1»: se le dice con qué urgencia sale su reporte.
-const URGENCIA: Record<Prioridad, string> = {
-  P1: "Crítico",
-  P2: "Urgente",
-  P3: "Importante",
-  P4: "Informativo",
+// Los mismos iconos que el tablero (`tablero/components/tablero/iconos.ts`): quien reporta y quien
+// coordina ven el mismo dibujo para el mismo tipo. Van siempre con la palabra al lado.
+const ICONO_TIPO: Record<Tipo, Icon> = {
+  ATRAP: IconLifebuoy,
+  MEDIC: IconFirstAidKit,
+  FUEGO: IconFlame,
+  DESLIZ: IconMountain,
+  INUND: IconRipple,
+  GAS: IconWind,
+  VIA: IconRoadOff,
+  DESAP: IconUserSearch,
+  OTRO: IconAlertCircle,
 }
 
-const TONO: Record<Prioridad, string> = {
-  P1: "bg-p1-surface text-p1",
-  P2: "bg-p2-surface text-p2",
-  P3: "bg-p3-surface text-p3",
-  P4: "bg-p4-surface text-p4",
+function IconoTipo({ t }: { t: Tipo }) {
+  const I = ICONO_TIPO[t]
+  return <I aria-hidden="true" className="size-5" />
+}
+
+/** Con el GPS fino (hasta 75 m) la ubicación está lista; con el de un computador o sin cielo
+ *  abierto es aproximada, y se dice para que la persona escriba la dirección. */
+function etiquetaUbicacion(precisionM: number): string {
+  const m = Math.max(1, Math.round(precisionM))
+  const radio = m >= 1000 ? `${Math.round(m / 1000)} km` : `${m} m`
+  return m <= 75
+    ? `Ubicación lista (±${radio})`
+    : `Ubicación aproximada (±${radio}): escribe también la dirección`
 }
 
 const ESTADO: Record<Estado, { texto: string; tono: string }> = {
@@ -271,19 +296,6 @@ export function AppReportar() {
     { ...datos, tipo: datos.tipo ?? "OTRO", texto }, // el tipo no cambia la prioridad
     palabras ?? []
   )
-  const palabra = palabraCritica(texto, palabras ?? [])
-  const motivo = datos.atrapados
-    ? "hay personas atrapadas"
-    : palabra
-      ? `el texto dice «${palabra}»`
-      : datos.heridos
-        ? "hay heridos"
-        : datos.vulnerables
-          ? "hay niños o adultos mayores"
-          : datos.personas >= 1
-            ? "hay personas afectadas"
-            : "nadie afectado"
-
   const enviar = () => {
     if (!datos.tipo) return
     const r = {
@@ -360,7 +372,7 @@ export function AppReportar() {
             {buscando
               ? "Buscando tu ubicación…"
               : ubicacion && "geohash" in ubicacion
-                ? `Ubicación lista (±${Math.max(1, Math.round(ubicacion.precisionM))} m)`
+                ? etiquetaUbicacion(ubicacion.precisionM)
                 : "Sin ubicación"}
           </p>
           {!buscando && (
@@ -375,11 +387,9 @@ export function AppReportar() {
             </Button>
           )}
         </div>
-        <p className="text-xs text-muted-foreground">
-          {ubicacion && "error" in ubicacion && !buscando
-            ? ubicacion.error
-            : "Se envía con tu reporte para que los organismos de socorro sepan a dónde ir. No se usa para nada más."}
-        </p>
+        {ubicacion && "error" in ubicacion && !buscando && (
+          <p className="text-xs text-muted-foreground">{ubicacion.error}</p>
+        )}
       </section>
 
       <section className="space-y-2" aria-labelledby="t-tipo">
@@ -396,8 +406,9 @@ export function AppReportar() {
             <ToggleGroupItem
               key={t}
               value={t}
-              className="h-12 px-1 text-[0.8125rem] leading-tight whitespace-normal aria-pressed:bg-primary aria-pressed:text-primary-foreground"
+              className="h-16 flex-col gap-1 px-1 text-[0.8125rem] leading-tight whitespace-normal aria-pressed:bg-primary aria-pressed:text-primary-foreground"
             >
+              <IconoTipo t={t} />
               {NOMBRE_TIPO[t]}
             </ToggleGroupItem>
           ))}
@@ -481,20 +492,6 @@ export function AppReportar() {
         />
       </section>
 
-      <section
-        className={cn("space-y-1 rounded-md p-3", TONO[prioridad])}
-        aria-live="polite"
-      >
-        <p className="font-semibold">Saldrá como: {URGENCIA[prioridad]}</p>
-        <p className="text-xs">Porque {motivo}.</p>
-        {palabras?.length === 0 && (
-          <p className="text-xs">
-            No se cargó la lista de palabras de alerta: marca las casillas que
-            apliquen.
-          </p>
-        )}
-      </section>
-
       <div className="space-y-1.5">
         <Button
           className="h-12 w-full bg-p1 text-base font-semibold text-white hover:bg-p1/90"
@@ -529,9 +526,6 @@ export function AppReportar() {
               {reportes.map((g) => (
                 <li key={g.id} className="space-y-2 rounded-md border p-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge className={TONO[g.prioridad]}>
-                      {URGENCIA[g.prioridad]}
-                    </Badge>
                     <Badge className={ESTADO[g.estado].tono}>
                       {ESTADO[g.estado].texto}
                     </Badge>

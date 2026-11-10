@@ -5,7 +5,7 @@ import { ArrowDown, Clock, MapPinOff, TriangleAlert, Users } from "lucide-react"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
 import type { Incidente } from "@/lib/api/tipos"
-import { FILTROS, agrupar, conteos, filtrar, type Filtro } from "@/lib/cola"
+import { FILTROS, agrupar, conteos, filtrar, quizaNoAplica, type Filtro } from "@/lib/cola"
 import { TIPO, duracion, haceCuanto } from "@/lib/formato"
 import type { Barrio } from "@/lib/geo"
 import { cn } from "@/lib/utils"
@@ -35,7 +35,7 @@ interface Props {
   onVerNuevos: () => void
 }
 
-/** Cola en filas densas, en el orden que decide la central. Los filtros esconden, no reordenan. */
+/** Cola en filas densas, por secciones (`lib/cola.ts`) y en el orden que decide la central. */
 export function Cola({
   incidentes,
   cargando,
@@ -152,6 +152,7 @@ export function Cola({
                     const Icono = ICONO_TIPO[inc.tipo]
                     const decidido =
                       inc.estado === "aprobada" || inc.estado === "rechazada"
+                    const dudoso = !decidido && quizaNoAplica(inc)
                     const avisos =
                       inc.incertidumbre.revisar ||
                       inc.impacto.vulnerables ||
@@ -229,6 +230,14 @@ export function Cola({
                                     aria-hidden="true"
                                   />
                                   Revisar
+                                </span>
+                              )}
+                              {dudoso && (
+                                <span
+                                  className="text-muted-foreground"
+                                  title="El mensaje podría estar diciendo que la emergencia no ocurrió o ya pasó. La prioridad no baja: va al final de su prioridad hasta que lo confirmes."
+                                >
+                                  Quizá ya no aplica
                                 </span>
                               )}
                               {inc.impacto.vulnerables && (

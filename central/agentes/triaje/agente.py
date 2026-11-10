@@ -8,7 +8,8 @@ Tabla de decisión:
 - prioridad de Jev = P1 si alguna señal vital supera el umbral de sí, P2 si «herido» lo supera;
 - prioridad final = la más alta de las dos. Nunca más baja que la de reglas.
 - revisión humana si Jev subió la prioridad, si el riesgo vital quedó en la zona dudosa, o si
-  Jev ve otro tipo de emergencia con claridad.
+  Jev ve otro tipo de emergencia con claridad. En ese caso el tipo que ve queda en
+  `tipo_sugerido`; el tipo del reporte no cambia.
 """
 
 import sqlite3
@@ -59,6 +60,7 @@ def triar(reporte: dict[str, Any], cliente: jev_mod.Jev) -> dict[str, Any]:
                 revision.append(f"riesgo vital dudoso ({riesgo:.2f})")
             if r.tipo != reporte["tipo"] and r.tipo_probabilidad >= jev_mod.SI:
                 revision.append(f"el celular dice {reporte['tipo']}, Jev ve {r.tipo}")
+                datos["tipo_sugerido"] = r.tipo
             testigo = r.nouls["testigo_directo"]
             datos["fuente"] = ("directa" if testigo >= jev_mod.SI
                                else "de_oidas" if testigo < jev_mod.NO else "incierta")

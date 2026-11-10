@@ -1,7 +1,7 @@
 // Tipos de `contracts/api-central.md`. Si el contrato cambia, se cambia aquí y en ningún otro lado.
 
 export type Prioridad = "P1" | "P2" | "P3" | "P4";
-export type Tipo = "ATRAP" | "MEDIC" | "FUEGO" | "VIA" | "DESAP" | "OTRO";
+export type Tipo = "ATRAP" | "MEDIC" | "FUEGO" | "DESLIZ" | "INUND" | "GAS" | "VIA" | "DESAP" | "OTRO";
 export type Estado = "sin_propuesta" | "pendiente" | "aprobada" | "rechazada";
 export type Corroboracion = "corroborado" | "sin_confirmar" | "posible_rumor";
 export type Fuente = "directa" | "de_oidas" | "incierta";
@@ -89,27 +89,6 @@ export interface Salud {
   estado: "ok";
   central: "A" | "B";
   jev: "ok" | "caido";
-}
-
-export type EstadoUnidad = "disponible" | "asignada" | "no_disponible";
-
-export interface Unidad {
-  matricula: string;
-  estado: EstadoUnidad;
-  incidente_id: string | null;
-  reportado_por: string;
-  reportado_en: number;
-  nota: string;
-}
-
-export interface Recurso {
-  entidad: string;
-  recurso: string;
-  disponibles: number;
-  asignadas: number;
-  no_disponibles: number;
-  solicitudes_abiertas: string[];
-  unidades: Unidad[];
 }
 
 export interface Rechazado {

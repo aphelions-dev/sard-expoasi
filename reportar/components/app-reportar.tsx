@@ -82,13 +82,25 @@ function nuevoId(): string {
   return `${dispositivo()}-${String(n).padStart(4, "0")}`
 }
 
-const VACIO: Datos = {
-  tipo: "OTRO",
+/** El formulario antes de enviar: el tipo empieza sin elegir, para que nadie mande «Otro» por
+ *  descuido. Es el único dato obligatorio. */
+type Formulario = Omit<Datos, "tipo"> & { tipo: Tipo | null }
+
+const VACIO: Formulario = {
+  tipo: null,
   personas: 1,
   atrapados: false,
   heridos: false,
   vulnerables: false,
   texto: "",
+}
+
+// Quien reporta no tiene por qué saber qué es «P1»: se le dice con qué urgencia sale su reporte.
+const URGENCIA: Record<Prioridad, string> = {
+  P1: "Crítico",
+  P2: "Urgente",
+  P3: "Importante",
+  P4: "Informativo",
 }
 
 const TONO: Record<Prioridad, string> = {
@@ -121,7 +133,7 @@ type Ubicacion =
   { geohash: string; precisionM: number } | { error: string } | null
 
 export function AppReportar() {
-  const [datos, setDatos] = useState<Datos>(VACIO)
+  const [datos, setDatos] = useState<Formulario>(VACIO)
   const [palabras, setPalabras] = useState<string[] | null>(null)
   const [ubicacion, setUbicacion] = useState<Ubicacion>(null)
   const [reportes, setReportes] = useState<Guardado[]>([])
@@ -212,12 +224,26 @@ export function AppReportar() {
     return () => clearInterval(t)
   }, [guardar])
 
-  const pedirUbicacion = () => {
-    if (!("geolocation" in navigator))
-      return setUbicacion({ error: "Este navegador no da la ubicación." })
-    setUbicacion(null)
+  // La ubicación se pide al abrir, sin esperar a que alguien encuentre el botón: es el dato que más
+  // sirve a quien va a llegar y el que más se queda sin enviar.
+  const [buscando, setBuscando] = useState(true)
+  const tomarUbicacion = useCallback(() => {
+    const falla = (error: string) => {
+      setBuscando(false)
+      setUbicacion({ error })
+    }
+    if (!("geolocation" in navigator)) {
+      // Fuera del cuerpo del efecto, como las otras respuestas del GPS.
+      queueMicrotask(() =>
+        falla(
+          "Este navegador no da la ubicación. Escribe abajo la dirección o un punto de referencia."
+        )
+      )
+      return
+    }
     navigator.geolocation.getCurrentPosition(
-      (p) =>
+      (p) => {
+        setBuscando(false)
         setUbicacion({
           geohash: geohashDe(
             p.coords.latitude,
@@ -225,18 +251,26 @@ export function AppReportar() {
             p.coords.accuracy
           ),
           precisionM: p.coords.accuracy,
-        }),
+        })
+      },
       () =>
-        setUbicacion({
-          error:
-            "Sin permiso o sin señal de GPS. El reporte sale sin ubicación.",
-        }),
+        falla(
+          "No se pudo tomar tu ubicación (sin permiso o sin señal de GPS). Escribe abajo la dirección o un punto de referencia."
+        ),
       { enableHighAccuracy: true, timeout: 15_000, maximumAge: 60_000 }
     )
+  }, [])
+  useEffect(tomarUbicacion, [tomarUbicacion])
+  const pedirUbicacion = () => {
+    setBuscando(true)
+    tomarUbicacion()
   }
 
   const texto = limpiarTexto(datos.texto)
-  const prioridad = calcularPrioridad({ ...datos, texto }, palabras ?? [])
+  const prioridad = calcularPrioridad(
+    { ...datos, tipo: datos.tipo ?? "OTRO", texto }, // el tipo no cambia la prioridad
+    palabras ?? []
+  )
   const palabra = palabraCritica(texto, palabras ?? [])
   const motivo = datos.atrapados
     ? "hay personas atrapadas"
@@ -251,8 +285,10 @@ export function AppReportar() {
             : "nadie afectado"
 
   const enviar = () => {
+    if (!datos.tipo) return
     const r = {
       ...datos,
+      tipo: datos.tipo,
       texto,
       id: nuevoId(),
       prioridad,
@@ -282,11 +318,22 @@ export function AppReportar() {
     }
   }
 
-  const banderas: [keyof Datos, string][] = [
-    ["atrapados", "Atrapados"],
-    ["heridos", "Heridos"],
-    ["vulnerables", "Niños o adultos mayores"],
-  ]
+  // Elegir «Atrapados» ya dice que hay personas atrapadas: se marca sola y su casilla no se repite.
+  const elegirTipo = (tipo: Tipo) =>
+    setDatos({
+      ...datos,
+      tipo,
+      atrapados:
+        tipo === "ATRAP" || (datos.tipo === "ATRAP" ? false : datos.atrapados),
+    })
+
+  const banderas = (
+    [
+      ["atrapados", "Personas atrapadas"],
+      ["heridos", "Heridos"],
+      ["vulnerables", "Niños o adultos mayores"],
+    ] as const
+  ).filter(([k]) => !(k === "atrapados" && datos.tipo === "ATRAP"))
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-5 px-4 py-5 text-sm">
@@ -307,23 +354,49 @@ export function AppReportar() {
         </Badge>
       </header>
 
+      <section className="space-y-1.5 rounded-md border p-3" aria-live="polite">
+        <div className="flex items-center justify-between gap-3">
+          <p className="font-medium">
+            {buscando
+              ? "Buscando tu ubicación…"
+              : ubicacion && "geohash" in ubicacion
+                ? `Ubicación lista (±${Math.max(1, Math.round(ubicacion.precisionM))} m)`
+                : "Sin ubicación"}
+          </p>
+          {!buscando && (
+            <Button
+              variant="outline"
+              className="h-9 shrink-0"
+              onClick={pedirUbicacion}
+            >
+              {ubicacion && "geohash" in ubicacion
+                ? "Actualizar"
+                : "Reintentar"}
+            </Button>
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {ubicacion && "error" in ubicacion && !buscando
+            ? ubicacion.error
+            : "Se envía con tu reporte para que los organismos de socorro sepan a dónde ir. No se usa para nada más."}
+        </p>
+      </section>
+
       <section className="space-y-2" aria-labelledby="t-tipo">
         <h2 id="t-tipo" className="font-medium">
           Qué pasa
         </h2>
         <ToggleGroup
           variant="outline"
-          className="grid w-full grid-cols-2 gap-2"
-          value={[datos.tipo]}
-          onValueChange={(v) =>
-            v[0] && setDatos({ ...datos, tipo: v[0] as Tipo })
-          }
+          className="grid w-full grid-cols-3 gap-2"
+          value={datos.tipo ? [datos.tipo] : []}
+          onValueChange={(v) => v[0] && elegirTipo(v[0] as Tipo)}
         >
           {TIPOS.map((t) => (
             <ToggleGroupItem
               key={t}
               value={t}
-              className="h-11 text-sm aria-pressed:bg-primary aria-pressed:text-primary-foreground"
+              className="h-12 px-1 text-[0.8125rem] leading-tight whitespace-normal aria-pressed:bg-primary aria-pressed:text-primary-foreground"
             >
               {NOMBRE_TIPO[t]}
             </ToggleGroupItem>
@@ -379,7 +452,7 @@ export function AppReportar() {
               <input
                 type="checkbox"
                 className="size-5 accent-[var(--primary)]"
-                checked={datos[k] as boolean}
+                checked={datos[k]}
                 onChange={(e) => setDatos({ ...datos, [k]: e.target.checked })}
               />
               {nombre}
@@ -390,54 +463,52 @@ export function AppReportar() {
 
       <section className="space-y-2">
         <Label htmlFor="texto" className="font-medium">
-          Detalle (opcional)
+          {ubicacion && "error" in ubicacion
+            ? "Dónde es y qué pasa"
+            : "Detalle (opcional)"}
         </Label>
         <Textarea
           id="texto"
           rows={3}
           className="text-base"
-          placeholder="p. ej. casa caída en la calle 23, se oyen voces"
+          placeholder={
+            ubicacion && "error" in ubicacion
+              ? "Dirección o punto de referencia, y qué pasa"
+              : "p. ej. casa caída en la calle 23, se oyen voces"
+          }
           value={datos.texto}
           onChange={(e) => setDatos({ ...datos, texto: e.target.value })}
         />
-      </section>
-
-      <section className="space-y-2">
-        <Button
-          variant="outline"
-          className="h-11 w-full text-sm"
-          onClick={pedirUbicacion}
-        >
-          {ubicacion && "geohash" in ubicacion
-            ? "Actualizar mi ubicación"
-            : "Usar mi ubicación"}
-        </Button>
-        {ubicacion && (
-          <p className="text-xs text-muted-foreground">
-            {"geohash" in ubicacion
-              ? `Ubicación con precisión de ${Math.round(ubicacion.precisionM)} m (${ubicacion.geohash}).`
-              : ubicacion.error}
-          </p>
-        )}
       </section>
 
       <section
         className={cn("space-y-1 rounded-md p-3", TONO[prioridad])}
         aria-live="polite"
       >
-        <p className="font-semibold">Prioridad {prioridad}</p>
+        <p className="font-semibold">Saldrá como: {URGENCIA[prioridad]}</p>
         <p className="text-xs">Porque {motivo}.</p>
         {palabras?.length === 0 && (
-          <p className="text-xs">No se cargó la lista de palabras críticas.</p>
+          <p className="text-xs">
+            No se cargó la lista de palabras de alerta: marca las casillas que
+            apliquen.
+          </p>
         )}
       </section>
 
-      <Button
-        className="h-12 w-full bg-p1 text-base font-semibold text-white hover:bg-p1/90"
-        onClick={enviar}
-      >
-        Enviar reporte
-      </Button>
+      <div className="space-y-1.5">
+        <Button
+          className="h-12 w-full bg-p1 text-base font-semibold text-white hover:bg-p1/90"
+          disabled={!datos.tipo}
+          onClick={enviar}
+        >
+          Enviar reporte
+        </Button>
+        <p className="text-center text-xs text-muted-foreground">
+          {datos.tipo
+            ? "Si puedes llamar, llama también al 123."
+            : "Elige arriba qué pasa para poder enviar."}
+        </p>
+      </div>
 
       <section className="space-y-2" aria-labelledby="t-mios">
         <h2 id="t-mios" className="font-medium">
@@ -458,7 +529,9 @@ export function AppReportar() {
               {reportes.map((g) => (
                 <li key={g.id} className="space-y-2 rounded-md border p-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge className={TONO[g.prioridad]}>{g.prioridad}</Badge>
+                    <Badge className={TONO[g.prioridad]}>
+                      {URGENCIA[g.prioridad]}
+                    </Badge>
                     <Badge className={ESTADO[g.estado].tono}>
                       {ESTADO[g.estado].texto}
                     </Badge>
@@ -466,7 +539,9 @@ export function AppReportar() {
                       {g.id}
                     </span>
                   </div>
-                  <p className="font-mono text-xs break-all">{g.mensaje}</p>
+                  {g.estado !== "entregado" && (
+                    <p className="font-mono text-xs break-all">{g.mensaje}</p>
+                  )}
                   {g.estado === "pendiente" && g.intentos > 0 && (
                     <p className="text-xs text-muted-foreground">
                       Intento {g.intentos}, se reintenta solo.
@@ -474,7 +549,8 @@ export function AppReportar() {
                   )}
                   {g.estado === "entregado" && g.central && (
                     <p className="text-xs text-muted-foreground">
-                      Recibido por la central {g.central}.
+                      Tu reporte llegó a la central de emergencias. Si la
+                      situación cambia, envía otro.
                     </p>
                   )}
                   {g.motivo && (

@@ -19,13 +19,18 @@ import type { Incidente } from "@/lib/api/tipos"
 import { token } from "@/lib/color"
 import { celda, type Barrio, type Geo } from "@/lib/geo"
 import { cn } from "@/lib/utils"
+import { metrosPorPixel, racimos } from "@/lib/racimos"
 import { enZona, resumenPorBarrio, type Zona } from "@/lib/zonas"
 
 import { EncuadrarZona, EstadoBarrios, EtiquetasBarrios, Zoom, pinturaBarrios, useReproduccion } from "./barrios-mapa"
-import { MarcaZona, TarjetaZona, siguienteDeZona } from "./zona-incidentes"
+import { MarcaPuntos, MarcaZona, PRECISO, TarjetaZona, siguienteDeZona } from "./zona-incidentes"
 
 /** Desde este zoom se ven las celdas de cada incidente en vez del resumen por barrio. */
 const ZOOM_CELDAS = 14
+/** Dos puntos a menos de estos pixeles se taparían: se juntan en uno con el número. */
+const RADIO_RACIMO_PX = 34
+/** Más cerca que esto no se acerca el mapa: lo que siga junto está en el mismo sitio. */
+const ZOOM_SEPARAR = 18
 
 interface Props {
   geo: Geo
@@ -119,6 +124,12 @@ function porCelda(incidentes: Incidente[]): [string, Incidente[]][] {
 function centroDe(gh: string): [number, number] {
   const [[o, s], , [e, n]] = celda(gh)
   return [(o + e) / 2, (s + n) / 2]
+}
+
+/** El medio del borde de arriba de la celda. */
+function arribaDe(gh: string): [number, number] {
+  const [[o], , [e, n]] = celda(gh)
+  return [(o + e) / 2, n]
 }
 
 /** Una celda por geohash, con la prioridad más alta de sus incidentes: varios incidentes en la
@@ -239,7 +250,18 @@ export function Mapa({ geo, incidentes: todos, seleccion, onSeleccion, barrio, z
   if (!colores) return <div className="h-full bg-mapa-fondo" />
 
   const porPrioridad = ["match", ["get", "prioridad"], "P1", colores.p.P1, "P2", colores.p.P2, "P3", colores.p.P3, colores.p.P4]
-  const pintura = pinturaBarrios(colores)
+  const pintura = pinturaBarrios(colores, !cerca)
+  const orden = (i: Incidente) => Number(i.prioridad.slice(1))
+  const imprecisos = grupos.filter(([gh]) => gh.length < PRECISO)
+  // Los puntos precisos, del más grave al menos grave, juntos cuando en pantalla se taparían.
+  const puntos = racimos(
+    grupos
+      .filter(([gh]) => gh.length >= PRECISO)
+      .flatMap(([gh, grupo]) => grupo.map((dato) => ({ centro: centroDe(gh), dato })))
+      .sort((a, b) => orden(a.dato) - orden(b.dato)),
+    RADIO_RACIMO_PX * metrosPorPixel(zoom, CENTRO[1]),
+  )
+  const seSeparan = RADIO_RACIMO_PX * metrosPorPixel(ZOOM_SEPARAR, CENTRO[1])
 
   return (
     <div className="relative h-full bg-mapa-fondo" role="region" aria-label="Mapa de incidentes">
@@ -283,12 +305,15 @@ export function Mapa({ geo, incidentes: todos, seleccion, onSeleccion, barrio, z
           interactive
           fillPaint={{
             "fill-color": porPrioridad as never,
-            "fill-opacity": ["case", ["get", "sel"], 0.6, ["get", "apagada"], 0.15, 0.4] as never,
+            // Relleno leve: el área se lee por su borde punteado, y dos zonas una dentro de otra no
+            // se vuelven una mancha. La elegida y la que está bajo el cursor sí se llenan.
+            "fill-opacity": ["case", ["get", "sel"], 0.4, ["get", "apagada"], 0.04, 0.12] as never,
           }}
-          fillHoverPaint={{ "fill-opacity": 0.6 }}
+          fillHoverPaint={{ "fill-opacity": 0.4 }}
           linePaint={{
             "line-color": ["case", ["get", "sel"], colores.texto, porPrioridad] as never,
-            "line-width": ["case", ["get", "sel"], 2.5, 1.25] as never,
+            "line-width": ["case", ["get", "sel"], 2.5, 1.5] as never,
+            "line-opacity": ["case", ["get", "sel"], 1, ["get", "apagada"], 0.4, 1] as never,
             "line-dasharray": [2, 1.5],
           }}
           onHover={(e) => setCeldaEncima((e?.feature.properties?.gh as string | undefined) ?? null)}
@@ -331,8 +356,18 @@ export function Mapa({ geo, incidentes: todos, seleccion, onSeleccion, barrio, z
         })}
         {/* De lejos, el nombre y el número de cada barrio; de cerca, cuántos hay en cada celda. */}
         {!cerca && <EtiquetasBarrios barrios={geo.barrios} resumen={resumen} zona={zona} destellan={destellan} onZona={onZona} onEncima={setEncima} />}
-        {grupos.map(([gh, grupo]) => (
-          <MarcaZona key={gh} gh={gh} grupo={grupo} centro={centroDe(gh)} seleccion={seleccion} onSeleccion={onSeleccion} />
+        {imprecisos.map(([gh, grupo]) => (
+          <MarcaZona key={gh} grupo={grupo} arriba={arribaDe(gh)} seleccion={seleccion} onSeleccion={onSeleccion} />
+        ))}
+        {puntos.map((r) => (
+          <MarcaPuntos
+            key={`${r.datos[0].id}-${r.datos.length}`}
+            grupo={r.datos}
+            centro={r.centro}
+            separable={zoom < ZOOM_SEPARAR && r.radio > seSeparan}
+            seleccion={seleccion}
+            onSeleccion={onSeleccion}
+          />
         ))}
         <MapControls position="top-right" />
         <Botones grupos={grupos} completo={completo} onCompleto={onCompleto} />
@@ -353,7 +388,8 @@ export function Mapa({ geo, incidentes: todos, seleccion, onSeleccion, barrio, z
         {leyenda && (
           <div className="space-y-2 border-t px-2.5 py-2">
             <p>De lejos, cada barrio toma el color de lo más grave que tiene por decidir, más intenso cuantos más incidentes tiene. Clic en un barrio: ver solo ese barrio en la cola.</p>
-            <p>Acércate o haz clic en un barrio para ver cada incidente: si el GPS fue preciso (hasta ~20 m), un punto con el icono del tipo en el sitio exacto; si no, la zona donde ocurrió, tan grande como la incertidumbre.</p>
+            <p>Acércate o haz clic en un barrio para ver cada incidente: si el GPS fue preciso (hasta ~20 m), un punto con el icono del tipo en el sitio exacto; si no, la zona donde ocurrió, con borde punteado y tan grande como la incertidumbre.</p>
+            <p>Un círculo con un número son varios puntos que se taparían: haz clic para acercarte y separarlos.</p>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               {(["P1", "P2", "P3", "P4"] as const).map((p) => (
                 <span key={p} className="flex items-center gap-1 font-mono">
@@ -361,10 +397,10 @@ export function Mapa({ geo, incidentes: todos, seleccion, onSeleccion, barrio, z
                     aria-hidden="true"
                     className={cn(
                       "size-3 border border-dashed",
-                      p === "P1" && "border-p1 bg-p1/40",
-                      p === "P2" && "border-p2 bg-p2/40",
-                      p === "P3" && "border-p3 bg-p3/40",
-                      p === "P4" && "border-p4 bg-p4/40",
+                      p === "P1" && "border-p1 bg-p1/15",
+                      p === "P2" && "border-p2 bg-p2/15",
+                      p === "P3" && "border-p3 bg-p3/15",
+                      p === "P4" && "border-p4 bg-p4/15",
                     )}
                   />
                   {p}

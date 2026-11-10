@@ -20,7 +20,7 @@ SARD1|<id>|<prioridad>|<tipo>|<personas>|<banderas>|<geohash>|<hora_unix>|<texto
 SACK|<id>
 ```
 
-- prioridad `P1`…`P4`; tipo `ATRAP MEDIC FUEGO VIA DESAP OTRO`; banderas 3 dígitos
+- prioridad `P1`…`P4`; tipo `ATRAP MEDIC FUEGO DESLIZ INUND GAS VIA DESAP OTRO`; banderas 3 dígitos
   (atrapados, heridos, niños/adultos mayores); geohash 6 caracteres o vacío.
 - Reenviar P1/P2 primero sin descartar P3/P4; reintentos con espera creciente hasta `SACK`;
   cada id se acepta una vez; ordenar por `hora_unix`; lo vencido se marca, no se borra.

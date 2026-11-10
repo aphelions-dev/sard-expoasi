@@ -40,6 +40,9 @@ class Incidente:
     motivo_orden: str = ""
     recurso: dict[str, Any] | None = None
     _fuentes: list[str] = field(default_factory=list, repr=False)
+    # Tipo que el triaje vio con claridad en el texto y no coincide con el que marcó quien reportó
+    # (el más repetido entre sus reportes). No sale por la API: lo usa la coordinación.
+    _tipo_sugerido: str | None = field(default=None, repr=False)
 
 
 def construir(evs: list[Evento]) -> dict[str, Incidente]:
@@ -142,6 +145,7 @@ def _incidente(inc_id, rids, recibidos, priorizados, rutas, vinculos, propuesta,
     contradicciones, posibles = [], []
     sin_ia = False
     prioridades = []
+    sugeridos: Counter = Counter()
     for rid in rids:
         rep, tri = recibidos[rid], priorizados[rid]
         ps = sorted({t["prioridad"] for t in tri})
@@ -150,6 +154,8 @@ def _incidente(inc_id, rids, recibidos, priorizados, rutas, vinculos, propuesta,
         t = min(tri, key=lambda x: x["prioridad"])  # la más alta si dos centrales difieren
         prioridades.append(t["prioridad"])
         fuentes.append(t.get("fuente") or "sin_dato")
+        if t.get("tipo_sugerido"):
+            sugeridos[t["tipo_sugerido"]] += 1
         sin_ia |= t["jev"] == "caido"
         motivos += [f"{rid}: {m}" for m in t["motivos_revision"]]
         v = vinculos[rid]
@@ -221,6 +227,7 @@ def _incidente(inc_id, rids, recibidos, priorizados, rutas, vinculos, propuesta,
         vigencia={"ultimo_reporte_unix": ultimo, "minutos_sin_noticias": sin_noticias // 60,
                   "sin_noticias_recientes": sin_noticias > SIN_NOTICIAS_S},
         motivo_orden=" · ".join(motivo),
+        _tipo_sugerido=sugeridos.most_common(1)[0][0] if sugeridos else None,
     )
 
 

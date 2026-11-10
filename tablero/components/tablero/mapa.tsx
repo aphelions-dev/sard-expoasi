@@ -221,6 +221,17 @@ export function Mapa({ geo, incidentes: todos, seleccion, onSeleccion, barrio, z
   // Durante la reproducción, solo lo que ya había llegado a esa hora.
   const incidentes = useMemo(() => (repro.t === null ? todos : todos.filter((i) => i.hora_unix <= repro.t!)), [todos, repro.t])
   const resumen = useMemo(() => resumenPorBarrio(incidentes, barrio), [incidentes, barrio])
+  // Lo que no trae ubicación exacta y cae en un barrio: su sitio es «ese barrio o cerca». De cerca se
+  // pinta el barrio, no el rectángulo del geohash, que corta manzanas por donde no hay ningún límite.
+  const sinSitio = useMemo(() => {
+    const grupos = new globalThis.Map<string, Incidente[]>()
+    for (const i of incidentes) {
+      const b = i.geohash && i.geohash.length < PRECISO ? barrio(i.geohash) : null
+      if (b) grupos.set(b.id, [...(grupos.get(b.id) ?? []), i])
+    }
+    return grupos
+  }, [incidentes, barrio])
+  const resumenSinSitio = useMemo(() => resumenPorBarrio([...sinSitio.values()].flat(), barrio), [sinSitio, barrio])
   const alCambiar = useCallback((ids: string[]) => {
     setDestellan(new Set(ids))
     setTimeout(() => setDestellan(new Set()), 3600)
@@ -241,7 +252,9 @@ export function Mapa({ geo, incidentes: todos, seleccion, onSeleccion, barrio, z
     [incidentes, cerca, barrio],
   )
   // Con una zona elegida, las celdas de afuera se apagan como lo ya decidido.
-  const datos = useMemo(() => celdas(grupos, seleccion, (gh) => !enZona(barrio(gh), zona)), [grupos, seleccion, barrio, zona])
+  // Rectángulo del geohash solo para lo impreciso que no cae en ningún barrio (Villamaría, afueras).
+  const afuera = useMemo(() => grupos.filter(([gh]) => gh.length < PRECISO && !barrio(gh)), [grupos, barrio])
+  const datos = useMemo(() => celdas(afuera, seleccion, (gh) => !enZona(barrio(gh), zona)), [afuera, seleccion, barrio, zona])
   const sinUbicacion = incidentes.filter((i) => !i.geohash).length
   const grupoDe = (gh: string) => grupos.find(([g]) => g === gh)?.[1] ?? null
   const enCelda = celdaEncima ? grupoDe(celdaEncima) : null
@@ -250,9 +263,8 @@ export function Mapa({ geo, incidentes: todos, seleccion, onSeleccion, barrio, z
   if (!colores) return <div className="h-full bg-mapa-fondo" />
 
   const porPrioridad = ["match", ["get", "prioridad"], "P1", colores.p.P1, "P2", colores.p.P2, "P3", colores.p.P3, colores.p.P4]
-  const pintura = pinturaBarrios(colores, !cerca)
+  const pintura = pinturaBarrios(colores, cerca)
   const orden = (i: Incidente) => Number(i.prioridad.slice(1))
-  const imprecisos = grupos.filter(([gh]) => gh.length < PRECISO)
   // Los puntos precisos, del más grave al menos grave, juntos cuando en pantalla se taparían.
   const puntos = racimos(
     grupos
@@ -295,7 +307,8 @@ export function Mapa({ geo, incidentes: todos, seleccion, onSeleccion, barrio, z
             onZona(zona?.tipo === "barrio" && zona.id === p.id ? null : { tipo: "barrio", id: p.id, nombre: p.name })
           }}
         />
-        <EstadoBarrios barrios={geo.barrios} resumen={resumen} zona={zona} onCambio={alCambiar} />
+        {/* Al cambiar de lejos a cerca cambia lo que se pinta: se monta de nuevo para que no destelle. */}
+        <EstadoBarrios key={cerca ? "cerca" : "lejos"} barrios={geo.barrios} resumen={cerca ? resumenSinSitio : resumen} zona={zona} onCambio={alCambiar} />
         {/* El incidente es su zona: relleno del color de la prioridad y borde punteado, porque el
             sitio exacto no se sabe; la elegida, con el borde marcado. */}
         <MapGeoJSON
@@ -356,9 +369,21 @@ export function Mapa({ geo, incidentes: todos, seleccion, onSeleccion, barrio, z
         })}
         {/* De lejos, el nombre y el número de cada barrio; de cerca, cuántos hay en cada celda. */}
         {!cerca && <EtiquetasBarrios barrios={geo.barrios} resumen={resumen} zona={zona} destellan={destellan} onZona={onZona} onEncima={setEncima} />}
-        {imprecisos.map(([gh, grupo]) => (
-          <MarcaZona key={gh} grupo={grupo} arriba={arribaDe(gh)} seleccion={seleccion} onSeleccion={onSeleccion} />
+        {afuera.map(([gh, grupo]) => (
+          <MarcaZona key={gh} grupo={grupo} donde={arribaDe(gh)} borde seleccion={seleccion} onSeleccion={onSeleccion} />
         ))}
+        {cerca &&
+          geo.barrios.features
+            .filter((f) => sinSitio.has(f.properties.id))
+            .map((f) => (
+              <MarcaZona
+                key={f.properties.id}
+                grupo={sinSitio.get(f.properties.id)!}
+                donde={[f.properties.lon, f.properties.lat]}
+                seleccion={seleccion}
+                onSeleccion={onSeleccion}
+              />
+            ))}
         {puntos.map((r) => (
           <MarcaPuntos
             key={`${r.datos[0].id}-${r.datos.length}`}
@@ -388,7 +413,7 @@ export function Mapa({ geo, incidentes: todos, seleccion, onSeleccion, barrio, z
         {leyenda && (
           <div className="space-y-2 border-t px-2.5 py-2">
             <p>De lejos, cada barrio toma el color de lo más grave que tiene por decidir, más intenso cuantos más incidentes tiene. Clic en un barrio: ver solo ese barrio en la cola.</p>
-            <p>Acércate o haz clic en un barrio para ver cada incidente: si el GPS fue preciso (hasta ~20 m), un punto con el icono del tipo en el sitio exacto; si no, la zona donde ocurrió, con borde punteado y tan grande como la incertidumbre.</p>
+            <p>Acércate o haz clic en un barrio para ver cada incidente: si el GPS fue preciso (hasta ~20 m), un punto con el icono del tipo en el sitio exacto; si no, se pinta su barrio y una etiqueta dice cuántos hay «sin sitio exacto»: están en ese barrio o cerca.</p>
             <p>Un círculo con un número son varios puntos que se taparían: haz clic para acercarte y separarlos.</p>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               {(["P1", "P2", "P3", "P4"] as const).map((p) => (

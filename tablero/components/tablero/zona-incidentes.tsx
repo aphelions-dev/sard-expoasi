@@ -1,8 +1,8 @@
 "use client"
 
 // Una zona del mapa con incidentes. El geohash dice la precisión con su largo: con 6 o 7 caracteres
-// (~1 km o ~150 m) el incidente se dibuja como el área sombreada del color de su prioridad (capa
-// `celdas` de `mapa.tsx`), no como un icono, que haría creer que se sabe el sitio exacto; aquí solo
+// (~1 km o ~150 m) no se sabe el sitio, y el incidente se muestra como su barrio pintado del color de
+// la prioridad (fuera de los barrios, como el rectángulo del geohash), no como un icono; aquí solo
 // va lo que el área no dice sola, cuántos hay y si piden revisión. Con 8 o más (~20 m), un punto;
 // los puntos que en pantalla se tocarían se juntan en uno con el número (`lib/racimos.ts`).
 import { MapMarker, MarkerContent, MarkerTooltip, useMap } from "@/components/ui/map"
@@ -111,32 +111,53 @@ export function MarcaPuntos({
   )
 }
 
-/** Sobre una zona imprecisa, lo que el área no dice sola: cuántos incidentes hay y si alguno pide
- *  revisión. Va en el borde de arriba, para no tapar los puntos que caigan dentro. */
+/** Los incidentes sin ubicación exacta de un área (un barrio, o una zona fuera de los barrios):
+ *  cuántos son y si alguno pide revisión. Es donde se hace clic para recorrerlos, así que se dibuja
+ *  aunque sea uno solo. `borde`: va pegada al borde de arriba de la zona en vez de en su centro. */
 export function MarcaZona({
   grupo,
-  arriba,
+  donde,
+  borde = false,
   seleccion,
   onSeleccion,
 }: {
   grupo: Incidente[]
-  arriba: [number, number]
+  donde: [number, number]
+  borde?: boolean
   seleccion: string | null
   onSeleccion: (id: string) => void
 }) {
   const revisar = grupo.some((i) => i.incertidumbre.revisar && pendiente(i))
-  if (grupo.length === 1 && !revisar) return null
+  const elegido = grupo.some((i) => i.id === seleccion)
   return (
-    <MapMarker longitude={arriba[0]} latitude={arriba[1]} anchor="top" offset={[0, 3]} onClick={() => onSeleccion(siguienteDeZona(grupo, seleccion))}>
+    <MapMarker
+      longitude={donde[0]}
+      latitude={donde[1]}
+      anchor={borde ? "top" : "center"}
+      offset={borde ? [0, 3] : [0, 0]}
+      onClick={() => onSeleccion(siguienteDeZona(grupo, seleccion))}
+    >
       <MarkerContent>
         <span
-          className="flex h-5 items-center gap-1 rounded-full border border-background bg-foreground px-1.5 font-mono text-[0.6875rem] leading-none font-semibold text-background shadow-sm"
-          aria-label={`${grupo.length} incidente${grupo.length > 1 ? "s" : ""} en esta zona${revisar ? ", alguno para revisar" : ""}`}
+          className={cn(
+            "flex h-6 items-center gap-1 rounded-full border border-dashed border-background bg-foreground px-2 text-[0.6875rem] leading-none font-semibold text-background shadow-sm",
+            elegido && "outline-2 outline-offset-2 outline-foreground",
+          )}
+          aria-label={`${grupo.length} incidente${grupo.length > 1 ? "s" : ""} sin ubicación exacta en esta zona${revisar ? ", alguno para revisar" : ""}`}
         >
-          {grupo.length > 1 && grupo.length}
+          <span className="font-mono">{grupo.length}</span> sin sitio exacto
           {revisar && <span aria-hidden="true" className="size-2 rounded-full bg-revisar" />}
         </span>
       </MarkerContent>
+      <MarkerTooltip className="rounded-none bg-transparent p-0 text-popover-foreground shadow-none">
+        <TarjetaZona
+          grupo={grupo}
+          barrio={null}
+          titulo="Sin ubicación exacta"
+          seleccion={seleccion}
+          pie={`Están en esta zona o cerca. ${grupo.length > 1 ? "Clic: ver el siguiente." : "Clic: ver el incidente."}`}
+        />
+      </MarkerTooltip>
     </MapMarker>
   )
 }

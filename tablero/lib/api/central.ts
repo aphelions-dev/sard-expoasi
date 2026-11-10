@@ -1,5 +1,5 @@
 // Cliente de la API de la central. El tablero lee de la A mientras responda a /salud; si no, de la B.
-import type { EstadoUnidad, Incidente, Rechazado, Recurso, Salud } from "./tipos";
+import type { Incidente, Rechazado, Salud } from "./tipos";
 
 export type Nodo = "A" | "B";
 
@@ -69,47 +69,6 @@ export function mensajeDecision(e: unknown): string {
     return `La central respondió ${e.estado}: ${e.message}`;
   }
   return "No se pudo hablar con la central. La decisión no se registró; inténtalo de nuevo.";
-}
-
-export function recursos(nodo: Nodo): Promise<Recurso[]> {
-  return pedir<Recurso[]>(`${CENTRALES[nodo]}/recursos`);
-}
-
-const enviar = (url: string, cuerpo: unknown) =>
-  pedir<Recurso[]>(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cuerpo) });
-
-export interface EntradaUnidad {
-  entidad: string;
-  recurso: string;
-  matricula: string;
-  reportado_por: string;
-}
-
-/** La entidad registra una unidad; entra disponible (`POST /recursos/unidades`). */
-export function registrarUnidad(nodo: Nodo, entrada: EntradaUnidad): Promise<Recurso[]> {
-  return enviar(`${CENTRALES[nodo]}/recursos/unidades`, entrada);
-}
-
-export interface CambioEstado {
-  estado: EstadoUnidad;
-  incidente_id: string | null;
-  reportado_por: string;
-  nota: string;
-}
-
-/** La entidad reporta el estado de una unidad; liberar es volverla disponible. */
-export function reportarEstado(nodo: Nodo, matricula: string, cambio: CambioEstado): Promise<Recurso[]> {
-  return enviar(`${CENTRALES[nodo]}/recursos/unidades/${encodeURIComponent(matricula)}/estado`, cambio);
-}
-
-/** Mensaje para quien reporta según el código de los `POST /recursos/unidades…`. */
-export function mensajeRecurso(e: unknown): string {
-  if (e instanceof ErrorApi) {
-    if (e.estado === 409) return "Esa matrícula ya está registrada.";
-    if (e.estado === 404) return "La unidad o el incidente ya no existen en esta central.";
-    return `La central respondió ${e.estado}: ${e.message}`;
-  }
-  return "No se pudo hablar con la central; no se registró. Inténtalo de nuevo.";
 }
 
 export function rechazados(nodo: Nodo): Promise<Rechazado[]> {

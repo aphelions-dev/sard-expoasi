@@ -6,8 +6,11 @@ import {
   IconFirstAidKit,
   IconFlame,
   IconLifebuoy,
+  IconMountain,
+  IconRipple,
   IconRoadOff,
   IconUserSearch,
+  IconWind,
   type Icon,
 } from "@tabler/icons-react"
 
@@ -17,6 +20,9 @@ export const ICONO_TIPO: Record<Tipo, Icon> = {
   ATRAP: IconLifebuoy,
   MEDIC: IconFirstAidKit,
   FUEGO: IconFlame,
+  DESLIZ: IconMountain,
+  INUND: IconRipple,
+  GAS: IconWind,
   VIA: IconRoadOff,
   DESAP: IconUserSearch,
   OTRO: IconAlertCircle,

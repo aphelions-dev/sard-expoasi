@@ -19,7 +19,6 @@ import {
   fuenteLegible,
   TIPO,
   coordenadas,
-  duracion,
   precision,
   haceCuanto,
   horaLocal,
@@ -157,9 +156,6 @@ export function PanelIncidente({
       (d) =>
         `Las centrales no coinciden en el ${numero.get(d.reporte_id) ?? d.reporte_id}: ${d.prioridades.join(" vs ")} (se muestra la más alta).`
     ),
-    ...(inc.vigencia.sin_noticias_recientes
-      ? [`Sin noticias hace ${duracion(inc.vigencia.minutos_sin_noticias)}.`]
-      : []),
   ]
 
   return (
@@ -177,7 +173,6 @@ export function PanelIncidente({
             </h2>
             <EstadoInsignia e={inc.estado} />
           </div>
-          <p className="text-xs text-muted-foreground">{inc.motivo_orden}</p>
 
           {/* Los tres datos que se miran primero. */}
           <dl className="grid grid-cols-3 gap-2 text-xs">
@@ -275,6 +270,7 @@ export function PanelIncidente({
                   key={ev.reporte_id}
                   ev={ev}
                   n={i + 1}
+                  unico={inc.evidencia.length === 1}
                   ahora={ahora}
                 />
               ))}
@@ -304,12 +300,6 @@ export function PanelIncidente({
                   <dd className="font-mono">
                     {inc.geohash} · {coordenadas(inc.geohash)} · {precision(inc.geohash)}
                   </dd>
-                </>
-              )}
-              {barrio && (
-                <>
-                  <dt className="text-muted-foreground">Comuna</dt>
-                  <dd>{barrio.comuna}</dd>
                 </>
               )}
               <dt className="text-muted-foreground">Primer reporte</dt>
@@ -432,14 +422,17 @@ function Confianza({
   )
 }
 
-/** El texto de la persona primero y grande; quién, cuándo y las señales del triaje, debajo y a un clic. */
+/** El texto de la persona primero y grande; quién, cuándo y las señales del triaje, debajo y a un clic.
+ *  Con un solo reporte, su prioridad y sus personas son las del incidente, que ya están arriba. */
 function ItemEvidencia({
   ev,
   n,
+  unico,
   ahora,
 }: {
   ev: Evidencia
   n: number
+  unico: boolean
   ahora: number
 }) {
   return (
@@ -450,12 +443,17 @@ function ItemEvidencia({
           <span className="font-medium text-foreground" title={ev.reporte_id}>
             Reporte {n}
           </span>
-          <Prioridad p={ev.prioridad} />
+          {!unico && <Prioridad p={ev.prioridad} />}
           <span>{fuenteLegible(ev.fuente)}</span>·
-          <span>{haceCuanto(ev.hora_unix, ahora)}</span>·
-          <span>
-            {ev.personas} persona{ev.personas === 1 ? "" : "s"}
-          </span>
+          <span>{haceCuanto(ev.hora_unix, ahora)}</span>
+          {!unico && (
+            <>
+              ·
+              <span>
+                {ev.personas} persona{ev.personas === 1 ? "" : "s"}
+              </span>
+            </>
+          )}
           {ev.vinculo === "mismo" && ev.similitud !== null && (
             <>· {Math.round(ev.similitud * 100)} % parecido</>
           )}

@@ -16,6 +16,7 @@ const firaCode = Fira_Code({ subsets: ["latin"], variable: "--font-fira-code" })
 export const metadata: Metadata = {
   title: "SARD · Tablero del coordinador",
   description: "Cola de incidentes, mapa y decisión del coordinador de la central de riesgo.",
+  icons: { icon: "/favicon.svg" },
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

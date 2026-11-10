@@ -6,9 +6,9 @@ import dynamic from "next/dynamic"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { notificar, prepararSonido, tono } from "@/lib/avisos"
-import { elegirActiva, incidentes, rechazados, recursos, salud, type Nodo } from "@/lib/api/central"
-import type { Incidente, Rechazado, Recurso, Salud } from "@/lib/api/tipos"
-import { filtrar, porDecidir, type Filtro } from "@/lib/cola"
+import { elegirActiva, incidentes, rechazados, salud, type Nodo } from "@/lib/api/central"
+import type { Incidente, Rechazado, Salud } from "@/lib/api/tipos"
+import { agrupar, filtrar, porDecidir, type Filtro } from "@/lib/cola"
 import { buscadorDeBarrio, cargarGeo, type Barrio, type Geo } from "@/lib/geo"
 import { ESCRITORIO, useMedia } from "@/lib/use-media"
 import { useNovedades } from "@/lib/use-novedades"
@@ -17,11 +17,10 @@ import { usePreferencia, useSondeo } from "@/lib/use-sondeo"
 import { cn } from "@/lib/utils"
 
 import { BarraEstado } from "./barra-estado"
+import { Boletin } from "./boletin"
 import { Cola } from "./cola"
-import { FranjaRecursos } from "./franja-recursos"
 import { PanelIncidente } from "./panel-incidente"
 import { Rechazados } from "./rechazados"
-import { Recursos } from "./recursos"
 import { TarjetaMapa } from "./tarjeta-mapa"
 import { AvisoP1 } from "./aviso-p1"
 
@@ -39,7 +38,8 @@ async function leerSaludes(): Promise<Record<Nodo, Salud | null>> {
   return { A, B }
 }
 
-type Vista = "incidente" | "recursos" | "rechazados"
+type Vista = "incidente" | "boletin" | "rechazados"
+const NOMBRE_VISTA: Record<Vista, string> = { incidente: "Incidente", boletin: "Boletín", rechazados: "Incompletos" }
 type Zona = "cola" | "mapa" | "panel" // en pantallas angostas se ve una a la vez
 
 export function Tablero() {
@@ -79,7 +79,6 @@ export function Tablero() {
   const activa = saludes.datos ? elegirActiva(saludes.datos) : null
   // Sin central activa no se pregunta: queda a la vista lo último que se leyó (lo dice el aviso).
   const lista = useSondeo<Incidente[]>(() => (activa ? incidentes(activa) : Promise.resolve(undefined)), CADA_MS)
-  const recs = useSondeo<Recurso[]>(() => (activa ? recursos(activa) : Promise.resolve(undefined)), CADA_MS)
   const rech = useSondeo<Rechazado[]>(() => (activa ? rechazados(activa) : Promise.resolve(undefined)), CADA_MS)
 
   // Al cambiar de central, leer enseguida en vez de esperar el siguiente ciclo.
@@ -92,9 +91,9 @@ export function Tablero() {
   const novedades = useNovedades(lista.datos)
   // La zona elegida filtra la cola y sus conteos; el mapa muestra todo y apaga lo de afuera.
   const enLaZona = zonaFiltro ? incs.filter((i) => enZona(barrio(i.geohash), zonaFiltro)) : incs
-  // Sin selección, el primero de lo que deja ver el filtro. Si el elegido desaparece de la cola, no
+  // Sin selección, el primero de la cola tal como se ve. Si el elegido desaparece de la cola, no
   // se reemplaza en silencio por otro: el panel lo dice y el coordinador elige de nuevo.
-  const elegido = seleccion ? (incs.find((i) => i.id === seleccion) ?? null) : (filtrar(enLaZona, filtro)[0] ?? null)
+  const elegido = seleccion ? (incs.find((i) => i.id === seleccion) ?? null) : (agrupar(filtrar(enLaZona, filtro)).flatMap((s) => s.incidentes)[0] ?? null)
   const perdido = seleccion !== null && elegido === null && lista.datos !== null
   const sinRecuperar = rech.datos?.filter((r) => !r.recuperado).length ?? 0
   const alertas = incs.filter((i) => novedades.alertas.includes(i.id))
@@ -155,12 +154,6 @@ export function Tablero() {
     setZona("panel")
   }
 
-  function abrirRecursos() {
-    setMapaCompleto(false)
-    setVista("recursos")
-    setZona("panel")
-  }
-
   const cola = (
     <Cola
       incidentes={enLaZona}
@@ -202,7 +195,7 @@ export function Tablero() {
     <Tabs value={vista} onValueChange={(v) => setVista(v as Vista)} className="h-full min-h-0 gap-0">
       <TabsList variant="line" className="h-9! w-full shrink-0 justify-start rounded-none border-b px-2">
         <TabsTrigger value="incidente" className="flex-none px-2">Incidente</TabsTrigger>
-        <TabsTrigger value="recursos" className="flex-none px-2">Recursos</TabsTrigger>
+        <TabsTrigger value="boletin" className="flex-none px-2">Boletín</TabsTrigger>
         <TabsTrigger value="rechazados" className="flex-none px-2">
           Incompletos
           {sinRecuperar > 0 && (
@@ -221,10 +214,7 @@ export function Tablero() {
             ahora={ahora}
             geo={geo}
             barrio={barrio(elegido.geohash)}
-            onDecidido={() => {
-              refrescar()
-              recs.refrescar()
-            }}
+            onDecidido={refrescar}
           />
         ) : (
           <p className="p-4 text-xs text-muted-foreground">
@@ -236,18 +226,8 @@ export function Tablero() {
           </p>
         )}
       </TabsContent>
-      <TabsContent value="recursos" className="min-h-0">
-        <Recursos
-          recursos={recs.datos}
-          incidentes={incs}
-          nodo={activa}
-          quien={coordinador}
-          ahora={ahora}
-          onCambio={() => {
-            recs.refrescar()
-            refrescar()
-          }}
-        />
+      <TabsContent value="boletin" className="min-h-0">
+        <Boletin incidentes={incs} barrio={barrio} quien={coordinador} />
       </TabsContent>
       <TabsContent value="rechazados" className="min-h-0">
         <Rechazados lista={rech.datos} ahora={ahora} />
@@ -317,7 +297,7 @@ export function Tablero() {
               [
                 ["cola", "Cola"],
                 ["mapa", "Mapa"],
-                ["panel", vista === "incidente" ? "Incidente" : vista === "recursos" ? "Recursos" : "Incompletos"],
+                ["panel", NOMBRE_VISTA[vista]],
               ] as const
             ).map(([z, etiqueta]) => (
               <button
@@ -337,7 +317,6 @@ export function Tablero() {
         </>
       )}
 
-      <FranjaRecursos recursos={recs.datos} onAbrir={abrirRecursos} />
     </div>
   )
 }

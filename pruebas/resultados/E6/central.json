@@ -1,0 +1,30 @@
+{
+ "jev": "ok",
+ "modos": {
+  "formulario_neutro": {
+   "enviados": 100,
+   "priorizados": 100,
+   "disponibilidad": 1.0,
+   "segundos_hasta_priorizar_todos": 20.3,
+   "exactas": 60,
+   "subtriaje": 28,
+   "sobretriaje": 12,
+   "recall_p1": 1.0,
+   "p1_subestimados": [],
+   "bajados_respecto_al_celular": []
+  },
+  "prioridad_del_celular": {
+   "enviados": 100,
+   "priorizados": 100,
+   "disponibilidad": 1.0,
+   "segundos_hasta_priorizar_todos": 18.5,
+   "exactas": 62,
+   "subtriaje": 7,
+   "sobretriaje": 31,
+   "recall_p1": 1.0,
+   "p1_subestimados": [],
+   "bajados_respecto_al_celular": []
+  }
+ },
+ "cumple": true
+}

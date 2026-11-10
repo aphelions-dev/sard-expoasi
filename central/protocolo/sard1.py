@@ -8,7 +8,7 @@ import re
 from dataclasses import dataclass, field
 
 PRIORIDADES = ("P1", "P2", "P3", "P4")
-TIPOS = ("ATRAP", "MEDIC", "FUEGO", "VIA", "DESAP", "OTRO")
+TIPOS = ("ATRAP", "MEDIC", "FUEGO", "DESLIZ", "INUND", "GAS", "VIA", "DESAP", "OTRO")
 N_CAMPOS = 9
 NOMBRES = ("id", "prioridad", "tipo", "personas", "banderas", "geohash", "hora_unix", "texto")
 
